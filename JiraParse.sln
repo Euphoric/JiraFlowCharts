@@ -5,11 +5,11 @@ VisualStudioVersion = 16.0.29215.179
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Jira.FlowCharts", "Jira.FlowCharts\Jira.FlowCharts.csproj", "{9F062E64-7707-4552-9955-49927D7E2715}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Jira.Querying.Test", "Jira.Querying.Test\Jira.Querying.Test.csproj", "{62A5ECD8-68AC-4CE6-9A15-B4F2752DFD8F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Jira.Querying.Test", "Jira.Querying.Test\Jira.Querying.Test.csproj", "{62A5ECD8-68AC-4CE6-9A15-B4F2752DFD8F}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Jira.Querying", "Jira.Querying\Jira.Querying.csproj", "{5E684A18-CAC5-460B-9E5A-810C48F09BF6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Jira.Querying.Console", "Jira.Querying.Console\Jira.Querying.Console.csproj", "{CB9B62E5-B57F-4A8E-9B8C-E7FAC3A28D16}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Jira.Querying.Console", "Jira.Querying.Console\Jira.Querying.Console.csproj", "{CB9B62E5-B57F-4A8E-9B8C-E7FAC3A28D16}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

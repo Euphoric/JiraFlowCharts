@@ -5,10 +5,8 @@
     <TargetFramework>netcoreapp2.1</TargetFramework>
     <LangVersion>7.3</LangVersion>
     <UserSecretsId>7126178a-1563-41ce-a8ba-574975157f7e</UserSecretsId>
+    <RootNamespace>Jira.Querying</RootNamespace>
   </PropertyGroup>
-  <ItemGroup>
-    <DotNetCliToolReference Include="Microsoft.Extensions.SecretManager.Tools" Version="2.0.2" />
-  </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Atlassian.SDK" Version="10.6.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="2.1.1" />
