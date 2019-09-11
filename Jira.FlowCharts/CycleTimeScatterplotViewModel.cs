@@ -29,7 +29,7 @@ namespace Jira.FlowCharts
         public double Percentile50 { get; }
         public double Percentile70 { get; }
         public double Percentile85 { get; }
-        public double Percentile99 { get; }
+        public double Percentile95 { get; }
 
         public Func<ChartPoint, string> LabelPoint { get; }
 
@@ -69,7 +69,7 @@ namespace Jira.FlowCharts
             Percentile50 = durations[(int)(durations.Length * 0.50)];
             Percentile70 = durations[(int)(durations.Length * 0.70)];
             Percentile85 = durations[(int)(durations.Length * 0.85)];
-            Percentile99 = durations[(int)(durations.Length * 0.99)];
+            Percentile95 = durations[(int)(durations.Length * 0.95)];
 
             LabelPoint = x => IssuePointLabel((IssuePoint) x.Instance);
             Formatter = x => (baseDate + TimeSpan.FromDays(x)).ToString("d/M/yy", CultureInfo.InvariantCulture);

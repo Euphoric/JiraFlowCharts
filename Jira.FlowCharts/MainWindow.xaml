@@ -34,7 +34,7 @@
                                          Stroke="Black" 
                                          StrokeDashArray="5,10"
                                          StrokeThickness="1"/>
-                                <lvc:AxisSection Value="{Binding Percentile99}" 
+                                <lvc:AxisSection Value="{Binding Percentile95}" 
                                          Stroke="Black" 
                                          StrokeDashArray="5,10"
                                          StrokeThickness="1"/>
@@ -55,7 +55,7 @@
                  50%: <Run Text="{Binding Percentile50, Mode=OneWay, StringFormat=N1}" /> days,
                  70%: <Run Text="{Binding Percentile70, Mode=OneWay, StringFormat=N1}" /> days,
                  85%: <Run Text="{Binding Percentile85, Mode=OneWay, StringFormat=N1}" /> days,
-                 99%: <Run Text="{Binding Percentile99, Mode=OneWay, StringFormat=N1}" /> days.
+                 95%: <Run Text="{Binding Percentile95, Mode=OneWay, StringFormat=N1}" /> days.
                     </TextBlock>
                 </StackPanel>
             </Grid>
