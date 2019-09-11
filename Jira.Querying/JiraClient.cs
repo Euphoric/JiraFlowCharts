@@ -15,26 +15,30 @@ namespace Jira.Querying
             _jiraRestClient = Atlassian.Jira.Jira.CreateRestClient(site, username, password);
         }
 
-        public async Task<IJiraIssue[]> GetIssues(string projectName, DateTime lastUpdated, int takeCount, int skipCount)
+        public Task<IJiraIssue[]> GetIssues(string projectName, DateTime lastUpdated, int takeCount, int skipCount)
         {
             // JIRA is only sensitive to the minute, so seconds are ignored
 
-            // use LINQ syntax to retrieve issues
-            var issuesQuery = from i in _jiraRestClient.Issues.Queryable
-                                     where i.Project == projectName && i.Updated > lastUpdated
-                                     orderby i.Updated
-                                     select i;
-
-            var issues =
-                issuesQuery
+            var issues = _jiraRestClient.Issues.Queryable
+                .Where(i => i.Project == projectName && i.Updated > lastUpdated)
+                .OrderBy(i => i.Updated)
+                .ThenBy(i => i.Key)
                 .Skip(skipCount)
                 .Take(takeCount)
-                .ToArray()
+                .ToArray();
+
+            Console.WriteLine($"Retrieved {issues.Length} issues.");
+            if (issues.Length > 0)
+            {
+                Console.WriteLine($"Issues last update time from {issues.Min(x=>x.Updated)} to {issues.Max(x=>x.Updated)}");
+            }
+
+            var innerIssues =
+                issues
                 .Select(iss=>new InnerJiraIssue(iss))
                 .ToArray();
-                ;
 
-            return issues;
+            return Task.FromResult<IJiraIssue[]>(innerIssues);
         }
 
         private class InnerJiraIssue : IJiraIssue
@@ -70,7 +74,11 @@ namespace Jira.Querying
             string storyPointsStr = issue.CustomFields.SingleOrDefault(x => x.Name == "Story Points")?.Values
                 ?.SingleOrDefault();
 
-            int? storyPoints = storyPointsStr == null ? 0 : int.Parse(storyPointsStr);
+            int? storyPoints = null;
+            if (storyPointsStr != null && int.TryParse(storyPointsStr, out var storyPointInt))
+            {
+                storyPoints = storyPointInt;
+            }
 
             return new FlatIssue()
             {
