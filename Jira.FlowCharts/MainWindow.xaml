@@ -75,7 +75,7 @@
             </lvc:CartesianChart>
         </TabItem>
         <TabItem Header="Story point vs. cycle time" x:Name="StoryPointCycleTime">
-            <lvc:CartesianChart Series="{Binding SeriesCollection}">
+            <lvc:CartesianChart Series="{Binding SeriesCollection}" LegendLocation="Bottom">
                 <lvc:CartesianChart.AxisX>
                     <lvc:Axis Labels="{Binding Labels}"/>
                 </lvc:CartesianChart.AxisX>

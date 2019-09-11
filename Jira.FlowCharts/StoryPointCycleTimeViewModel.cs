@@ -43,12 +43,21 @@ namespace Jira.FlowCharts
                         new ChartValues<OhlcPoint>(
                             storyPointGrouped
                                 .Select(grp => new OhlcPoint(grp.Percentile25, grp.Max, grp.Min, grp.Percentile75))
-                                .ToArray())
+                                .ToArray()),
+                    Title = "Cycle times"
                 },
                 new LineSeries
                 {
-                    Values = new ChartValues<double>(storyPointGrouped.Select(x=>(double)x.Median)),
-                    Fill = Brushes.Transparent
+                    Values = new ChartValues<double>(storyPointGrouped.Select(x=>(double)x.Average)),
+                    Fill = Brushes.Transparent,
+                    Title = "Average cycle time"
+                }
+                ,
+                new LineSeries
+                {
+                    Values = new ChartValues<double>(storyPointGrouped.Select(x=>(double)x.Count)),
+                    Fill = Brushes.Transparent,
+                    Title = "Issue count"
                 }
             };
 
