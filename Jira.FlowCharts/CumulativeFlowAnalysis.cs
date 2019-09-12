@@ -39,31 +39,42 @@ namespace Jira.FlowCharts
             return stateRanges;
         }
 
-        public CumulativeFlowAnalysis(IEnumerable<FlatIssue> stories)
+        public CumulativeFlowAnalysis(IEnumerable<FlatIssue> stories, string[] states)
         {
-            var mergedChanges =
-                stories.SelectMany(st => ChangeRanges(st.StatusChanges).Select(sc => new { story = st, change = sc }))
-                .ToArray();
+            // TODO : Order by date
+            // TODO : Follow correct order of states
 
-            //DateTime to = mergedChanges.Max(x => x.change.ChangeTime);
-            //DateTime from = to.AddYears(-1);
+            States = states;
+            var stateIxs = States.Select((x, i) => new { i, x }).ToDictionary(x => x.x, x => x.i);
 
-            //DateTime current = from;
+            List<ChangePoint> changes = new List<ChangePoint>();
+            int[] statesCounter = new int[States.Length];
+            var groupedStories = 
+                stories
+                .SelectMany(x => x.StatusChanges)
+                .Where(st => stateIxs.ContainsKey(st.State))
+                .GroupBy(x => x.ChangeTime.Date);
 
-            //List<ChangePoint> changePoints = new List<ChangePoint>();
+            foreach (var grp in groupedStories)
+            {
+                foreach (var item in grp)
+                {
+                    if (!stateIxs.ContainsKey(item.State))
+                        continue;
 
-            //for (; current <= to; current += TimeSpan.FromDays(1))
-            //{
-            //    var changePoint = new ChangePoint();
-            //    changePoint.Time = current;
+                    var stateIx = stateIxs[item.State];
+                    statesCounter[stateIx]++;
 
+                    if (stateIx > 0)
+                        statesCounter[stateIx - 1]--;
+                }
 
-            //    changePoints.Add(changePoint);
-            //}
+                var cp = new ChangePoint() { Date = grp.Key, StateCounts = statesCounter.ToArray() };
 
-            States = stories.SelectMany(x => x.StatusChanges).Select(x => x.State).Distinct().ToArray();
+                changes.Add(cp);
+            }
 
-            Changes = stories.SelectMany(x => x.StatusChanges).Select((q, i) => new ChangePoint() { Date = q.ChangeTime, StateCounts = new int[] { i + 1 } }).ToArray();
+            Changes = changes.ToArray();
         }
     }
 }

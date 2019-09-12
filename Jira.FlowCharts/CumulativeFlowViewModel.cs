@@ -10,79 +10,38 @@ namespace Jira.FlowCharts
 
     public class CumulativeFlowViewModel
     {
-        private FlatIssue[] stories;
-
         public CumulativeFlowViewModel(IEnumerable<FlatIssue> stories)
         {
-            this.stories = stories.ToArray();
+            stories = stories.Where(x => x.Status != "Withdrawn" && x.Status != "On Hold" && x.Resolution != "Duplicate");
 
-            SeriesCollection = new SeriesCollection
+            var states = new[] { "In Dev", "In QA", "Done" };
+            var currentStatus = stories.Select(x => x.Status).Distinct().ToArray();
+            var currentResolution = stories.Select(x => x.Resolution).Distinct().ToArray();
+            var allStates = stories.SelectMany(x => x.StatusChanges).Select(x => x.State).Distinct().ToArray();
+
+            var cfa = new CumulativeFlowAnalysis(stories, states);
+
+            var qqq = cfa.Changes;
+
+            SeriesCollection = new SeriesCollection();
+
+            foreach (var state in cfa.States)
             {
-                new StackedAreaSeries
+                SeriesCollection.Add(new StackedAreaSeries
                 {
-                    Title = "Africa",
-                    Values = new ChartValues<DateTimePoint>
-                    {
-                        new DateTimePoint(new DateTime(1950, 1, 1), .228),
-                        new DateTimePoint(new DateTime(1960, 1, 1), .285),
-                        new DateTimePoint(new DateTime(1970, 1, 1), .366),
-                        new DateTimePoint(new DateTime(1980, 1, 1), .478),
-                        new DateTimePoint(new DateTime(1990, 1, 1), .629),
-                        new DateTimePoint(new DateTime(2000, 1, 1), .808),
-                        new DateTimePoint(new DateTime(2010, 1, 1), 1.031),
-                        new DateTimePoint(new DateTime(2013, 1, 1), 1.110)
-                    },
+                    Title = state,
+                    Values = new ChartValues<DateTimePoint>(),
                     LineSmoothness = 0
-                },
-                new StackedAreaSeries
+                });
+            }
+
+            foreach (var change in cfa.Changes)
+            {
+                for (int i = 0; i < cfa.States.Length; i++)
                 {
-                    Title = "N & S America",
-                    Values = new ChartValues<DateTimePoint>
-                    {
-                        new DateTimePoint(new DateTime(1950, 1, 1), .339),
-                        new DateTimePoint(new DateTime(1960, 1, 1), .424),
-                        new DateTimePoint(new DateTime(1970, 1, 1), .519),
-                        new DateTimePoint(new DateTime(1980, 1, 1), .618),
-                        new DateTimePoint(new DateTime(1990, 1, 1), .727),
-                        new DateTimePoint(new DateTime(2000, 1, 1), .841),
-                        new DateTimePoint(new DateTime(2010, 1, 1), .942),
-                        new DateTimePoint(new DateTime(2013, 1, 1), .972)
-                    },
-                    LineSmoothness = 0
-                },
-                new StackedAreaSeries
-                {
-                    Title = "Asia",
-                    Values = new ChartValues<DateTimePoint>
-                    {
-                        new DateTimePoint(new DateTime(1950, 1, 1), 1.395),
-                        new DateTimePoint(new DateTime(1960, 1, 1), 1.694),
-                        new DateTimePoint(new DateTime(1970, 1, 1), 2.128),
-                        new DateTimePoint(new DateTime(1980, 1, 1), 2.634),
-                        new DateTimePoint(new DateTime(1990, 1, 1), 3.213),
-                        new DateTimePoint(new DateTime(2000, 1, 1), 3.717),
-                        new DateTimePoint(new DateTime(2010, 1, 1), 4.165),
-                        new DateTimePoint(new DateTime(2013, 1, 1), 4.298)
-                    },
-                    LineSmoothness = 0
-                },
-                new StackedAreaSeries
-                {
-                    Title = "Europe",
-                    Values = new ChartValues<DateTimePoint>
-                    {
-                        new DateTimePoint(new DateTime(1950, 1, 1), .549),
-                        new DateTimePoint(new DateTime(1960, 1, 1), .605),
-                        new DateTimePoint(new DateTime(1970, 1, 1), .657),
-                        new DateTimePoint(new DateTime(1980, 1, 1), .694),
-                        new DateTimePoint(new DateTime(1990, 1, 1), .723),
-                        new DateTimePoint(new DateTime(2000, 1, 1), .729),
-                        new DateTimePoint(new DateTime(2010, 1, 1), .740),
-                        new DateTimePoint(new DateTime(2013, 1, 1), .742)
-                    },
-                    LineSmoothness = 0
+                    SeriesCollection[i].Values.Add(new DateTimePoint(change.Date, change.StateCounts[i]));
                 }
-            };
+            }
 
             XFormatter = val => new DateTime((long)val).ToString("yyyy");
             YFormatter = val => val.ToString("N") + " M";
