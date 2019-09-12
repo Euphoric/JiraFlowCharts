@@ -45,7 +45,7 @@ namespace JiraParse
             var updatedIssues = jiraLocalCache.Issues;
 
             // serialize JSON directly to a file
-            using (StreamWriter file = File.CreateText(@"issues.json"))
+            using (StreamWriter file = File.CreateText(@"../../../Data/issues.json"))
             {
                 JsonSerializer serializer = new JsonSerializer();
                 serializer.Serialize(file, updatedIssues);

@@ -82,7 +82,7 @@ namespace Jira.FlowCharts
 
         private static List<FlatIssue> RetrieveIssues()
         {
-            using (StreamReader r = new StreamReader("issues.json"))
+            using (StreamReader r = new StreamReader("../../../Data/issues.json"))
             using (JsonReader jr = new JsonTextReader(r))
             {
                 JsonSerializer serializer = new JsonSerializer();
