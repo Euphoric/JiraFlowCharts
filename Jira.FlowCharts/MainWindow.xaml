@@ -81,5 +81,16 @@
                 </lvc:CartesianChart.AxisX>
             </lvc:CartesianChart>
         </TabItem>
+        <TabItem Header="Cumulative flow" x:Name="CumulativeFlow" Visibility="Hidden">
+            <lvc:CartesianChart Series="{Binding SeriesCollection}"  LegendLocation="Right">
+                <lvc:CartesianChart.AxisX>
+                    <lvc:Axis Title="Year" LabelFormatter="{Binding XFormatter}"></lvc:Axis>
+                </lvc:CartesianChart.AxisX>
+                <lvc:CartesianChart.AxisY>
+                    <lvc:Axis Title="Population" LabelFormatter="{Binding YFormatter}"></lvc:Axis>
+                </lvc:CartesianChart.AxisY>
+            </lvc:CartesianChart>
+        </TabItem>
+
     </TabControl>
 </Window>

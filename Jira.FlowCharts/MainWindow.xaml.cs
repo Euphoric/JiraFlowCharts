@@ -44,18 +44,18 @@ namespace Jira.FlowCharts
 
             DateTime startDate = DateTime.Now.AddMonths(-12);
 
-            var allTypes = issues.Select(x => x.Type).Distinct().ToArray();
+            var stories = issues.Where(x => x.Type == "Story" || x.Type == "Bug");
 
-            var stories = issues
-                .Where(x=>x.Type == "Story" || x.Type == "Bug")
+            var finishedStories = stories
                 .Where(x=>x.Resolution != "Cancelled" && x.Status == "Done")
                 .Select(CalculateDuration)
                 .Where(x=>x.Duration.HasValue && x.Duration.Value < 80)
                 .Where(x=>x.End > startDate).ToArray();
 
-            CycleTimeScatterplotTab.DataContext = new CycleTimeScatterplotViewModel(stories);
-            CycleTimeHistogram.DataContext = new CycleTimeHistogramViewModel(stories);
-            StoryPointCycleTime.DataContext = new StoryPointCycleTimeViewModel(stories);
+            CycleTimeScatterplotTab.DataContext = new CycleTimeScatterplotViewModel(finishedStories);
+            CycleTimeHistogram.DataContext = new CycleTimeHistogramViewModel(finishedStories);
+            StoryPointCycleTime.DataContext = new StoryPointCycleTimeViewModel(finishedStories);
+            //CumulativeFlow.DataContext = new CumulativeFlowViewModel(stories);
         }
 
         private static FlowIssue CalculateDuration(FlatIssue issue)
