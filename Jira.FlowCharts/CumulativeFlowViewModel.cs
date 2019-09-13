@@ -14,12 +14,14 @@ namespace Jira.FlowCharts
         {
             stories = stories.Where(x => x.Status != "Withdrawn" && x.Status != "On Hold" && x.Resolution != "Duplicate");
 
-            var states = new[] { "In Dev", "In QA", "Done" };
+            var states = new[] { "Ready For Dev", "In Dev", "Ready for Peer Review", "Ready for QA", "In QA", "Ready for Done", "Done" };
             var currentStatus = stories.Select(x => x.Status).Distinct().ToArray();
             var currentResolution = stories.Select(x => x.Resolution).Distinct().ToArray();
             var allStates = stories.SelectMany(x => x.StatusChanges).Select(x => x.State).Distinct().ToArray();
 
-            var cfa = new CumulativeFlowAnalysis(stories, states);
+            var fromDate = DateTime.Now.AddMonths(-3);
+
+            var cfa = new CumulativeFlowAnalysis(stories, states, fromDate);
 
             var qqq = cfa.Changes;
 
@@ -35,6 +37,8 @@ namespace Jira.FlowCharts
                 });
             }
 
+            
+
             foreach (var change in cfa.Changes)
             {
                 for (int i = 0; i < cfa.States.Length; i++)
@@ -43,12 +47,10 @@ namespace Jira.FlowCharts
                 }
             }
 
-            XFormatter = val => new DateTime((long)val).ToString("yyyy");
-            YFormatter = val => val.ToString("N") + " M";
+            XFormatter = val => new DateTime((long)val).ToShortDateString();
         }
 
         public SeriesCollection SeriesCollection { get; private set; }
         public Func<double, string> XFormatter { get; private set; }
-        public Func<double, string> YFormatter { get; private set; }
     }
 }

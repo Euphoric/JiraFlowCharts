@@ -39,7 +39,7 @@ namespace Jira.FlowCharts
             return stateRanges;
         }
 
-        public CumulativeFlowAnalysis(IEnumerable<FlatIssue> stories, string[] states)
+        public CumulativeFlowAnalysis(IEnumerable<FlatIssue> stories, string[] states, DateTime? from = null)
         {
             // TODO : Follow correct order of states
             // TODO : Last state should be taken from last occurence of change
@@ -83,7 +83,43 @@ namespace Jira.FlowCharts
                 changes.Add(cp);
             }
 
-            Changes = changes.ToArray();
+            IEnumerable<ChangePoint> changesFiltered = changes;
+
+            if (from != null)
+            {
+                changesFiltered = FilterChanges(changesFiltered, from.Value);
+            }
+
+            Changes = changesFiltered.ToArray();
+        }
+
+        private static IEnumerable<ChangePoint> FilterChanges(IEnumerable<ChangePoint> changesFiltered, DateTime fromValue)
+        {
+            ChangePoint previousChange = null;
+            int? baseDoneStateCount = null;
+            foreach (var change in changesFiltered)
+            {
+                if (change.Date >= fromValue)
+                {
+                    if (baseDoneStateCount == null)
+                    {
+                        if (previousChange == null)
+                        {
+                            baseDoneStateCount = 0;
+                        }
+                        else
+                        {
+                            baseDoneStateCount = previousChange.StateCounts[0];
+                        }
+                    }
+
+                    change.StateCounts[0] -= baseDoneStateCount.Value;
+
+                    yield return change;
+                }
+
+                previousChange = change;
+            }
         }
 
         private IEnumerable<FlatIssueStatusChange> FilterStatusChanges(IEnumerable<FlatIssueStatusChange> statusChanges)

@@ -281,5 +281,50 @@ namespace Jira.FlowCharts.Test
             Assert.Equal(new DateTime(2010, 07, 06), skippedDevChange.Date);
             Assert.Equal(new int[] { 1, 2, 1 }, skippedDevChange.StateCounts);
         }
+
+        [Fact]
+        public void From_date_filter_results_in_empty_changes()
+        {
+            var builder = new FlatIssueBuilder();
+            builder.UpdateIssue(1, DevState);
+            CumulativeFlowAnalysis cfa = new CumulativeFlowAnalysis(builder.BuildIssues(), new[] { DevState, QaState, DoneState }, new DateTime(2010, 07, 06));
+            Assert.Empty(cfa.Changes);
+        }
+
+        [Theory]
+        [InlineData(2)]
+        [InlineData(3)]
+        public void From_date_shows_only_changes_from_given_date(int offsetDays)
+        {
+            var builder = new FlatIssueBuilder();
+            builder.UpdateIssue(1, DevState);
+            builder.ForwardTime(TimeSpan.FromDays(offsetDays));
+            builder.UpdateIssue(2, DevState);
+            CumulativeFlowAnalysis cfa = new CumulativeFlowAnalysis(builder.BuildIssues(), new[] { DevState, QaState, DoneState }, new DateTime(2010, 07, 05));
+
+            var change = Assert.Single(cfa.Changes);
+            Assert.Equal(new DateTime(2010, 07, 03+offsetDays), change.Date);
+            Assert.Equal(new int[] { 0, 0, 2 }, change.StateCounts);
+        }
+
+        [Theory]
+        [InlineData(0)]
+        [InlineData(1)]
+        [InlineData(5)]
+        public void Done_issues_before_from_date_are_ignored(int doneStatesBefore)
+        {
+            var builder = new FlatIssueBuilder();
+            for (int i = 0; i < doneStatesBefore; i++)
+            {
+                builder.UpdateIssue(i, DoneState);
+            }
+            builder.ForwardTime(TimeSpan.FromDays(3));
+            builder.UpdateIssue(100, DoneState);
+            CumulativeFlowAnalysis cfa = new CumulativeFlowAnalysis(builder.BuildIssues(), new[] { DevState, QaState, DoneState }, new DateTime(2010, 07, 05));
+
+            var change = Assert.Single(cfa.Changes);
+            Assert.Equal(new DateTime(2010, 07, 06), change.Date);
+            Assert.Equal(new int[] { 1, 0, 0 }, change.StateCounts);
+        }
     }
 }
