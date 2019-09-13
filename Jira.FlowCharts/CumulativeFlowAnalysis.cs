@@ -43,7 +43,7 @@ namespace Jira.FlowCharts
         {
             // TODO : Follow correct order of states
 
-            States = states;
+            States = states.Reverse().ToArray();
             var stateIxs = States.Select((x, i) => new { i, x }).ToDictionary(x => x.x, x => x.i);
 
             List<ChangePoint> changes = new List<ChangePoint>();
@@ -65,8 +65,8 @@ namespace Jira.FlowCharts
                     var stateIx = stateIxs[item.State];
                     statesCounter[stateIx]++;
 
-                    if (stateIx > 0)
-                        statesCounter[stateIx - 1]--;
+                    if (stateIx < states.Length-1)
+                        statesCounter[stateIx + 1]--;
                 }
 
                 var cp = new ChangePoint() { Date = grp.Key, StateCounts = statesCounter.ToArray() };

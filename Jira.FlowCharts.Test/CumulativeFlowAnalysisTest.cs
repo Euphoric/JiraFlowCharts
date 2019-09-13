@@ -48,7 +48,7 @@ namespace Jira.FlowCharts.Test
             var builder = new FlatIssueBuilder();
             CumulativeFlowAnalysis cfa = new CumulativeFlowAnalysis(builder.BuildIssues(), new []{ DevState, QaState });
             Assert.Empty(cfa.Changes);
-            Assert.Equal(new[] { DevState, QaState }, cfa.States);
+            Assert.Equal(new[] { QaState, DevState }, cfa.States);
         }
 
         [Fact]
@@ -106,17 +106,17 @@ namespace Jira.FlowCharts.Test
             builder.UpdateIssue(1, QaState);
             CumulativeFlowAnalysis cfa = new CumulativeFlowAnalysis(builder.BuildIssues(), new[] { DevState, QaState });
 
-            Assert.Equal(new[] { DevState, QaState }, cfa.States);
+            Assert.Equal(new[] { QaState, DevState }, cfa.States);
 
             Assert.Equal(2, cfa.Changes.Length);
 
             var firstChange = cfa.Changes[0];
             Assert.Equal(new DateTime(2010, 07, 03), firstChange.Date);
-            Assert.Equal(new int[] { 1, 0 }, firstChange.StateCounts);
+            Assert.Equal(new int[] { 0, 1 }, firstChange.StateCounts);
 
             var secondChange = cfa.Changes[1];
             Assert.Equal(new DateTime(2010, 07, 04), secondChange.Date);
-            Assert.Equal(new int[] { 0, 1 }, secondChange.StateCounts);
+            Assert.Equal(new int[] { 1, 0 }, secondChange.StateCounts);
         }
 
         [Fact]
