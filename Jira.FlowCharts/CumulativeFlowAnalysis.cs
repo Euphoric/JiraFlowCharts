@@ -41,7 +41,6 @@ namespace Jira.FlowCharts
 
         public CumulativeFlowAnalysis(IEnumerable<FlatIssue> stories, string[] states)
         {
-            // TODO : Order by date
             // TODO : Follow correct order of states
 
             States = states;
@@ -53,7 +52,8 @@ namespace Jira.FlowCharts
                 stories
                 .SelectMany(x => x.StatusChanges)
                 .Where(st => stateIxs.ContainsKey(st.State))
-                .GroupBy(x => x.ChangeTime.Date);
+                .GroupBy(x => x.ChangeTime.Date)
+                .OrderBy(x=>x.Key);
 
             foreach (var grp in groupedStories)
             {

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using Xunit;
 
 namespace Jira.FlowCharts.Test
@@ -164,6 +165,29 @@ namespace Jira.FlowCharts.Test
             CumulativeFlowAnalysis cfa = new CumulativeFlowAnalysis(builder.BuildIssues(), new[] { QaState });
 
             Assert.Empty(cfa.Changes);
+        }
+
+        [Fact]
+        public void Changes_are_ordered_by_date()
+        {
+            var builder = new FlatIssueBuilder();
+            builder.UpdateIssue(1, DevState);
+            builder.ForwardTime(TimeSpan.FromDays(1));
+            builder.UpdateIssue(2, DevState);
+            builder.ForwardTime(TimeSpan.FromDays(1));
+            builder.UpdateIssue(1, QaState);
+            builder.ForwardTime(TimeSpan.FromDays(1));
+            builder.UpdateIssue(2, QaState);
+            builder.ForwardTime(TimeSpan.FromDays(1));
+            builder.UpdateIssue(1, QaState);
+            builder.ForwardTime(TimeSpan.FromDays(1));
+            CumulativeFlowAnalysis cfa = new CumulativeFlowAnalysis(builder.BuildIssues(), new[] { DevState, QaState });
+
+            Assert.Equal(5, cfa.Changes.Length);
+
+            var dates = cfa.Changes.Select(x => x.Date).ToArray();
+
+            Assert.Equal(dates.OrderBy(x => x), dates);
         }
     }
 }
