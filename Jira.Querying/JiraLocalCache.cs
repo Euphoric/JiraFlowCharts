@@ -57,13 +57,5 @@ namespace Jira.Querying
 
             Issues.Add(flatIssue);
         }
-
-        private static DateTime? WithoutSeconds(DateTime? dateTime)
-        {
-            if (!dateTime.HasValue)
-                return null;
-            var d = dateTime.Value;
-            return new DateTime(d.Year, d.Month, d.Day, d.Hour, d.Minute, 0);
-        }
     }
 }
