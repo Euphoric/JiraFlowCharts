@@ -1,4 +1,5 @@
-﻿using LiveCharts;
+﻿using Jira.Querying;
+using LiveCharts;
 using LiveCharts.Defaults;
 using LiveCharts.Wpf;
 using System;
@@ -10,7 +11,7 @@ namespace Jira.FlowCharts
 
     public class CumulativeFlowViewModel
     {
-        public CumulativeFlowViewModel(IEnumerable<FlatIssue> stories)
+        public CumulativeFlowViewModel(IEnumerable<CachedIssue> stories)
         {
             stories = stories.Where(x => x.Status != "Withdrawn" && x.Status != "On Hold" && x.Resolution != "Duplicate");
 

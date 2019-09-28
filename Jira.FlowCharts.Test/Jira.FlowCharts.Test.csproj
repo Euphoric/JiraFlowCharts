@@ -74,6 +74,10 @@
       <Project>{9f062e64-7707-4552-9955-49927d7e2715}</Project>
       <Name>Jira.FlowCharts</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Jira.Querying\Jira.Querying.csproj">
+      <Project>{5E684A18-CAC5-460B-9E5A-810C48F09BF6}</Project>
+      <Name>Jira.Querying</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets" Condition="Exists('$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets')" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -14,6 +14,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Jira.Querying;
 using LiveCharts;
 using LiveCharts.Configurations;
 using Newtonsoft.Json;
@@ -58,7 +59,7 @@ namespace Jira.FlowCharts
             CumulativeFlow.DataContext = new CumulativeFlowViewModel(stories);
         }
 
-        private static FlowIssue CalculateDuration(FlatIssue issue)
+        private static FlowIssue CalculateDuration(CachedIssue issue)
         {
             var startTime = issue.StatusChanges.FirstOrDefault(x=>x.State == "In Dev")?.ChangeTime;
             var doneTime = issue.StatusChanges.LastOrDefault(x=>x.State == "Done")?.ChangeTime;
@@ -80,13 +81,13 @@ namespace Jira.FlowCharts
             return flowIssue;
         }
 
-        private static List<FlatIssue> RetrieveIssues()
+        private static List<CachedIssue> RetrieveIssues()
         {
             using (StreamReader r = new StreamReader("../../../Data/issues.json"))
             using (JsonReader jr = new JsonTextReader(r))
             {
                 JsonSerializer serializer = new JsonSerializer();
-                return serializer.Deserialize<List<FlatIssue>>(jr);
+                return serializer.Deserialize<List<CachedIssue>>(jr);
             }
         }
     }

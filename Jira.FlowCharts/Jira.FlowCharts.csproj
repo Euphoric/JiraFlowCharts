@@ -77,8 +77,6 @@
     </Compile>
     <Compile Include="CycleTimeHistogramViewModel.cs" />
     <Compile Include="CycleTimeScatterplotViewModel.cs" />
-    <Compile Include="FlatIssue.cs" />
-    <Compile Include="FlatIssueStatusChange.cs" />
     <Compile Include="FlowIssue.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
@@ -111,6 +109,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Jira.Querying\Jira.Querying.csproj">
+      <Project>{5e684a18-cac5-460b-9e5a-810c48f09bf6}</Project>
+      <Name>Jira.Querying</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

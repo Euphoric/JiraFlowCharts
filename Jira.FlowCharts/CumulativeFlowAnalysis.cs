@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Jira.Querying;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -32,14 +33,14 @@ namespace Jira.FlowCharts
             }
         }
 
-        private IEnumerable<StateRange> ChangeRanges(Collection<FlatIssueStatusChange> statusChanges)
+        private IEnumerable<StateRange> ChangeRanges(Collection<CachedIssueStatusChange> statusChanges)
         {
             List<StateRange> stateRanges = new List<StateRange>();
 
             return stateRanges;
         }
 
-        public CumulativeFlowAnalysis(IEnumerable<FlatIssue> stories, string[] states, DateTime? from = null)
+        public CumulativeFlowAnalysis(IEnumerable<CachedIssue> stories, string[] states, DateTime? from = null)
         {
             // TODO : Follow correct order of states
             // TODO : Last state should be taken from last occurence of change
@@ -122,7 +123,7 @@ namespace Jira.FlowCharts
             }
         }
 
-        private IEnumerable<FlatIssueStatusChange> FilterStatusChanges(IEnumerable<FlatIssueStatusChange> statusChanges)
+        private IEnumerable<CachedIssueStatusChange> FilterStatusChanges(IEnumerable<CachedIssueStatusChange> statusChanges)
         {
             HashSet<string> foundStates = new HashSet<string>();
             foreach (var change in statusChanges)

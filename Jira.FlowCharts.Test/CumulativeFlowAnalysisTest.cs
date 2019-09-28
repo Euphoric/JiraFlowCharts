@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Jira.Querying;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -10,11 +11,11 @@ namespace Jira.FlowCharts.Test
     {
         private class FlatIssueBuilder
         {
-            Dictionary<int, FlatIssue> issues = new Dictionary<int, FlatIssue>();
+            Dictionary<int, CachedIssue> issues = new Dictionary<int, CachedIssue>();
 
             DateTime currentDateTime = new DateTime(2010, 07, 03);
 
-            internal IEnumerable<FlatIssue> BuildIssues()
+            internal IEnumerable<CachedIssue> BuildIssues()
             {
                 return issues.Values;
             }
@@ -24,13 +25,13 @@ namespace Jira.FlowCharts.Test
                 if (issues.ContainsKey(id))
                     return;
 
-                issues.Add(id, new FlatIssue() { Key = (string)("IS-" + id), StatusChanges = new Collection<FlatIssueStatusChange>() });
+                issues.Add(id, new CachedIssue() { Key = (string)("IS-" + id), StatusChanges = new Collection<CachedIssueStatusChange>() });
             }
 
             internal void UpdateIssue(int id, string state)
             {
                 CreateIssue(id);
-                issues[id].StatusChanges.Add(new FlatIssueStatusChange(currentDateTime, state));
+                issues[id].StatusChanges.Add(new CachedIssueStatusChange(currentDateTime, state));
             }
 
             internal void ForwardTime(TimeSpan time)
