@@ -2,9 +2,9 @@
 
 namespace Jira.Querying
 {
-    public class FlatIssueStatusChange
+    public class CachedIssueStatusChange
     {
-        public FlatIssueStatusChange(DateTime changeTime, string state)
+        public CachedIssueStatusChange(DateTime changeTime, string state)
         {
             ChangeTime = changeTime;
             State = state;

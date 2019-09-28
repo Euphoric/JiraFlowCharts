@@ -6,6 +6,6 @@ namespace Jira.Querying
     public interface IJiraClient
     {
         Task<IJiraIssue[]> GetIssues(string project, DateTime lastUpdated, int count, int skipCount);
-        Task<FlatIssue> RetrieveDetails(IJiraIssue issue);
+        Task<CachedIssue> RetrieveDetails(IJiraIssue issue);
     }
 }

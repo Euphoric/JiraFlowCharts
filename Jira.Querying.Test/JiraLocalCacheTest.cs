@@ -57,10 +57,10 @@ namespace Jira.Querying
             return new DateTime(d.Year, d.Month, d.Day, d.Hour, d.Minute, 0);
         }
 
-        public async Task<FlatIssue> RetrieveDetails(IJiraIssue issue)
+        public async Task<CachedIssue> RetrieveDetails(IJiraIssue issue)
         {
             var fake = (FakeJiraIssue)issue;
-            return new FlatIssue()
+            return new CachedIssue()
             {
                 Key = fake.Key,
                 Created = fake.Created,

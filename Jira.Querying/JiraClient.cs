@@ -53,12 +53,12 @@ namespace Jira.Querying
             public Issue Issue { get; }
         }
 
-        public Task<FlatIssue> RetrieveDetails(IJiraIssue issue)
+        public Task<CachedIssue> RetrieveDetails(IJiraIssue issue)
         {
             return RetrieveTaskData(((InnerJiraIssue)issue).Issue);
         }
 
-        private async Task<FlatIssue> RetrieveTaskData(Issue issue)
+        private async Task<CachedIssue> RetrieveTaskData(Issue issue)
         {
             Console.WriteLine($"Retrieving issue {issue.Key.Value}");
 
@@ -67,7 +67,7 @@ namespace Jira.Querying
                 changeLog
                     .SelectMany(log => log.Items.Select(item => new { log, item }))
                     .Where(x => x.item.FieldName == "status")
-                    .Select(x => new FlatIssueStatusChange(x.log.CreatedDate, x.item.ToValue))
+                    .Select(x => new CachedIssueStatusChange(x.log.CreatedDate, x.item.ToValue))
                     .OrderBy(x => x.ChangeTime)
                     .ToArray();
 
@@ -80,7 +80,7 @@ namespace Jira.Querying
                 storyPoints = storyPointInt;
             }
 
-            return new FlatIssue()
+            return new CachedIssue()
             {
                 Key = issue.Key?.Value,
                 Title = issue.Summary,
@@ -92,7 +92,7 @@ namespace Jira.Querying
                 Resolved = issue.ResolutionDate,
                 OriginalEstimate = issue.TimeTrackingData?.OriginalEstimateInSeconds,
                 TimeSpent = issue.TimeTrackingData?.TimeSpentInSeconds,
-                StatusChanges = new Collection<FlatIssueStatusChange>(statusChanges),
+                StatusChanges = new Collection<CachedIssueStatusChange>(statusChanges),
                 StoryPoints = storyPoints,
             };
         }

@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
-using Atlassian.Jira;
 
 namespace Jira.Querying
 {
@@ -19,7 +18,7 @@ namespace Jira.Querying
             _startUpdateDate = startUpdateDate;
         }
 
-        public Collection<FlatIssue> Issues { get; private set; } = new Collection<FlatIssue>();
+        public Collection<CachedIssue> Issues { get; private set; } = new Collection<CachedIssue>();
 
         public async Task Update()
         {
@@ -34,7 +33,7 @@ namespace Jira.Querying
 
                 foreach (var issue in updatedIssues)
                 {
-                    FlatIssue flatIssue = await _client.RetrieveDetails(issue);
+                    CachedIssue flatIssue = await _client.RetrieveDetails(issue);
 
                     AddOrReplaceCachedIssue(flatIssue);
                 }
@@ -48,7 +47,7 @@ namespace Jira.Querying
             }
         }
 
-        private void AddOrReplaceCachedIssue(FlatIssue flatIssue)
+        private void AddOrReplaceCachedIssue(CachedIssue flatIssue)
         {
             var cachedIssue = Issues.FirstOrDefault(x => x.Key == flatIssue.Key);
             if (cachedIssue != null)

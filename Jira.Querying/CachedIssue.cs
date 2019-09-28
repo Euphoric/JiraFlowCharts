@@ -3,7 +3,7 @@ using System.Collections.ObjectModel;
 
 namespace Jira.Querying
 {
-    public class FlatIssue
+    public class CachedIssue
     {
         public string Key { get; set; }
         public string Title { get; set; }
@@ -16,7 +16,7 @@ namespace Jira.Querying
         public int? OriginalEstimate { get; set; }
         public int? TimeSpent { get; set; }
 
-        public Collection<FlatIssueStatusChange> StatusChanges { get; set; }
+        public Collection<CachedIssueStatusChange> StatusChanges { get; set; }
         public int? StoryPoints { get; set; }
     }
 }
