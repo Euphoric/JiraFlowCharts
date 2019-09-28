@@ -13,6 +13,7 @@ namespace Jira.Querying
             Key = key;
         }
 
+        public DateTime? Created { get; set; }
         public DateTime? Updated { get; set; }
         public string Key { get; set; }
     }
@@ -62,13 +63,22 @@ namespace Jira.Querying
             return new FlatIssue()
             {
                 Key = fake.Key,
+                Created = fake.Created,
                 Updated = fake.Updated
             };
         }
 
         internal void UpdateIssue(string key, TimeSpan? step = null)
         {
-            Issues.Add(new FakeJiraIssue(key) { Updated = _currentDateTime });
+            var existingIssue = Issues.FirstOrDefault(x => x.Key == key);
+            if (existingIssue == null)
+            {
+                Issues.Add(new FakeJiraIssue(key) { Created = _currentDateTime, Updated = _currentDateTime });
+            }
+            else
+            {
+                existingIssue.Updated = _currentDateTime;
+            }
             _currentDateTime = _currentDateTime.Add(step ?? TimeSpan.FromDays(1));
         }
     }
@@ -211,6 +221,27 @@ namespace Jira.Querying
             var cachedKeys = cache.Issues.Select(x => x.Key).ToArray();
 
             Assert.Equal(Enumerable.Range(0, issueCount).Select(i => "KEY-" + i), cachedKeys);
+        }
+
+        [Fact]
+        public async Task Updates_issue_in_cache_when_it_was_updated_in_client1()
+        {
+            var client = new FakeJiraClient(new DateTime(2019, 1, 1));
+            JiraLocalCache cache = new JiraLocalCache(client, new DateTime(2018, 1, 1));
+
+            client.UpdateIssue("KEY-1");
+            
+            await cache.Update();
+
+            client.UpdateIssue("KEY-1");
+
+            await cache.Update();
+
+            var cachedIssue = Assert.Single(cache.Issues);
+
+            Assert.Equal("KEY-1", cachedIssue.Key);
+            Assert.Equal(new DateTime(2019, 1, 1), cachedIssue.Created);
+            Assert.Equal(new DateTime(2019, 1, 2), cachedIssue.Updated);
         }
     }
 }

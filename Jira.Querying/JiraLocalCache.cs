@@ -30,25 +30,33 @@ namespace Jira.Querying
             {
                 const int QueryLimit = 50;
 
-                IJiraIssue[] issues = await _client.GetIssues(projectName, _startUpdateDate, QueryLimit, itemPaging);
+                IJiraIssue[] updatedIssues = await _client.GetIssues(projectName, _startUpdateDate, QueryLimit, itemPaging);
 
-                foreach (var issue in issues)
+                foreach (var issue in updatedIssues)
                 {
                     FlatIssue flatIssue = await _client.RetrieveDetails(issue);
 
-                    if (Issues.Any(x => x.Key == flatIssue.Key))
-                        continue;
-
-                    Issues.Add(flatIssue);
+                    AddOrReplaceCachedIssue(flatIssue);
                 }
 
                 itemPaging += QueryLimit;
 
-                if (issues.Length != QueryLimit)
+                if (updatedIssues.Length != QueryLimit)
                 {
                     break;
                 }
             }
+        }
+
+        private void AddOrReplaceCachedIssue(FlatIssue flatIssue)
+        {
+            var cachedIssue = Issues.FirstOrDefault(x => x.Key == flatIssue.Key);
+            if (cachedIssue != null)
+            {
+                Issues.Remove(cachedIssue);
+            }
+
+            Issues.Add(flatIssue);
         }
 
         private static DateTime? WithoutSeconds(DateTime? dateTime)
