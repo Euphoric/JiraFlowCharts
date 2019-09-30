@@ -41,10 +41,9 @@ namespace Jira.Querying
         private readonly IRepository _repository;
 
         private DateTime? _startUpdateDate;
-        public JiraLocalCache(IJiraClient client, DateTime? startUpdateDate = null)
+        public JiraLocalCache(IJiraClient client)
         {
             _client = client;
-            _startUpdateDate = startUpdateDate;
             _repository = new InMemoryRepository();
         }
 
