@@ -29,7 +29,7 @@ namespace Jira.Querying
 
         }
 
-        public FakeJiraClient(DateTime dateTime)
+        private FakeJiraClient(DateTime dateTime)
         {
             _currentDateTime = dateTime;
         }
@@ -86,12 +86,17 @@ namespace Jira.Querying
     
     public class JiraLocalCacheTest
     {
+        private readonly FakeJiraClient _client;
+            
+        public JiraLocalCacheTest()
+        {
+            _client = new FakeJiraClient();
+        }
 
         [Fact]
         public async Task Updates_no_issues()
         {
-            var client = new FakeJiraClient();
-            JiraLocalCache cache = new JiraLocalCache(client, new DateTime(2018, 1, 1));
+            JiraLocalCache cache = new JiraLocalCache(_client, new DateTime(2018, 1, 1));
             await cache.Update();
 
             Assert.Empty(cache.Issues);
@@ -100,10 +105,9 @@ namespace Jira.Querying
         [Fact]
         public async Task Retrieves_single_issue()
         {
-            var client = new FakeJiraClient();
-            client.UpdateIssue("KEY-1");
+            _client.UpdateIssue("KEY-1");
 
-            JiraLocalCache cache = new JiraLocalCache(client, new DateTime(2018, 1, 1));
+            JiraLocalCache cache = new JiraLocalCache(_client, new DateTime(2018, 1, 1));
             await cache.Update();
 
             var cachedKeys = cache.Issues.Select(x => x.Key).ToArray();
@@ -114,12 +118,11 @@ namespace Jira.Querying
         [Fact]
         public async Task Retrieves_multiple_issues()
         {
-            var client = new FakeJiraClient();
-            client.UpdateIssue("KEY-1");
-            client.UpdateIssue("KEY-2");
-            client.UpdateIssue("KEY-3");
+            _client.UpdateIssue("KEY-1");
+            _client.UpdateIssue("KEY-2");
+            _client.UpdateIssue("KEY-3");
 
-            JiraLocalCache cache = new JiraLocalCache(client, new DateTime(2018, 1, 1));
+            JiraLocalCache cache = new JiraLocalCache(_client, new DateTime(2018, 1, 1));
             await cache.Update();
 
             var cachedKeys = cache.Issues.Select(x => x.Key).ToArray();
@@ -130,30 +133,28 @@ namespace Jira.Querying
         [Fact]
         public async Task Retrieves_issues_update_field()
         {
-            var client = new FakeJiraClient(new DateTime(2019, 4, 1));
-            client.UpdateIssue("KEY-1");
-            client.UpdateIssue("KEY-2");
-            client.UpdateIssue("KEY-3");
+            _client.UpdateIssue("KEY-1");
+            _client.UpdateIssue("KEY-2");
+            _client.UpdateIssue("KEY-3");
 
-            JiraLocalCache cache = new JiraLocalCache(client, new DateTime(2018, 1, 1));
+            JiraLocalCache cache = new JiraLocalCache(_client, new DateTime(2018, 1, 1));
             await cache.Update();
 
             var cachedKeys = cache.Issues.Select(x => x.Key).ToArray();
 
             var issuesByKey = cache.Issues.ToDictionary(x => x.Key, x => x.Updated.Value);
 
-            Assert.Equal(new DateTime(2019, 4, 1), issuesByKey["KEY-1"]);
-            Assert.Equal(new DateTime(2019, 4, 2), issuesByKey["KEY-2"]);
-            Assert.Equal(new DateTime(2019, 4, 3), issuesByKey["KEY-3"]);
+            Assert.Equal(new DateTime(2019, 1, 1), issuesByKey["KEY-1"]);
+            Assert.Equal(new DateTime(2019, 1, 2), issuesByKey["KEY-2"]);
+            Assert.Equal(new DateTime(2019, 1, 3), issuesByKey["KEY-3"]);
         }
 
         [Fact]
         public async Task Doesnt_retrieve_issue_with_older_update()
         {
-            var client = new FakeJiraClient(new DateTime(2019, 4, 1));
-            client.UpdateIssue("KEY-1");
+            _client.UpdateIssue("KEY-1");
 
-            JiraLocalCache cache = new JiraLocalCache(client, new DateTime(2019, 5, 1));
+            JiraLocalCache cache = new JiraLocalCache(_client, new DateTime(2019, 1, 2));
             await cache.Update();
 
             var cachedKeys = cache.Issues.Select(x => x.Key).ToArray();
@@ -167,13 +168,12 @@ namespace Jira.Querying
         [InlineData(201)]
         public async Task Retrieves_more_issues_than_is_limit_of_client(int issueCount)
         {
-            var client = new FakeJiraClient();
             for (int i = 0; i < issueCount; i++)
             {
-                client.UpdateIssue("KEY-" + i);
+                _client.UpdateIssue("KEY-" + i);
             }
 
-            JiraLocalCache cache = new JiraLocalCache(client, new DateTime(2018, 1, 1));
+            JiraLocalCache cache = new JiraLocalCache(_client, new DateTime(2018, 1, 1));
             await cache.Update();
 
             var cachedKeys = cache.Issues.Select(x => x.Key).ToArray();
@@ -187,13 +187,12 @@ namespace Jira.Querying
         [InlineData(201)]
         public async Task Retrieves_more_issues_than_is_limit_of_client_without_duplication_when_per_second_timings(int issueCount)
         {
-            var client = new FakeJiraClient();
             for (int i = 0; i < issueCount; i++)
             {
-                client.UpdateIssue("KEY-" + i, TimeSpan.FromSeconds(5));
+                _client.UpdateIssue("KEY-" + i, TimeSpan.FromSeconds(5));
             }
 
-            JiraLocalCache cache = new JiraLocalCache(client, new DateTime(2018, 1, 1));
+            JiraLocalCache cache = new JiraLocalCache(_client, new DateTime(2018, 1, 1));
             await cache.Update();
 
             var cachedKeys = cache.Issues.Select(x => x.Key).ToArray();
@@ -209,13 +208,12 @@ namespace Jira.Querying
         [InlineData(201)]
         public async Task Retrieves_many_tasks_that_are_within_same_minute(int issueCount)
         {
-            var client = new FakeJiraClient();
             for (int i = 0; i < issueCount; i++)
             {
-                client.UpdateIssue("KEY-" + i, TimeSpan.FromSeconds(0.5));
+                _client.UpdateIssue("KEY-" + i, TimeSpan.FromSeconds(0.5));
             }
 
-            JiraLocalCache cache = new JiraLocalCache(client, new DateTime(2018, 1, 1));
+            JiraLocalCache cache = new JiraLocalCache(_client, new DateTime(2018, 1, 1));
             await cache.Update();
 
             var cachedKeys = cache.Issues.Select(x => x.Key).ToArray();
@@ -226,14 +224,13 @@ namespace Jira.Querying
         [Fact]
         public async Task Updates_issue_in_cache_when_it_was_updated_in_client1()
         {
-            var client = new FakeJiraClient(new DateTime(2019, 1, 1));
-            JiraLocalCache cache = new JiraLocalCache(client, new DateTime(2018, 1, 1));
+            JiraLocalCache cache = new JiraLocalCache(_client, new DateTime(2018, 1, 1));
 
-            client.UpdateIssue("KEY-1");
+            _client.UpdateIssue("KEY-1");
             
             await cache.Update();
 
-            client.UpdateIssue("KEY-1");
+            _client.UpdateIssue("KEY-1");
 
             await cache.Update();
 
