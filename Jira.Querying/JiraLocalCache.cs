@@ -14,6 +14,8 @@ namespace Jira.Querying
             Collection<CachedIssue> GetIssues();
 
             void AddOrReplaceCachedIssue(CachedIssue flatIssue);
+
+            DateTime? LastUpdatedIssueTime();
         }
 
         private class InMemoryRepository : IRepository
@@ -34,6 +36,11 @@ namespace Jira.Querying
                 }
 
                 _issues.Insert(Math.Max(0, _issues.Count - 2), flatIssue); // inserting things out-of-order, to simulate sql's behavior of not keeping order
+            }
+
+            public DateTime? LastUpdatedIssueTime()
+            {
+                return _issues.Select(x => x.Updated).Max();
             }
         }
 
@@ -101,7 +108,7 @@ namespace Jira.Querying
         {
             DateTime lastUpdateDate = _startUpdateDate.Value;
 
-            var lastIssueUpdate = Issues.Select(x => x.Updated).Max();
+            var lastIssueUpdate = _repository.LastUpdatedIssueTime();
 
             if (lastIssueUpdate.HasValue)
             {
