@@ -9,16 +9,40 @@ namespace Jira.Querying
 {
     public class JiraLocalCache
     {
+        private class Repository
+        {
+            public Collection<CachedIssue> Issues { get; private set; } = new Collection<CachedIssue>();
+
+            public void AddOrReplaceCachedIssue(CachedIssue flatIssue)
+            {
+                var cachedIssue = Issues.FirstOrDefault(x => x.Key == flatIssue.Key);
+                if (cachedIssue != null)
+                {
+                    Issues.Remove(cachedIssue);
+                }
+
+                Issues.Add(flatIssue);
+            }
+        }
+
         private readonly IJiraClient _client;
         private readonly DateTime _startUpdateDate;
+        private readonly Repository _repository;
 
         public JiraLocalCache(IJiraClient client, DateTime startUpdateDate)
         {
             _client = client;
             _startUpdateDate = startUpdateDate;
+            _repository = new Repository();
         }
 
-        public Collection<CachedIssue> Issues { get; private set; } = new Collection<CachedIssue>();
+        public Collection<CachedIssue> Issues
+        {
+            get
+            {
+                return _repository.Issues;
+            }
+        }
 
         public async Task Update()
         {
@@ -35,7 +59,7 @@ namespace Jira.Querying
                 {
                     CachedIssue flatIssue = await _client.RetrieveDetails(issue);
 
-                    AddOrReplaceCachedIssue(flatIssue);
+                    _repository.AddOrReplaceCachedIssue(flatIssue);
                 }
 
                 itemPaging += QueryLimit;
@@ -45,17 +69,6 @@ namespace Jira.Querying
                     break;
                 }
             }
-        }
-
-        private void AddOrReplaceCachedIssue(CachedIssue flatIssue)
-        {
-            var cachedIssue = Issues.FirstOrDefault(x => x.Key == flatIssue.Key);
-            if (cachedIssue != null)
-            {
-                Issues.Remove(cachedIssue);
-            }
-
-            Issues.Add(flatIssue);
         }
     }
 }
