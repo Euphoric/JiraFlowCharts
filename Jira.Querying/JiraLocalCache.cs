@@ -9,38 +9,50 @@ namespace Jira.Querying
 {
     public class JiraLocalCache
     {
-        private class Repository
+        public interface IRepository
         {
-            public Collection<CachedIssue> Issues { get; private set; } = new Collection<CachedIssue>();
+            Collection<CachedIssue> GetIssues();
+
+            void AddOrReplaceCachedIssue(CachedIssue flatIssue);
+        }
+
+        private class InMemoryRepository : IRepository
+        {
+            readonly Collection<CachedIssue> _issues = new Collection<CachedIssue>();
+
+            public Collection<CachedIssue> GetIssues()
+            {
+                return _issues;
+            }
 
             public void AddOrReplaceCachedIssue(CachedIssue flatIssue)
             {
-                var cachedIssue = Issues.FirstOrDefault(x => x.Key == flatIssue.Key);
+                var cachedIssue = _issues.FirstOrDefault(x => x.Key == flatIssue.Key);
                 if (cachedIssue != null)
                 {
-                    Issues.Remove(cachedIssue);
+                    _issues.Remove(cachedIssue);
                 }
 
-                Issues.Add(flatIssue);
+                _issues.Add(flatIssue);
             }
         }
 
         private readonly IJiraClient _client;
         private readonly DateTime _startUpdateDate;
-        private readonly Repository _repository;
+        private readonly IRepository _repository;
 
         public JiraLocalCache(IJiraClient client, DateTime startUpdateDate)
         {
             _client = client;
             _startUpdateDate = startUpdateDate;
-            _repository = new Repository();
+            _repository = new InMemoryRepository();
         }
 
         public Collection<CachedIssue> Issues
         {
             get
             {
-                return _repository.Issues;
+                return _repository.GetIssues();
             }
         }
 
