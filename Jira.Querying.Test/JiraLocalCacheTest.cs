@@ -94,9 +94,18 @@ namespace Jira.Querying
         }
 
         [Fact]
+        public async Task Update_without_start_date_is_error()
+        {
+            JiraLocalCache cache = new JiraLocalCache(_client);
+            var ex = await Assert.ThrowsAsync<InvalidOperationException>(() => cache.Update());
+            Assert.Equal("Must set StartDate before first call to update.", ex.Message);
+        }
+
+        [Fact]
         public async Task Updates_no_issues()
         {
-            JiraLocalCache cache = new JiraLocalCache(_client, new DateTime(2018, 1, 1));
+            JiraLocalCache cache = new JiraLocalCache(_client);
+            cache.SetStartDate(new DateTime(2018, 1, 1));
             await cache.Update();
 
             Assert.Empty(cache.Issues);
@@ -107,7 +116,8 @@ namespace Jira.Querying
         {
             _client.UpdateIssue("KEY-1");
 
-            JiraLocalCache cache = new JiraLocalCache(_client, new DateTime(2018, 1, 1));
+            JiraLocalCache cache = new JiraLocalCache(_client);
+            cache.SetStartDate(new DateTime(2018, 1, 1));
             await cache.Update();
 
             var cachedKeys = cache.Issues.Select(x => x.Key).ToArray();
@@ -122,7 +132,8 @@ namespace Jira.Querying
             _client.UpdateIssue("KEY-2");
             _client.UpdateIssue("KEY-3");
 
-            JiraLocalCache cache = new JiraLocalCache(_client, new DateTime(2018, 1, 1));
+            JiraLocalCache cache = new JiraLocalCache(_client);
+            cache.SetStartDate(new DateTime(2018, 1, 1));
             await cache.Update();
 
             var cachedKeys = cache.Issues.Select(x => x.Key).ToArray();
@@ -137,7 +148,8 @@ namespace Jira.Querying
             _client.UpdateIssue("KEY-2");
             _client.UpdateIssue("KEY-3");
 
-            JiraLocalCache cache = new JiraLocalCache(_client, new DateTime(2018, 1, 1));
+            JiraLocalCache cache = new JiraLocalCache(_client);
+            cache.SetStartDate(new DateTime(2018, 1, 1));
             await cache.Update();
 
             var cachedKeys = cache.Issues.Select(x => x.Key).ToArray();
@@ -154,7 +166,8 @@ namespace Jira.Querying
         {
             _client.UpdateIssue("KEY-1");
 
-            JiraLocalCache cache = new JiraLocalCache(_client, new DateTime(2019, 1, 2));
+            JiraLocalCache cache = new JiraLocalCache(_client);
+            cache.SetStartDate(new DateTime(2019, 1, 2));
             await cache.Update();
 
             var cachedKeys = cache.Issues.Select(x => x.Key).ToArray();
@@ -173,7 +186,8 @@ namespace Jira.Querying
                 _client.UpdateIssue("KEY-" + i);
             }
 
-            JiraLocalCache cache = new JiraLocalCache(_client, new DateTime(2018, 1, 1));
+            JiraLocalCache cache = new JiraLocalCache(_client);
+            cache.SetStartDate(new DateTime(2018, 1, 1));
             await cache.Update();
 
             var cachedKeys = cache.Issues.Select(x => x.Key).ToArray();
@@ -192,7 +206,8 @@ namespace Jira.Querying
                 _client.UpdateIssue("KEY-" + i, TimeSpan.FromSeconds(5));
             }
 
-            JiraLocalCache cache = new JiraLocalCache(_client, new DateTime(2018, 1, 1));
+            JiraLocalCache cache = new JiraLocalCache(_client);
+            cache.SetStartDate(new DateTime(2018, 1, 1));
             await cache.Update();
 
             var cachedKeys = cache.Issues.Select(x => x.Key).ToArray();
@@ -213,7 +228,8 @@ namespace Jira.Querying
                 _client.UpdateIssue("KEY-" + i, TimeSpan.FromSeconds(0.5));
             }
 
-            JiraLocalCache cache = new JiraLocalCache(_client, new DateTime(2018, 1, 1));
+            JiraLocalCache cache = new JiraLocalCache(_client);
+            cache.SetStartDate(new DateTime(2018, 1, 1));
             await cache.Update();
 
             var cachedKeys = cache.Issues.Select(x => x.Key).ToArray();
@@ -224,7 +240,8 @@ namespace Jira.Querying
         [Fact]
         public async Task Updates_issue_in_cache_when_it_was_updated_in_client1()
         {
-            JiraLocalCache cache = new JiraLocalCache(_client, new DateTime(2018, 1, 1));
+            JiraLocalCache cache = new JiraLocalCache(_client);
+            cache.SetStartDate(new DateTime(2018, 1, 1));
 
             _client.UpdateIssue("KEY-1");
             

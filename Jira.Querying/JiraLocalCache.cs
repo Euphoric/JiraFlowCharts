@@ -38,10 +38,10 @@ namespace Jira.Querying
         }
 
         private readonly IJiraClient _client;
-        private readonly DateTime _startUpdateDate;
         private readonly IRepository _repository;
 
-        public JiraLocalCache(IJiraClient client, DateTime startUpdateDate)
+        private DateTime? _startUpdateDate;
+        public JiraLocalCache(IJiraClient client, DateTime? startUpdateDate = null)
         {
             _client = client;
             _startUpdateDate = startUpdateDate;
@@ -56,8 +56,18 @@ namespace Jira.Querying
             }
         }
 
+        public void SetStartDate(DateTime startDateTime)
+        {
+            _startUpdateDate = startDateTime;
+        }
+
         public async Task Update()
         {
+            if (!_startUpdateDate.HasValue)
+            {
+                throw new InvalidOperationException("Must set StartDate before first call to update.");
+            }
+
             string projectName = "AC"; // TODO : Parametrize project
 
             int itemPaging = 0;
@@ -65,7 +75,7 @@ namespace Jira.Querying
             {
                 const int QueryLimit = 50;
 
-                IJiraIssue[] updatedIssues = await _client.GetIssues(projectName, _startUpdateDate, QueryLimit, itemPaging);
+                IJiraIssue[] updatedIssues = await _client.GetIssues(projectName, _startUpdateDate.Value, QueryLimit, itemPaging);
 
                 foreach (var issue in updatedIssues)
                 {
