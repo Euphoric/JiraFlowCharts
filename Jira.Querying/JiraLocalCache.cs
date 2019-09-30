@@ -33,7 +33,7 @@ namespace Jira.Querying
                     _issues.Remove(cachedIssue);
                 }
 
-                _issues.Add(flatIssue);
+                _issues.Insert(Math.Max(0, _issues.Count - 2), flatIssue); // inserting things out-of-order, to simulate sql's behavior of not keeping order
             }
         }
 
@@ -69,12 +69,14 @@ namespace Jira.Querying
 
             string projectName = "AC"; // TODO : Parametrize project
 
+            DateTime lastUpdateDate = GetLastUpdateDateTime();
+
             int itemPaging = 0;
             while (true)
             {
                 const int QueryLimit = 50;
 
-                IJiraIssue[] updatedIssues = await _client.GetIssues(projectName, _startUpdateDate.Value, QueryLimit, itemPaging);
+                IJiraIssue[] updatedIssues = await _client.GetIssues(projectName, lastUpdateDate, QueryLimit, itemPaging);
 
                 foreach (var issue in updatedIssues)
                 {
@@ -90,6 +92,23 @@ namespace Jira.Querying
                     break;
                 }
             }
+        }
+
+        /// <summary>
+        /// Retrieves last updated date. If there are no issues, uses set default. If there are, uses date time of last updated issue.
+        /// </summary>
+        private DateTime GetLastUpdateDateTime()
+        {
+            DateTime lastUpdateDate = _startUpdateDate.Value;
+
+            var lastIssueUpdate = Issues.Select(x => x.Updated).Max();
+
+            if (lastIssueUpdate.HasValue)
+            {
+                lastUpdateDate = lastIssueUpdate.Value;
+            }
+
+            return lastUpdateDate;
         }
     }
 }

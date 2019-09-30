@@ -23,6 +23,11 @@ namespace Jira.Querying
         List<FakeJiraIssue> Issues = new List<FakeJiraIssue>();
         private DateTime _currentDateTime;
 
+        /// <summary>
+        /// Will fail a query if issue with given key were to be retrieved. NULL for no-op.
+        /// </summary>
+        public string FailIfIssueWereToBeRetrieved { get; set; }
+
         public FakeJiraClient()
             :this(new DateTime(2019, 1, 1))
         {
@@ -40,13 +45,20 @@ namespace Jira.Querying
         public async Task<IJiraIssue[]> GetIssues(string project, DateTime lastUpdated, int count, int skipCount)
         {
             Assert.InRange(count, 0, 50); // Must query between 0 and 50 items
-            return 
-                Issues
+            FakeJiraIssue[] returnedJiraIssues = Issues
                 .Where(x => WithoutSeconds(x.Updated) >= WithoutSeconds(lastUpdated))
-                .OrderBy(x=>x.Updated)
+                .OrderBy(x => x.Updated)
                 .Skip(skipCount)
                 .Take(count)
                 .ToArray();
+
+            if (FailIfIssueWereToBeRetrieved != null)
+            {
+                var isReturningIssue = returnedJiraIssues.Any(x => x.Key == FailIfIssueWereToBeRetrieved);
+                Assert.False(isReturningIssue, $"Should not have returned issue with key : {FailIfIssueWereToBeRetrieved}");
+            }
+
+            return returnedJiraIssues;
         }
 
         private static DateTime? WithoutSeconds(DateTime? dateTime)
@@ -135,7 +147,7 @@ namespace Jira.Querying
 
             var cachedKeys = cache.Issues.Select(x => x.Key).ToArray();
 
-            Assert.Equal(new[] { "KEY-1", "KEY-2", "KEY-3" }, cachedKeys);
+            Assert.NotStrictEqual(new[] { "KEY-1", "KEY-2", "KEY-3" }, cachedKeys);
         }
 
         [Fact]
@@ -186,7 +198,7 @@ namespace Jira.Querying
 
             var cachedKeys = cache.Issues.Select(x => x.Key).ToArray();
 
-            Assert.Equal(Enumerable.Range(0, issueCount).Select(i => "KEY-" + i), cachedKeys);
+            Assert.NotStrictEqual(Enumerable.Range(0, issueCount).Select(i => "KEY-" + i), cachedKeys);
         }
 
         [Theory]
@@ -205,7 +217,7 @@ namespace Jira.Querying
 
             var cachedKeys = cache.Issues.Select(x => x.Key).ToArray();
 
-            Assert.Equal(Enumerable.Range(0, issueCount).Select(i => "KEY-" + i), cachedKeys);
+            Assert.NotStrictEqual(Enumerable.Range(0, issueCount).Select(i => "KEY-" + i), cachedKeys);
         }
 
         [Theory]
@@ -226,7 +238,7 @@ namespace Jira.Querying
 
             var cachedKeys = cache.Issues.Select(x => x.Key).ToArray();
 
-            Assert.Equal(Enumerable.Range(0, issueCount).Select(i => "KEY-" + i), cachedKeys);
+            Assert.NotStrictEqual(Enumerable.Range(0, issueCount).Select(i => "KEY-" + i), cachedKeys);
         }
 
         [Fact]
@@ -247,6 +259,44 @@ namespace Jira.Querying
             Assert.Equal("KEY-1", cachedIssue.Key);
             Assert.Equal(new DateTime(2019, 1, 1), cachedIssue.Created);
             Assert.Equal(new DateTime(2019, 1, 2), cachedIssue.Updated);
+        }
+
+        [Fact]
+        public async Task When_updating_doesnt_retrive_items_not_updated_since_last_update()
+        {
+            cache.SetStartDate(new DateTime(2018, 1, 1));
+
+            _client.UpdateIssue("KEY-1");
+            _client.UpdateIssue("KEY-2");
+
+            await cache.Update();
+
+            _client.UpdateIssue("KEY-2");
+
+            _client.FailIfIssueWereToBeRetrieved = "KEY-1";
+
+            await cache.Update();
+        }
+
+        [Fact]
+        public async Task When_updating_doesnt_retrive_items_not_updated_since_last_update2()
+        {
+            cache.SetStartDate(new DateTime(2018, 1, 1));
+
+            _client.UpdateIssue("KEY-1");
+            _client.UpdateIssue("KEY-2");
+            
+            await cache.Update();
+
+            _client.UpdateIssue("KEY-1");
+
+            await cache.Update();
+
+            _client.UpdateIssue("KEY-1");
+
+            _client.FailIfIssueWereToBeRetrieved = "KEY-2";
+
+            await cache.Update();
         }
     }
 }
