@@ -95,6 +95,13 @@ namespace Jira.Querying
         }
     }
     
+    public class JiraLocalCacheTestSqlite : JiraLocalCacheTest
+    {
+        public JiraLocalCacheTestSqlite()
+            :base(new SqliteJiraLocalCacheRepository())
+        {
+        }
+    }
 
     public class JiraLocalCacheTest
     {
@@ -102,9 +109,14 @@ namespace Jira.Querying
         private readonly JiraLocalCache _cache;
 
         public JiraLocalCacheTest()
+            :this(JiraLocalCache.CreateMemoryRepository())
+        {
+        }
+
+        protected JiraLocalCacheTest(JiraLocalCache.IRepository repository)
         {
             _client = new FakeJiraClient();
-            _cache = new JiraLocalCache(_client, JiraLocalCache.CreateMemoryRepository());
+            _cache = new JiraLocalCache(_client, repository);
         }
 
         [Fact]
