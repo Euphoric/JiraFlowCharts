@@ -44,14 +44,20 @@ namespace Jira.Querying
             }
         }
 
+        public static IRepository CreateMemoryRepository()
+        {
+            return new InMemoryRepository();
+        }
+
         private readonly IJiraClient _client;
         private readonly IRepository _repository;
 
         private DateTime? _startUpdateDate;
-        public JiraLocalCache(IJiraClient client)
+
+        public JiraLocalCache(IJiraClient client, IRepository repository)
         {
             _client = client;
-            _repository = new InMemoryRepository();
+            _repository = repository;
         }
 
         public Collection<CachedIssue> Issues

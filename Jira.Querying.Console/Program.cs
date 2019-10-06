@@ -38,7 +38,7 @@ namespace JiraParse
 
             DateTime lastUpdate = DateTime.Now.AddYears(-1);
 
-            JiraLocalCache jiraLocalCache = new JiraLocalCache(client);
+            JiraLocalCache jiraLocalCache = new JiraLocalCache(client, JiraLocalCache.CreateMemoryRepository());
             jiraLocalCache.SetStartDate(lastUpdate);
 
             await jiraLocalCache.Update();
