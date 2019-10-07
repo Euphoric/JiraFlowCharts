@@ -2,34 +2,11 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Jira.Querying
+namespace Jira.Querying.Sqlite
 {
-
-    public class CachedIssueDb
-    {
-        [Key]
-        public string Key { get; set; }
-        // TODO : Remaining parameters, needs tests
-        public DateTime? Created { get; set; }
-        public DateTime? Updated { get; set; }
-    }
-
-    class IssuesCacheContext : DbContext
-    {
-        public DbSet<CachedIssueDb> Issues { get; set; }
-
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            optionsBuilder.UseSqlite("DataSource=:memory:"); // TODO: use connection string from constructor
-
-            base.OnConfiguring(optionsBuilder);
-        }
-    }
-
     public class SqliteJiraLocalCacheRepository : JiraLocalCache.IRepository
     {
         IssuesCacheContext _dbContext;
