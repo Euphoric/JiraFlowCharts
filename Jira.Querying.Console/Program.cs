@@ -43,7 +43,7 @@ namespace JiraParse
 
             await jiraLocalCache.Update();
 
-            var updatedIssues = jiraLocalCache.Issues;
+            var updatedIssues = await jiraLocalCache.GetIssues();
 
             // serialize JSON directly to a file
             using (StreamWriter file = File.CreateText(@"../../../Data/issues.json"))

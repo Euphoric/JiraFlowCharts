@@ -11,23 +11,23 @@ namespace Jira.Querying
     {
         public interface IRepository
         {
-            Collection<CachedIssue> GetIssues();
+            Task<IEnumerable<CachedIssue>> GetIssues();
 
-            void AddOrReplaceCachedIssue(CachedIssue flatIssue);
+            Task AddOrReplaceCachedIssue(CachedIssue flatIssue);
 
-            DateTime? LastUpdatedIssueTime();
+            Task<DateTime?> LastUpdatedIssueTime();
         }
 
         private class InMemoryRepository : IRepository
         {
             readonly Collection<CachedIssue> _issues = new Collection<CachedIssue>();
 
-            public Collection<CachedIssue> GetIssues()
+            public Task<IEnumerable<CachedIssue>> GetIssues()
             {
-                return _issues;
+                return Task.FromResult<IEnumerable<CachedIssue>>(_issues);
             }
 
-            public void AddOrReplaceCachedIssue(CachedIssue flatIssue)
+            public Task AddOrReplaceCachedIssue(CachedIssue flatIssue)
             {
                 var cachedIssue = _issues.FirstOrDefault(x => x.Key == flatIssue.Key);
                 if (cachedIssue != null)
@@ -36,11 +36,13 @@ namespace Jira.Querying
                 }
 
                 _issues.Insert(Math.Max(0, _issues.Count - 2), flatIssue); // inserting things out-of-order, to simulate sql's behavior of not keeping order
+
+                return Task.CompletedTask;
             }
 
-            public DateTime? LastUpdatedIssueTime()
+            public Task<DateTime?> LastUpdatedIssueTime()
             {
-                return _issues.Select(x => x.Updated).Max();
+                return Task.FromResult(_issues.Select(x => x.Updated).Max());
             }
         }
 
@@ -60,12 +62,9 @@ namespace Jira.Querying
             _repository = repository;
         }
 
-        public Collection<CachedIssue> Issues
+        public async Task<IEnumerable<CachedIssue>> GetIssues()
         {
-            get
-            {
-                return _repository.GetIssues();
-            }
+            return await _repository.GetIssues();
         }
 
         public void SetStartDate(DateTime startDateTime)
@@ -82,7 +81,7 @@ namespace Jira.Querying
 
             string projectName = "AC"; // TODO : Parametrize project
 
-            DateTime lastUpdateDate = GetLastUpdateDateTime();
+            DateTime lastUpdateDate = await GetLastUpdateDateTime();
 
             int itemPaging = 0;
             while (true)
@@ -95,7 +94,7 @@ namespace Jira.Querying
                 {
                     CachedIssue flatIssue = await _client.RetrieveDetails(issue);
 
-                    _repository.AddOrReplaceCachedIssue(flatIssue);
+                    await _repository.AddOrReplaceCachedIssue(flatIssue);
                 }
 
                 itemPaging += QueryLimit;
@@ -110,11 +109,11 @@ namespace Jira.Querying
         /// <summary>
         /// Retrieves last updated date. If there are no issues, uses set default. If there are, uses date time of last updated issue.
         /// </summary>
-        private DateTime GetLastUpdateDateTime()
+        private async Task<DateTime> GetLastUpdateDateTime()
         {
             DateTime lastUpdateDate = _startUpdateDate.Value;
 
-            var lastIssueUpdate = _repository.LastUpdatedIssueTime();
+            var lastIssueUpdate = await _repository.LastUpdatedIssueTime();
 
             if (lastIssueUpdate.HasValue)
             {

@@ -132,7 +132,7 @@ namespace Jira.Querying
             _cache.SetStartDate(new DateTime(2018, 1, 1));
             await _cache.Update();
 
-            Assert.Empty(_cache.Issues);
+            Assert.Empty(await _cache.GetIssues());
         }
 
         [Fact]
@@ -143,7 +143,7 @@ namespace Jira.Querying
             _cache.SetStartDate(new DateTime(2018, 1, 1));
             await _cache.Update();
 
-            var cachedKeys = _cache.Issues.Select(x => x.Key).ToArray();
+            var cachedKeys = (await _cache.GetIssues()).Select(x => x.Key).ToArray();
 
             Assert.Equal(new[] { "KEY-1" }, cachedKeys);
         }
@@ -158,7 +158,7 @@ namespace Jira.Querying
             _cache.SetStartDate(new DateTime(2018, 1, 1));
             await _cache.Update();
 
-            var cachedKeys = _cache.Issues.Select(x => x.Key).ToArray();
+            var cachedKeys = (await _cache.GetIssues()).Select(x => x.Key).ToArray();
 
             Assert.NotStrictEqual(new[] { "KEY-1", "KEY-2", "KEY-3" }, cachedKeys);
         }
@@ -173,9 +173,9 @@ namespace Jira.Querying
             _cache.SetStartDate(new DateTime(2018, 1, 1));
             await _cache.Update();
 
-            var cachedKeys = _cache.Issues.Select(x => x.Key).ToArray();
+            var cachedKeys = (await _cache.GetIssues()).Select(x => x.Key).ToArray();
 
-            var issuesByKey = _cache.Issues.ToDictionary(x => x.Key, x => x.Updated.Value);
+            var issuesByKey = (await _cache.GetIssues()).ToDictionary(x => x.Key, x => x.Updated.Value);
 
             Assert.Equal(new DateTime(2019, 1, 1), issuesByKey["KEY-1"]);
             Assert.Equal(new DateTime(2019, 1, 2), issuesByKey["KEY-2"]);
@@ -190,9 +190,9 @@ namespace Jira.Querying
             _cache.SetStartDate(new DateTime(2019, 1, 2));
             await _cache.Update();
 
-            var cachedKeys = _cache.Issues.Select(x => x.Key).ToArray();
+            var cachedKeys = (await _cache.GetIssues()).Select(x => x.Key).ToArray();
 
-            Assert.Empty(_cache.Issues);
+            Assert.Empty(await _cache.GetIssues());
         }
 
         [Theory]
@@ -209,7 +209,7 @@ namespace Jira.Querying
             _cache.SetStartDate(new DateTime(2018, 1, 1));
             await _cache.Update();
 
-            var cachedKeys = _cache.Issues.Select(x => x.Key).ToArray();
+            var cachedKeys = (await _cache.GetIssues()).Select(x => x.Key).ToArray();
 
             Assert.NotStrictEqual(Enumerable.Range(0, issueCount).Select(i => "KEY-" + i), cachedKeys);
         }
@@ -228,7 +228,7 @@ namespace Jira.Querying
             _cache.SetStartDate(new DateTime(2018, 1, 1));
             await _cache.Update();
 
-            var cachedKeys = _cache.Issues.Select(x => x.Key).ToArray();
+            var cachedKeys = (await _cache.GetIssues()).Select(x => x.Key).ToArray();
 
             Assert.NotStrictEqual(Enumerable.Range(0, issueCount).Select(i => "KEY-" + i), cachedKeys);
         }
@@ -249,7 +249,7 @@ namespace Jira.Querying
             _cache.SetStartDate(new DateTime(2018, 1, 1));
             await _cache.Update();
 
-            var cachedKeys = _cache.Issues.Select(x => x.Key).ToArray();
+            var cachedKeys = (await _cache.GetIssues()).Select(x => x.Key).ToArray();
 
             Assert.NotStrictEqual(Enumerable.Range(0, issueCount).Select(i => "KEY-" + i), cachedKeys);
         }
@@ -267,7 +267,7 @@ namespace Jira.Querying
 
             await _cache.Update();
 
-            var cachedIssue = Assert.Single(_cache.Issues);
+            var cachedIssue = Assert.Single(await _cache.GetIssues());
 
             Assert.Equal("KEY-1", cachedIssue.Key);
             Assert.Equal(new DateTime(2019, 1, 1), cachedIssue.Created);

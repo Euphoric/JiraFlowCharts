@@ -1,8 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Jira.Querying
 {
@@ -39,10 +41,9 @@ namespace Jira.Querying
             _dbContext.Database.Migrate();
         }
 
-        public void AddOrReplaceCachedIssue(CachedIssue issue)
+        public async Task AddOrReplaceCachedIssue(CachedIssue issue)
         {
-            // TODO : Async in all operations
-            var existingIssue = _dbContext.Issues.FirstOrDefault(x => x.Key == issue.Key);
+            var existingIssue = await _dbContext.Issues.FirstOrDefaultAsync(x => x.Key == issue.Key);
             if (existingIssue != null)
             {
                 _dbContext.Issues.Remove(existingIssue);
@@ -56,24 +57,24 @@ namespace Jira.Querying
             };
 
             _dbContext.Issues.Add(issueDb);
-            _dbContext.SaveChanges();
+            await _dbContext.SaveChangesAsync();
         }
 
-        public Collection<CachedIssue> GetIssues()
+        public async Task<IEnumerable<CachedIssue>> GetIssues()
         {
-            var dbIssues = _dbContext.Issues.ToArray();
+            var dbIssues = await _dbContext.Issues.ToArrayAsync();
             var issues = dbIssues.Select(iss => new CachedIssue()
             {
                 Key = iss.Key,
                 Created = iss.Created,
                 Updated = iss.Updated
             });
-            return new Collection<CachedIssue>(issues.ToList());
+            return issues;
         }
 
-        public DateTime? LastUpdatedIssueTime()
+        public async Task<DateTime?> LastUpdatedIssueTime()
         {
-            return _dbContext.Issues.Select(x => x.Updated).Max();
+            return await _dbContext.Issues.Select(x => x.Updated).MaxAsync();
         }
     }
 }
