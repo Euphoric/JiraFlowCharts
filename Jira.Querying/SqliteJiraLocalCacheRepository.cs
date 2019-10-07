@@ -37,8 +37,12 @@ namespace Jira.Querying
         public SqliteJiraLocalCacheRepository()
         {
             _dbContext = new IssuesCacheContext();
-            _dbContext.Database.OpenConnection(); // needed for in-memory test (TODO : fix?)
-            _dbContext.Database.Migrate();
+        }
+
+        public async Task Initialize()
+        {
+            await _dbContext.Database.OpenConnectionAsync(); // needed for in-memory test (TODO : fix?)
+            await _dbContext.Database.MigrateAsync();
         }
 
         public async Task AddOrReplaceCachedIssue(CachedIssue issue)

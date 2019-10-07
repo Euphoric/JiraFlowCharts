@@ -11,6 +11,8 @@ namespace Jira.Querying
     {
         public interface IRepository
         {
+            Task Initialize();
+
             Task<IEnumerable<CachedIssue>> GetIssues();
 
             Task AddOrReplaceCachedIssue(CachedIssue flatIssue);
@@ -21,6 +23,11 @@ namespace Jira.Querying
         private class InMemoryRepository : IRepository
         {
             readonly Collection<CachedIssue> _issues = new Collection<CachedIssue>();
+
+            public Task Initialize()
+            {
+                return Task.CompletedTask;
+            }
 
             public Task<IEnumerable<CachedIssue>> GetIssues()
             {
@@ -67,11 +74,11 @@ namespace Jira.Querying
             return await _repository.GetIssues();
         }
 
-        public Task Initialize(DateTime startDateTime)
+        public async Task Initialize(DateTime startDateTime)
         {
             _startUpdateDate = startDateTime;
 
-            return Task.CompletedTask;
+            await _repository.Initialize();
         }
 
         public async Task Update()
