@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 
 namespace Jira.Querying
 {
-    public class JiraLocalCache
+    public class JiraLocalCache : IDisposable
     {
-        public interface IRepository
+        public interface IRepository : IDisposable
         {
             Task Initialize();
 
@@ -18,11 +18,15 @@ namespace Jira.Querying
             Task AddOrReplaceCachedIssue(CachedIssue flatIssue);
 
             Task<DateTime?> LastUpdatedIssueTime();
+
+            bool IsDisposed { get; }
         }
 
         private class InMemoryRepository : IRepository
         {
             readonly Collection<CachedIssue> _issues = new Collection<CachedIssue>();
+
+            public bool IsDisposed { get; private set; }
 
             public Task Initialize()
             {
@@ -50,6 +54,11 @@ namespace Jira.Querying
             public Task<DateTime?> LastUpdatedIssueTime()
             {
                 return Task.FromResult(_issues.Select(x => x.Updated).Max());
+            }
+
+            public void Dispose()
+            {
+                IsDisposed = true;
             }
         }
 
@@ -130,6 +139,11 @@ namespace Jira.Querying
             }
 
             return lastUpdateDate;
+        }
+
+        public void Dispose()
+        {
+            _repository.Dispose();
         }
     }
 }

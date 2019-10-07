@@ -103,36 +103,62 @@ namespace Jira.Querying
         }
     }
 
-    public class JiraLocalCacheTest
+    public class JiraLocalCacheTest : IDisposable
     {
         private readonly FakeJiraClient _client;
-        private readonly JiraLocalCache _cache;
+
+        protected JiraLocalCache.IRepository Repository { get; }
+        protected JiraLocalCache Cache { get; }
 
         public JiraLocalCacheTest()
             :this(JiraLocalCache.CreateMemoryRepository())
         {
         }
 
+        public void Dispose()
+        {
+            Cache.Dispose();
+        }
+
         protected JiraLocalCacheTest(JiraLocalCache.IRepository repository)
         {
             _client = new FakeJiraClient();
-            _cache = new JiraLocalCache(_client, repository);
+            Repository = repository;
+            Cache = new JiraLocalCache(_client, repository);
         }
 
         [Fact]
         public async Task Update_without_start_date_is_error()
         {
-            var ex = await Assert.ThrowsAsync<InvalidOperationException>(() => _cache.Update());
+            var ex = await Assert.ThrowsAsync<InvalidOperationException>(() => Cache.Update());
             Assert.Equal("Must call Initialize before updating.", ex.Message);
+        }
+
+        [Fact]
+        public void Repository_is_disposed_after_cache_is_disposed_when_not_initialized()
+        {
+            Assert.False(Repository.IsDisposed);
+            Cache.Dispose();
+            Assert.True(Repository.IsDisposed);
+        }
+
+        [Fact]
+        public async Task Repository_is_disposed_after_cache_is_disposed_when_initialized()
+        {
+            await Cache.Initialize(new DateTime(2018, 1, 1));
+
+            Assert.False(Repository.IsDisposed);
+            Cache.Dispose();
+            Assert.True(Repository.IsDisposed);
         }
 
         [Fact]
         public async Task Updates_no_issues()
         {
-            await _cache.Initialize(new DateTime(2018, 1, 1));
-            await _cache.Update();
+            await Cache.Initialize(new DateTime(2018, 1, 1));
+            await Cache.Update();
 
-            Assert.Empty(await _cache.GetIssues());
+            Assert.Empty(await Cache.GetIssues());
         }
 
         [Fact]
@@ -140,10 +166,10 @@ namespace Jira.Querying
         {
             _client.UpdateIssue("KEY-1");
 
-            await _cache.Initialize(new DateTime(2018, 1, 1));
-            await _cache.Update();
+            await Cache.Initialize(new DateTime(2018, 1, 1));
+            await Cache.Update();
 
-            var cachedKeys = (await _cache.GetIssues()).Select(x => x.Key).ToArray();
+            var cachedKeys = (await Cache.GetIssues()).Select(x => x.Key).ToArray();
 
             Assert.Equal(new[] { "KEY-1" }, cachedKeys);
         }
@@ -155,10 +181,10 @@ namespace Jira.Querying
             _client.UpdateIssue("KEY-2");
             _client.UpdateIssue("KEY-3");
 
-            await _cache.Initialize(new DateTime(2018, 1, 1));
-            await _cache.Update();
+            await Cache.Initialize(new DateTime(2018, 1, 1));
+            await Cache.Update();
 
-            var cachedKeys = (await _cache.GetIssues()).Select(x => x.Key).ToArray();
+            var cachedKeys = (await Cache.GetIssues()).Select(x => x.Key).ToArray();
 
             Assert.NotStrictEqual(new[] { "KEY-1", "KEY-2", "KEY-3" }, cachedKeys);
         }
@@ -170,12 +196,12 @@ namespace Jira.Querying
             _client.UpdateIssue("KEY-2");
             _client.UpdateIssue("KEY-3");
 
-            await _cache.Initialize(new DateTime(2018, 1, 1));
-            await _cache.Update();
+            await Cache.Initialize(new DateTime(2018, 1, 1));
+            await Cache.Update();
 
-            var cachedKeys = (await _cache.GetIssues()).Select(x => x.Key).ToArray();
+            var cachedKeys = (await Cache.GetIssues()).Select(x => x.Key).ToArray();
 
-            var issuesByKey = (await _cache.GetIssues()).ToDictionary(x => x.Key, x => x.Updated.Value);
+            var issuesByKey = (await Cache.GetIssues()).ToDictionary(x => x.Key, x => x.Updated.Value);
 
             Assert.Equal(new DateTime(2019, 1, 1), issuesByKey["KEY-1"]);
             Assert.Equal(new DateTime(2019, 1, 2), issuesByKey["KEY-2"]);
@@ -187,12 +213,12 @@ namespace Jira.Querying
         {
             _client.UpdateIssue("KEY-1");
 
-            await _cache.Initialize(new DateTime(2019, 1, 2));
-            await _cache.Update();
+            await Cache.Initialize(new DateTime(2019, 1, 2));
+            await Cache.Update();
 
-            var cachedKeys = (await _cache.GetIssues()).Select(x => x.Key).ToArray();
+            var cachedKeys = (await Cache.GetIssues()).Select(x => x.Key).ToArray();
 
-            Assert.Empty(await _cache.GetIssues());
+            Assert.Empty(await Cache.GetIssues());
         }
 
         [Theory]
@@ -206,10 +232,10 @@ namespace Jira.Querying
                 _client.UpdateIssue("KEY-" + i);
             }
 
-            await _cache.Initialize(new DateTime(2018, 1, 1));
-            await _cache.Update();
+            await Cache.Initialize(new DateTime(2018, 1, 1));
+            await Cache.Update();
 
-            var cachedKeys = (await _cache.GetIssues()).Select(x => x.Key).ToArray();
+            var cachedKeys = (await Cache.GetIssues()).Select(x => x.Key).ToArray();
 
             Assert.NotStrictEqual(Enumerable.Range(0, issueCount).Select(i => "KEY-" + i), cachedKeys);
         }
@@ -225,10 +251,10 @@ namespace Jira.Querying
                 _client.UpdateIssue("KEY-" + i, TimeSpan.FromSeconds(5));
             }
 
-            await _cache.Initialize(new DateTime(2018, 1, 1));
-            await _cache.Update();
+            await Cache.Initialize(new DateTime(2018, 1, 1));
+            await Cache.Update();
 
-            var cachedKeys = (await _cache.GetIssues()).Select(x => x.Key).ToArray();
+            var cachedKeys = (await Cache.GetIssues()).Select(x => x.Key).ToArray();
 
             Assert.NotStrictEqual(Enumerable.Range(0, issueCount).Select(i => "KEY-" + i), cachedKeys);
         }
@@ -246,10 +272,10 @@ namespace Jira.Querying
                 _client.UpdateIssue("KEY-" + i, TimeSpan.FromSeconds(0.5));
             }
 
-            await _cache.Initialize(new DateTime(2018, 1, 1));
-            await _cache.Update();
+            await Cache.Initialize(new DateTime(2018, 1, 1));
+            await Cache.Update();
 
-            var cachedKeys = (await _cache.GetIssues()).Select(x => x.Key).ToArray();
+            var cachedKeys = (await Cache.GetIssues()).Select(x => x.Key).ToArray();
 
             Assert.NotStrictEqual(Enumerable.Range(0, issueCount).Select(i => "KEY-" + i), cachedKeys);
         }
@@ -257,17 +283,17 @@ namespace Jira.Querying
         [Fact]
         public async Task Updates_issue_in_cache_when_it_was_updated_in_client1()
         {
-            await _cache.Initialize(new DateTime(2018, 1, 1));
+            await Cache.Initialize(new DateTime(2018, 1, 1));
 
             _client.UpdateIssue("KEY-1");
             
-            await _cache.Update();
+            await Cache.Update();
 
             _client.UpdateIssue("KEY-1");
 
-            await _cache.Update();
+            await Cache.Update();
 
-            var cachedIssue = Assert.Single(await _cache.GetIssues());
+            var cachedIssue = Assert.Single(await Cache.GetIssues());
 
             Assert.Equal("KEY-1", cachedIssue.Key);
             Assert.Equal(new DateTime(2019, 1, 1), cachedIssue.Created);
@@ -277,39 +303,39 @@ namespace Jira.Querying
         [Fact]
         public async Task When_updating_doesnt_retrive_items_not_updated_since_last_update()
         {
-            await _cache.Initialize(new DateTime(2018, 1, 1));
+            await Cache.Initialize(new DateTime(2018, 1, 1));
 
             _client.UpdateIssue("KEY-1");
             _client.UpdateIssue("KEY-2");
 
-            await _cache.Update();
+            await Cache.Update();
 
             _client.UpdateIssue("KEY-2");
 
             _client.FailIfIssueWereToBeRetrieved = "KEY-1";
 
-            await _cache.Update();
+            await Cache.Update();
         }
 
         [Fact]
         public async Task When_updating_doesnt_retrive_items_not_updated_since_last_update2()
         {
-            await _cache.Initialize(new DateTime(2018, 1, 1));
+            await Cache.Initialize(new DateTime(2018, 1, 1));
 
             _client.UpdateIssue("KEY-1");
             _client.UpdateIssue("KEY-2");
             
-            await _cache.Update();
+            await Cache.Update();
 
             _client.UpdateIssue("KEY-1");
 
-            await _cache.Update();
+            await Cache.Update();
 
             _client.UpdateIssue("KEY-1");
 
             _client.FailIfIssueWereToBeRetrieved = "KEY-2";
 
-            await _cache.Update();
+            await Cache.Update();
         }
     }
 }

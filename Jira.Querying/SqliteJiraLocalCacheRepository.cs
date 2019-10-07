@@ -32,7 +32,9 @@ namespace Jira.Querying
 
     public class SqliteJiraLocalCacheRepository : JiraLocalCache.IRepository
     {
-        IssuesCacheContext _dbContext; // TODO: dispose after usage
+        IssuesCacheContext _dbContext;
+
+        public bool IsDisposed { get; private set; }
 
         public SqliteJiraLocalCacheRepository()
         {
@@ -79,6 +81,12 @@ namespace Jira.Querying
         public async Task<DateTime?> LastUpdatedIssueTime()
         {
             return await _dbContext.Issues.Select(x => x.Updated).MaxAsync();
+        }
+
+        public void Dispose()
+        {
+            _dbContext.Dispose(); // WARN: Not unit tested. 
+            IsDisposed = true;
         }
     }
 }

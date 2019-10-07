@@ -38,18 +38,20 @@ namespace JiraParse
 
             DateTime lastUpdate = DateTime.Now.AddYears(-1);
 
-            JiraLocalCache jiraLocalCache = new JiraLocalCache(client, JiraLocalCache.CreateMemoryRepository());
-            await jiraLocalCache.Initialize(lastUpdate);
-
-            await jiraLocalCache.Update();
-
-            var updatedIssues = await jiraLocalCache.GetIssues();
-
-            // serialize JSON directly to a file
-            using (StreamWriter file = File.CreateText(@"../../../Data/issues.json"))
+            using (JiraLocalCache jiraLocalCache = new JiraLocalCache(client, JiraLocalCache.CreateMemoryRepository()))
             {
-                JsonSerializer serializer = new JsonSerializer();
-                serializer.Serialize(file, updatedIssues);
+                await jiraLocalCache.Initialize(lastUpdate);
+
+                await jiraLocalCache.Update();
+
+                var updatedIssues = await jiraLocalCache.GetIssues();
+
+                // serialize JSON directly to a file
+                using (StreamWriter file = File.CreateText(@"../../../Data/issues.json"))
+                {
+                    JsonSerializer serializer = new JsonSerializer();
+                    serializer.Serialize(file, updatedIssues);
+                }
             }
 
             Console.WriteLine("Finished");
