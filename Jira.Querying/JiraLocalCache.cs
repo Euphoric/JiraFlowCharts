@@ -67,16 +67,18 @@ namespace Jira.Querying
             return await _repository.GetIssues();
         }
 
-        public void SetStartDate(DateTime startDateTime)
+        public Task Initialize(DateTime startDateTime)
         {
             _startUpdateDate = startDateTime;
+
+            return Task.CompletedTask;
         }
 
         public async Task Update()
         {
             if (!_startUpdateDate.HasValue)
             {
-                throw new InvalidOperationException("Must set StartDate before first call to update.");
+                throw new InvalidOperationException($"Must call {nameof(Initialize)} before updating.");
             }
 
             string projectName = "AC"; // TODO : Parametrize project

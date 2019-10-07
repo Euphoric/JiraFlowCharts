@@ -123,13 +123,13 @@ namespace Jira.Querying
         public async Task Update_without_start_date_is_error()
         {
             var ex = await Assert.ThrowsAsync<InvalidOperationException>(() => _cache.Update());
-            Assert.Equal("Must set StartDate before first call to update.", ex.Message);
+            Assert.Equal("Must call Initialize before updating.", ex.Message);
         }
 
         [Fact]
         public async Task Updates_no_issues()
         {
-            _cache.SetStartDate(new DateTime(2018, 1, 1));
+            await _cache.Initialize(new DateTime(2018, 1, 1));
             await _cache.Update();
 
             Assert.Empty(await _cache.GetIssues());
@@ -140,7 +140,7 @@ namespace Jira.Querying
         {
             _client.UpdateIssue("KEY-1");
 
-            _cache.SetStartDate(new DateTime(2018, 1, 1));
+            await _cache.Initialize(new DateTime(2018, 1, 1));
             await _cache.Update();
 
             var cachedKeys = (await _cache.GetIssues()).Select(x => x.Key).ToArray();
@@ -155,7 +155,7 @@ namespace Jira.Querying
             _client.UpdateIssue("KEY-2");
             _client.UpdateIssue("KEY-3");
 
-            _cache.SetStartDate(new DateTime(2018, 1, 1));
+            await _cache.Initialize(new DateTime(2018, 1, 1));
             await _cache.Update();
 
             var cachedKeys = (await _cache.GetIssues()).Select(x => x.Key).ToArray();
@@ -170,7 +170,7 @@ namespace Jira.Querying
             _client.UpdateIssue("KEY-2");
             _client.UpdateIssue("KEY-3");
 
-            _cache.SetStartDate(new DateTime(2018, 1, 1));
+            await _cache.Initialize(new DateTime(2018, 1, 1));
             await _cache.Update();
 
             var cachedKeys = (await _cache.GetIssues()).Select(x => x.Key).ToArray();
@@ -187,7 +187,7 @@ namespace Jira.Querying
         {
             _client.UpdateIssue("KEY-1");
 
-            _cache.SetStartDate(new DateTime(2019, 1, 2));
+            await _cache.Initialize(new DateTime(2019, 1, 2));
             await _cache.Update();
 
             var cachedKeys = (await _cache.GetIssues()).Select(x => x.Key).ToArray();
@@ -206,7 +206,7 @@ namespace Jira.Querying
                 _client.UpdateIssue("KEY-" + i);
             }
 
-            _cache.SetStartDate(new DateTime(2018, 1, 1));
+            await _cache.Initialize(new DateTime(2018, 1, 1));
             await _cache.Update();
 
             var cachedKeys = (await _cache.GetIssues()).Select(x => x.Key).ToArray();
@@ -225,7 +225,7 @@ namespace Jira.Querying
                 _client.UpdateIssue("KEY-" + i, TimeSpan.FromSeconds(5));
             }
 
-            _cache.SetStartDate(new DateTime(2018, 1, 1));
+            await _cache.Initialize(new DateTime(2018, 1, 1));
             await _cache.Update();
 
             var cachedKeys = (await _cache.GetIssues()).Select(x => x.Key).ToArray();
@@ -246,7 +246,7 @@ namespace Jira.Querying
                 _client.UpdateIssue("KEY-" + i, TimeSpan.FromSeconds(0.5));
             }
 
-            _cache.SetStartDate(new DateTime(2018, 1, 1));
+            await _cache.Initialize(new DateTime(2018, 1, 1));
             await _cache.Update();
 
             var cachedKeys = (await _cache.GetIssues()).Select(x => x.Key).ToArray();
@@ -257,7 +257,7 @@ namespace Jira.Querying
         [Fact]
         public async Task Updates_issue_in_cache_when_it_was_updated_in_client1()
         {
-            _cache.SetStartDate(new DateTime(2018, 1, 1));
+            await _cache.Initialize(new DateTime(2018, 1, 1));
 
             _client.UpdateIssue("KEY-1");
             
@@ -277,7 +277,7 @@ namespace Jira.Querying
         [Fact]
         public async Task When_updating_doesnt_retrive_items_not_updated_since_last_update()
         {
-            _cache.SetStartDate(new DateTime(2018, 1, 1));
+            await _cache.Initialize(new DateTime(2018, 1, 1));
 
             _client.UpdateIssue("KEY-1");
             _client.UpdateIssue("KEY-2");
@@ -294,7 +294,7 @@ namespace Jira.Querying
         [Fact]
         public async Task When_updating_doesnt_retrive_items_not_updated_since_last_update2()
         {
-            _cache.SetStartDate(new DateTime(2018, 1, 1));
+            await _cache.Initialize(new DateTime(2018, 1, 1));
 
             _client.UpdateIssue("KEY-1");
             _client.UpdateIssue("KEY-2");
