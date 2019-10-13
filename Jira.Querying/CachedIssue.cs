@@ -15,8 +15,7 @@ namespace Jira.Querying
         public DateTime? Resolved { get; set; }
         public int? OriginalEstimate { get; set; }
         public int? TimeSpent { get; set; }
-
-        public Collection<CachedIssueStatusChange> StatusChanges { get; set; }
         public int? StoryPoints { get; set; }
+        public Collection<CachedIssueStatusChange> StatusChanges { get; set; }
     }
 }

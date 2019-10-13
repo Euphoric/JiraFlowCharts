@@ -21,7 +21,7 @@ namespace Jira.Querying
 
     public class FakeJiraClient : IJiraClient
     {
-        List<FakeJiraIssue> Issues = new List<FakeJiraIssue>();
+        readonly List<FakeJiraIssue> Issues = new List<FakeJiraIssue>();
         private DateTime _currentDateTime;
 
         /// <summary>
@@ -43,7 +43,7 @@ namespace Jira.Querying
         /// <summary>
         /// Get issues that emulates how JIRA REST API works. With all it's quirks and limitations.
         /// </summary>
-        public async Task<IJiraIssue[]> GetIssues(string project, DateTime lastUpdated, int count, int skipCount)
+        public Task<IJiraIssue[]> GetIssues(string project, DateTime lastUpdated, int count, int skipCount)
         {
             Assert.InRange(count, 0, 50); // Must query between 0 and 50 items
             FakeJiraIssue[] returnedJiraIssues = Issues
@@ -59,7 +59,7 @@ namespace Jira.Querying
                 Assert.False(isReturningIssue, $"Should not have returned issue with key : {FailIfIssueWereToBeRetrieved}");
             }
 
-            return returnedJiraIssues;
+            return Task.FromResult<IJiraIssue[]>(returnedJiraIssues);
         }
 
         private static DateTime? WithoutSeconds(DateTime? dateTime)
@@ -70,15 +70,17 @@ namespace Jira.Querying
             return new DateTime(d.Year, d.Month, d.Day, d.Hour, d.Minute, 0);
         }
 
-        public async Task<CachedIssue> RetrieveDetails(IJiraIssue issue)
+        public Task<CachedIssue> RetrieveDetails(IJiraIssue issue)
         {
             var fake = (FakeJiraIssue)issue;
-            return new CachedIssue()
+            CachedIssue cachedIssue = new CachedIssue()
             {
                 Key = fake.Key,
                 Created = fake.Created,
                 Updated = fake.Updated
             };
+
+            return Task.FromResult(cachedIssue);
         }
 
         internal void UpdateIssue(string key, TimeSpan? step = null)
