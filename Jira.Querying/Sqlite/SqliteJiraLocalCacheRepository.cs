@@ -32,6 +32,8 @@ namespace Jira.Querying.Sqlite
                 _dbContext.Issues.Remove(existingIssue);
             }
 
+            await _dbContext.SaveChangesAsync();
+
             var issueDb = new CachedIssueDb()
             {
                 Key = issue.Key,

@@ -37,7 +37,7 @@ namespace Jira.Querying
             {
                 return Task.FromResult<IEnumerable<CachedIssue>>(_issues);
             }
-
+            
             public Task AddOrReplaceCachedIssue(CachedIssue flatIssue)
             {
                 var cachedIssue = _issues.FirstOrDefault(x => x.Key == flatIssue.Key);

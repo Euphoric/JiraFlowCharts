@@ -1,4 +1,5 @@
-﻿using AutoFixture.Xunit2;
+﻿using AutoFixture;
+using AutoFixture.Xunit2;
 using Jira.Querying.Sqlite;
 using KellermanSoftware.CompareNetObjects;
 using System;
@@ -355,6 +356,42 @@ namespace Jira.Querying
             var retrievedIssue = (await Repository.GetIssues()).SingleOrDefault();
 
             issue.ShouldCompare(retrievedIssue);
+        }
+
+        [Fact]
+        public async Task Repository_saves_many_issue()
+        {
+            Fixture fixture = new Fixture();
+            var issues = fixture.CreateMany<CachedIssue>(10);
+
+            await Repository.Initialize();
+            foreach (var issue in issues.OrderBy(x => x.Key))
+            {
+                await Repository.AddOrReplaceCachedIssue(issue);
+            }
+
+            var retrievedIssues = await Repository.GetIssues();
+
+            issues.OrderBy(x=>x.Key).ToArray().ShouldCompare(retrievedIssues.OrderBy(x => x.Key).ToArray());
+        }
+
+        [Fact]
+        public async Task Repository_replaces_issue()
+        {
+            Fixture fixture = new Fixture();
+            var issue1 = fixture.Create<CachedIssue>();
+            issue1.Key = "KEY-1";
+            var issue2 = fixture.Create<CachedIssue>();
+            issue2.Key = "KEY-1";
+
+            await Repository.Initialize();
+
+            await Repository.AddOrReplaceCachedIssue(issue1);
+            await Repository.AddOrReplaceCachedIssue(issue2);
+
+            var retrievedIssue = (await Repository.GetIssues()).SingleOrDefault();
+
+            issue2.ShouldCompare(retrievedIssue);
         }
     }
 }
