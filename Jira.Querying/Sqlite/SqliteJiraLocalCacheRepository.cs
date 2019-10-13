@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -9,13 +10,24 @@ namespace Jira.Querying.Sqlite
 {
     public class SqliteJiraLocalCacheRepository : JiraLocalCache.IRepository
     {
-        IssuesCacheContext _dbContext;
+        readonly IssuesCacheContext _dbContext;
+        readonly IMapper _mapper;
 
         public bool IsDisposed { get; private set; }
 
         public SqliteJiraLocalCacheRepository()
         {
             _dbContext = new IssuesCacheContext();
+
+            var config = new MapperConfiguration(cfg => {
+                cfg.CreateMap<CachedIssue, CachedIssueDb>();
+                cfg.CreateMap<CachedIssueStatusChange, CachedIssueStatusChangeDb>();
+
+                cfg.CreateMap<CachedIssueDb, CachedIssue>();
+                cfg.CreateMap<CachedIssueStatusChangeDb, CachedIssueStatusChange>();
+            }
+);
+            _mapper = config.CreateMapper();
         }
 
         public async Task Initialize()
@@ -34,27 +46,7 @@ namespace Jira.Querying.Sqlite
 
             await _dbContext.SaveChangesAsync();
 
-            var issueDb = new CachedIssueDb()
-            {
-                Key = issue.Key,
-                Created = issue.Created,
-                Updated = issue.Updated,
-                Title = issue.Title,
-                Type = issue.Type,
-                Status = issue.Status,
-                TimeSpent = issue.TimeSpent,
-                OriginalEstimate = issue.OriginalEstimate,
-                Resolution = issue.Resolution,
-                Resolved = issue.Resolved,
-                StoryPoints = issue.StoryPoints,
-                StatusChanges = new Collection<CachedIssueStatusChangeDb>(
-                    issue.StatusChanges.Select(
-                        state=> new CachedIssueStatusChangeDb() { 
-                            IssueKey = issue.Key, 
-                            State = state.State, 
-                            ChangeTime = state.ChangeTime
-                        }).ToList())
-            };
+            CachedIssueDb issueDb = _mapper.Map<CachedIssueDb>(issue);
 
             _dbContext.Issues.Add(issueDb);
             await _dbContext.SaveChangesAsync();
@@ -63,23 +55,8 @@ namespace Jira.Querying.Sqlite
         public async Task<IEnumerable<CachedIssue>> GetIssues()
         {
             var dbIssues = await _dbContext.Issues.ToArrayAsync();
-            var issues = dbIssues.Select(issue => new CachedIssue()
-            {
-                Key = issue.Key,
-                Created = issue.Created,
-                Updated = issue.Updated,
-                Title = issue.Title,
-                Type = issue.Type,
-                Status = issue.Status,
-                TimeSpent = issue.TimeSpent,
-                OriginalEstimate = issue.OriginalEstimate,
-                Resolution = issue.Resolution,
-                Resolved = issue.Resolved,
-                StoryPoints = issue.StoryPoints,
-                StatusChanges = new Collection<CachedIssueStatusChange>(
-                    issue.StatusChanges.Select(state => new CachedIssueStatusChange(state.ChangeTime, state.State)).ToList())
-            });
-            return issues;
+
+            return _mapper.Map<IEnumerable<CachedIssue>>(dbIssues);
         }
 
         public async Task<DateTime?> LastUpdatedIssueTime()
