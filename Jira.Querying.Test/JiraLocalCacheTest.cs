@@ -1,8 +1,9 @@
-﻿using AutoFixture;
+﻿using AutoFixture.Xunit2;
 using Jira.Querying.Sqlite;
 using KellermanSoftware.CompareNetObjects;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
@@ -79,7 +80,8 @@ namespace Jira.Querying
             {
                 Key = fake.Key,
                 Created = fake.Created,
-                Updated = fake.Updated
+                Updated = fake.Updated,
+                StatusChanges = new Collection<CachedIssueStatusChange>()
             };
 
             return Task.FromResult(cachedIssue);
@@ -343,14 +345,9 @@ namespace Jira.Querying
             await Cache.Update();
         }
 
-        [Fact]
-        public async Task Repository_saves_whole_issue()
+        [Theory, AutoData]
+        public async Task Repository_saves_whole_issue(CachedIssue issue)
         {
-            Fixture fixture = new Fixture();
-            var issue = fixture.Build<CachedIssue>()
-                .Without(x=>x.StatusChanges)
-                .Create();
-
             await Repository.Initialize();
 
             await Repository.AddOrReplaceCachedIssue(issue);

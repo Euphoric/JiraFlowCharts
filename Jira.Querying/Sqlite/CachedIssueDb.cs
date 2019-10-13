@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace Jira.Querying.Sqlite
@@ -17,5 +19,6 @@ namespace Jira.Querying.Sqlite
         public int? OriginalEstimate { get; set; }
         public int? TimeSpent { get; set; }
         public int? StoryPoints { get; set; }
+        public ICollection<CachedIssueStatusChangeDb> StatusChanges { get; set; }
     }
 }

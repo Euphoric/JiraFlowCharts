@@ -12,5 +12,16 @@ namespace Jira.Querying.Sqlite
 
             base.OnConfiguring(optionsBuilder);
         }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<CachedIssueDb>().OwnsMany(p => p.StatusChanges, a =>
+            {
+                a.HasKey(x => x.Id);
+                a.HasForeignKey(x=>x.IssueKey);
+            });
+        }
     }
 }

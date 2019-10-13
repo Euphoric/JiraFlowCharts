@@ -44,7 +44,14 @@ namespace Jira.Querying.Sqlite
                 OriginalEstimate = issue.OriginalEstimate,
                 Resolution = issue.Resolution,
                 Resolved = issue.Resolved,
-                StoryPoints = issue.StoryPoints
+                StoryPoints = issue.StoryPoints,
+                StatusChanges = new Collection<CachedIssueStatusChangeDb>(
+                    issue.StatusChanges.Select(
+                        state=> new CachedIssueStatusChangeDb() { 
+                            IssueKey = issue.Key, 
+                            State = state.State, 
+                            ChangeTime = state.ChangeTime
+                        }).ToList())
             };
 
             _dbContext.Issues.Add(issueDb);
@@ -66,7 +73,9 @@ namespace Jira.Querying.Sqlite
                 OriginalEstimate = issue.OriginalEstimate,
                 Resolution = issue.Resolution,
                 Resolved = issue.Resolved,
-                StoryPoints = issue.StoryPoints
+                StoryPoints = issue.StoryPoints,
+                StatusChanges = new Collection<CachedIssueStatusChange>(
+                    issue.StatusChanges.Select(state => new CachedIssueStatusChange(state.ChangeTime, state.State)).ToList())
             });
             return issues;
         }
