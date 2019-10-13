@@ -37,6 +37,14 @@ namespace Jira.Querying.Sqlite
                 Key = issue.Key,
                 Created = issue.Created,
                 Updated = issue.Updated,
+                Title = issue.Title,
+                Type = issue.Type,
+                Status = issue.Status,
+                TimeSpent = issue.TimeSpent,
+                OriginalEstimate = issue.OriginalEstimate,
+                Resolution = issue.Resolution,
+                Resolved = issue.Resolved,
+                StoryPoints = issue.StoryPoints
             };
 
             _dbContext.Issues.Add(issueDb);
@@ -46,11 +54,19 @@ namespace Jira.Querying.Sqlite
         public async Task<IEnumerable<CachedIssue>> GetIssues()
         {
             var dbIssues = await _dbContext.Issues.ToArrayAsync();
-            var issues = dbIssues.Select(iss => new CachedIssue()
+            var issues = dbIssues.Select(issue => new CachedIssue()
             {
-                Key = iss.Key,
-                Created = iss.Created,
-                Updated = iss.Updated
+                Key = issue.Key,
+                Created = issue.Created,
+                Updated = issue.Updated,
+                Title = issue.Title,
+                Type = issue.Type,
+                Status = issue.Status,
+                TimeSpent = issue.TimeSpent,
+                OriginalEstimate = issue.OriginalEstimate,
+                Resolution = issue.Resolution,
+                Resolved = issue.Resolved,
+                StoryPoints = issue.StoryPoints
             });
             return issues;
         }

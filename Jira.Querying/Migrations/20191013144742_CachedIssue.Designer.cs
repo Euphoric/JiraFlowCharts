@@ -9,8 +9,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Jira.Querying.Migrations
 {
     [DbContext(typeof(IssuesCacheContext))]
-    [Migration("20191006191718_Initial")]
-    partial class Initial
+    [Migration("20191013144742_CachedIssue")]
+    partial class CachedIssue
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -18,12 +18,28 @@ namespace Jira.Querying.Migrations
             modelBuilder
                 .HasAnnotation("ProductVersion", "2.2.6-servicing-10079");
 
-            modelBuilder.Entity("Jira.Querying.CachedIssueDb", b =>
+            modelBuilder.Entity("Jira.Querying.Sqlite.CachedIssueDb", b =>
                 {
                     b.Property<string>("Key")
                         .ValueGeneratedOnAdd();
 
                     b.Property<DateTime?>("Created");
+
+                    b.Property<int?>("OriginalEstimate");
+
+                    b.Property<string>("Resolution");
+
+                    b.Property<DateTime?>("Resolved");
+
+                    b.Property<string>("Status");
+
+                    b.Property<int?>("StoryPoints");
+
+                    b.Property<int?>("TimeSpent");
+
+                    b.Property<string>("Title");
+
+                    b.Property<string>("Type");
 
                     b.Property<DateTime?>("Updated");
 

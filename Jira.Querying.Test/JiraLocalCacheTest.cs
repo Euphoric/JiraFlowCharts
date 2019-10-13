@@ -1,4 +1,6 @@
-﻿using Jira.Querying.Sqlite;
+﻿using AutoFixture;
+using Jira.Querying.Sqlite;
+using KellermanSoftware.CompareNetObjects;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,9 +16,9 @@ namespace Jira.Querying
             Key = key;
         }
 
+        public string Key { get; private set; }
         public DateTime? Created { get; set; }
         public DateTime? Updated { get; set; }
-        public string Key { get; set; }
     }
 
     public class FakeJiraClient : IJiraClient
@@ -339,6 +341,23 @@ namespace Jira.Querying
             _client.FailIfIssueWereToBeRetrieved = "KEY-2";
 
             await Cache.Update();
+        }
+
+        [Fact]
+        public async Task Repository_saves_whole_issue()
+        {
+            Fixture fixture = new Fixture();
+            var issue = fixture.Build<CachedIssue>()
+                .Without(x=>x.StatusChanges)
+                .Create();
+
+            await Repository.Initialize();
+
+            await Repository.AddOrReplaceCachedIssue(issue);
+
+            var retrievedIssue = (await Repository.GetIssues()).SingleOrDefault();
+
+            issue.ShouldCompare(retrievedIssue);
         }
     }
 }
