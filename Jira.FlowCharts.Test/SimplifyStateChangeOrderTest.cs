@@ -126,7 +126,7 @@ namespace Jira.FlowCharts.Test
                 new CachedIssueStatusChange(new DateTime(2010, 07, 06), OnHoldState),
             };
 
-            SimplifyStateChangeOrder simplify = new SimplifyStateChangeOrder(new[] { DevState, QaState, DoneState }, OnHoldState);
+            SimplifyStateChangeOrder simplify = new SimplifyStateChangeOrder(new[] { DevState, QaState, DoneState }, new[] { OnHoldState });
             var simplified = simplify.FilterStatusChanges(changes).ToList();
 
             Assert.Empty(simplified);
@@ -143,7 +143,7 @@ namespace Jira.FlowCharts.Test
                 new CachedIssueStatusChange(new DateTime(2010, 07, 07), DevState),
             };
 
-            SimplifyStateChangeOrder simplify = new SimplifyStateChangeOrder(new[] { DevState, QaState, DoneState }, OnHoldState);
+            SimplifyStateChangeOrder simplify = new SimplifyStateChangeOrder(new[] { DevState, QaState, DoneState }, new[] { OnHoldState });
             var simplified = simplify.FilterStatusChanges(changes).ToList();
 
             List<CachedIssueStatusChange> expectedChanges = new List<CachedIssueStatusChange>()
@@ -166,7 +166,7 @@ namespace Jira.FlowCharts.Test
                 new CachedIssueStatusChange(new DateTime(2010, 07, 08), DevState),
             };
 
-            SimplifyStateChangeOrder simplify = new SimplifyStateChangeOrder(new[] { DevState, QaState, DoneState }, OnHoldState);
+            SimplifyStateChangeOrder simplify = new SimplifyStateChangeOrder(new[] { DevState, QaState, DoneState }, new[] { OnHoldState });
             var simplified = simplify.FilterStatusChanges(changes).ToList();
 
             List<CachedIssueStatusChange> expectedChanges = new List<CachedIssueStatusChange>()
@@ -189,7 +189,7 @@ namespace Jira.FlowCharts.Test
                 new CachedIssueStatusChange(new DateTime(2010, 07, 09), DevState),
             };
 
-            SimplifyStateChangeOrder simplify = new SimplifyStateChangeOrder(new[] { DevState, QaState, DoneState }, OnHoldState);
+            SimplifyStateChangeOrder simplify = new SimplifyStateChangeOrder(new[] { DevState, QaState, DoneState }, new[] { OnHoldState });
             var simplified = simplify.FilterStatusChanges(changes).ToList();
 
             List<CachedIssueStatusChange> expectedChanges = new List<CachedIssueStatusChange>()
@@ -198,6 +198,24 @@ namespace Jira.FlowCharts.Test
             };
 
             simplified.ShouldCompare(expectedChanges);
+        }
+
+        [Theory]
+        [InlineData("Reset1")]
+        [InlineData("Reset2")]
+        [InlineData("Reset3")]
+        public void Handles_multiple_reset_states(string inputState)
+        {
+            List<CachedIssueStatusChange> changes = new List<CachedIssueStatusChange>()
+            {
+                new CachedIssueStatusChange(new DateTime(2010, 07, 07), QaState),
+                new CachedIssueStatusChange(new DateTime(2010, 07, 08), inputState),
+            };
+
+            SimplifyStateChangeOrder simplify = new SimplifyStateChangeOrder(new[] { DevState, QaState, DoneState }, new[] { "Reset1", "Reset2", "Reset3" });
+            var simplified = simplify.FilterStatusChanges(changes).ToList();
+
+            Assert.Empty(simplified);
         }
     }
 }

@@ -48,8 +48,8 @@ namespace Jira.FlowCharts
             var stories = issues.Where(x => x.Type == "Story" || x.Type == "Bug");
 
             var states = new[] { "Ready For Dev", "In Dev", "Ready for Peer Review", "Ready for QA", "In QA", "Ready for Done", "Done" };
-            var resetState = "On Hold";
-            SimplifyStateChangeOrder simplify = new SimplifyStateChangeOrder(states, resetState);
+            var resetStates = new[] { "On Hold", "Not Started", "Withdrawn" };
+            SimplifyStateChangeOrder simplify = new SimplifyStateChangeOrder(states, resetStates);
 
             var finishedStories = stories
                 .Where(x=>x.Resolution != "Cancelled" && x.Status == "Done")

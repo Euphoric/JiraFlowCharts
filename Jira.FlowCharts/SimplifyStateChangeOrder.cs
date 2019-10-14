@@ -7,15 +7,15 @@ namespace Jira.FlowCharts
     public class SimplifyStateChangeOrder
     {
         private readonly Dictionary<string, int> _states;
-        private readonly string _resetState;
+        private readonly HashSet<string> _resetStates;
 
         // TODO : Last state should be taken from last occurence of change
         // TODO : State changes in same day/time are in right order
 
-        public SimplifyStateChangeOrder(string[] states, string resetState = null)
+        public SimplifyStateChangeOrder(string[] states, string[] resetStates = null)
         {
             _states = states.Select((state, i) => new { state, i }).ToDictionary(x => x.state, x => x.i);
-            _resetState = resetState;
+            _resetStates = new HashSet<string>(resetStates ?? new string[0]);
         }
 
         public IEnumerable<CachedIssueStatusChange> FilterStatusChanges(IEnumerable<CachedIssueStatusChange> statusChanges)
@@ -26,7 +26,7 @@ namespace Jira.FlowCharts
         private IEnumerable<CachedIssueStatusChange> SkipAfterResetState(IEnumerable<CachedIssueStatusChange> statusChanges)
         {
             var list = statusChanges.ToList();
-            var resetStateIdx = list.FindLastIndex(x => x.State == _resetState);
+            var resetStateIdx = list.FindLastIndex(x => _resetStates.Contains(x.State));
             if (resetStateIdx != -1)
             {
                 return list.Skip(resetStateIdx + 1);
