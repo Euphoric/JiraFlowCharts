@@ -18,7 +18,6 @@ using Jira.Querying;
 using Jira.Querying.Sqlite;
 using LiveCharts;
 using LiveCharts.Configurations;
-using Newtonsoft.Json;
 
 namespace Jira.FlowCharts
 {
@@ -45,14 +44,17 @@ namespace Jira.FlowCharts
 
             DateTime startDate = DateTime.Now.AddMonths(-12);
 
-            var stories = issues.Where(x => x.Type == "Story" || x.Type == "Bug");
+            var stories = issues
+                .Where(x => x.Type == "Story" || x.Type == "Bug")
+                .Where(x => x.Resolution != "Cancelled" && x.Resolution != "Duplicate")
+                .Where(x => x.Status != "Withdrawn" && x.Status != "On Hold");
 
             var states = new[] { "Ready For Dev", "In Dev", "Ready for Peer Review", "Ready for QA", "In QA", "Ready for Done", "Done" };
             var resetStates = new[] { "On Hold", "Not Started", "Withdrawn" };
             SimplifyStateChangeOrder simplify = new SimplifyStateChangeOrder(states, resetStates);
 
             var finishedStories = stories
-                .Where(x=>x.Resolution != "Cancelled" && x.Status == "Done")
+                .Where(x=>x.Status == "Done")
                 .Select(x=>CalculateDuration(x, simplify))
                 .Where(x=>x.End > startDate).ToArray();
 

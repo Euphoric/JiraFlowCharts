@@ -13,8 +13,6 @@ namespace Jira.FlowCharts
     {
         public CumulativeFlowViewModel(IEnumerable<CachedIssue> stories, string[] states)
         {
-            stories = stories.Where(x => x.Status != "Withdrawn" && x.Status != "On Hold" && x.Resolution != "Duplicate");
-
             var currentStatus = stories.Select(x => x.Status).Distinct().ToArray();
             var currentResolution = stories.Select(x => x.Resolution).Distinct().ToArray();
             var allStates = stories.SelectMany(x => x.StatusChanges).Select(x => x.State).Distinct().ToArray();
