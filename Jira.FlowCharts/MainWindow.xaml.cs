@@ -61,8 +61,12 @@ namespace Jira.FlowCharts
 
         private static FlowIssue CalculateDuration(CachedIssue issue)
         {
-            var startTime = issue.StatusChanges.FirstOrDefault(x=>x.State == "In Dev")?.ChangeTime;
-            var doneTime = issue.StatusChanges.LastOrDefault(x=>x.State == "Done")?.ChangeTime;
+            SimplifyStateChangeOrder simplify = new SimplifyStateChangeOrder();
+
+            var simplifiedIssues = simplify.FilterStatusChanges(issue.StatusChanges);
+
+            var startTime = simplifiedIssues.FirstOrDefault()?.ChangeTime;
+            var doneTime = simplifiedIssues.LastOrDefault(x=>x.State == "Done")?.ChangeTime;
 
             TimeSpan? duration = doneTime - startTime;
 
