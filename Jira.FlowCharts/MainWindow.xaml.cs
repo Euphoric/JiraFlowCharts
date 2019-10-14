@@ -15,6 +15,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Jira.Querying;
+using Jira.Querying.Sqlite;
 using LiveCharts;
 using LiveCharts.Configurations;
 using Newtonsoft.Json;
@@ -33,15 +34,14 @@ namespace Jira.FlowCharts
             this.Loaded += MainWindow_Loaded;
         }
 
-        private void MainWindow_Loaded(object sender, RoutedEventArgs e)
+        private async void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
             var mapper1 = Mappers.Xy<CycleTimeScatterplotViewModel.IssuePoint>()
                 .X(value => value.X)
                 .Y(value => value.Y);
             LiveCharts.Charting.For<CycleTimeScatterplotViewModel.IssuePoint>(mapper1);
 
-            var issues = RetrieveIssues();
-
+            var issues = await RetrieveIssues();
 
             DateTime startDate = DateTime.Now.AddMonths(-12);
 
@@ -81,13 +81,13 @@ namespace Jira.FlowCharts
             return flowIssue;
         }
 
-        private static List<CachedIssue> RetrieveIssues()
+        private static async Task<List<CachedIssue>> RetrieveIssues()
         {
-            using (StreamReader r = new StreamReader("../../../Data/issues.json"))
-            using (JsonReader jr = new JsonTextReader(r))
+            using (var cacheRepo = new SqliteJiraLocalCacheRepository(@"../../../Data/issuesCache.db"))
             {
-                JsonSerializer serializer = new JsonSerializer();
-                return serializer.Deserialize<List<CachedIssue>>(jr);
+                await cacheRepo.Initialize();
+
+                return (await cacheRepo.GetIssues()).ToList();
             }
         }
     }
