@@ -12,6 +12,7 @@ namespace Jira.FlowCharts.Test
         private const string DevState = "In dev";
         private const string QaState = "In QA";
         private const string DoneState = "Done";
+        private const string OnHoldState = "On Hold";
 
         [Fact]
         public void Ignores_all_but_first_transition_into_state()
@@ -110,6 +111,90 @@ namespace Jira.FlowCharts.Test
             List<CachedIssueStatusChange> expectedChanges = new List<CachedIssueStatusChange>()
             {
                 new CachedIssueStatusChange(new DateTime(2010, 07, 04), "State4"),
+            };
+
+            simplified.ShouldCompare(expectedChanges);
+        }
+
+        [Fact]
+        public void Ignore_states_before_reset_state()
+        {
+            List<CachedIssueStatusChange> changes = new List<CachedIssueStatusChange>()
+            {
+                new CachedIssueStatusChange(new DateTime(2010, 07, 04), QaState),
+                new CachedIssueStatusChange(new DateTime(2010, 07, 05), DevState),
+                new CachedIssueStatusChange(new DateTime(2010, 07, 06), OnHoldState),
+            };
+
+            SimplifyStateChangeOrder simplify = new SimplifyStateChangeOrder(new[] { DevState, QaState, DoneState }, OnHoldState);
+            var simplified = simplify.FilterStatusChanges(changes).ToList();
+
+            Assert.Empty(simplified);
+        }
+
+        [Fact]
+        public void Ignore_states_before_reset_state_and_returns_next_state()
+        {
+            List<CachedIssueStatusChange> changes = new List<CachedIssueStatusChange>()
+            {
+                new CachedIssueStatusChange(new DateTime(2010, 07, 04), QaState),
+                new CachedIssueStatusChange(new DateTime(2010, 07, 05), DevState),
+                new CachedIssueStatusChange(new DateTime(2010, 07, 06), OnHoldState),
+                new CachedIssueStatusChange(new DateTime(2010, 07, 07), DevState),
+            };
+
+            SimplifyStateChangeOrder simplify = new SimplifyStateChangeOrder(new[] { DevState, QaState, DoneState }, OnHoldState);
+            var simplified = simplify.FilterStatusChanges(changes).ToList();
+
+            List<CachedIssueStatusChange> expectedChanges = new List<CachedIssueStatusChange>()
+            {
+                new CachedIssueStatusChange(new DateTime(2010, 07, 07), DevState),
+            };
+
+            simplified.ShouldCompare(expectedChanges);
+        }
+
+        [Fact]
+        public void Ignore_states_before_reset_state_and_returns_following_states_simplified()
+        {
+            List<CachedIssueStatusChange> changes = new List<CachedIssueStatusChange>()
+            {
+                new CachedIssueStatusChange(new DateTime(2010, 07, 04), QaState),
+                new CachedIssueStatusChange(new DateTime(2010, 07, 05), DevState),
+                new CachedIssueStatusChange(new DateTime(2010, 07, 06), OnHoldState),
+                new CachedIssueStatusChange(new DateTime(2010, 07, 07), QaState),
+                new CachedIssueStatusChange(new DateTime(2010, 07, 08), DevState),
+            };
+
+            SimplifyStateChangeOrder simplify = new SimplifyStateChangeOrder(new[] { DevState, QaState, DoneState }, OnHoldState);
+            var simplified = simplify.FilterStatusChanges(changes).ToList();
+
+            List<CachedIssueStatusChange> expectedChanges = new List<CachedIssueStatusChange>()
+            {
+                new CachedIssueStatusChange(new DateTime(2010, 07, 07), QaState),
+            };
+
+            simplified.ShouldCompare(expectedChanges);
+        }
+
+        [Fact]
+        public void Takes_last_reset_state()
+        {
+            List<CachedIssueStatusChange> changes = new List<CachedIssueStatusChange>()
+            {
+                new CachedIssueStatusChange(new DateTime(2010, 07, 04), DevState),
+                new CachedIssueStatusChange(new DateTime(2010, 07, 06), OnHoldState),
+                new CachedIssueStatusChange(new DateTime(2010, 07, 07), QaState),
+                new CachedIssueStatusChange(new DateTime(2010, 07, 08), OnHoldState),
+                new CachedIssueStatusChange(new DateTime(2010, 07, 09), DevState),
+            };
+
+            SimplifyStateChangeOrder simplify = new SimplifyStateChangeOrder(new[] { DevState, QaState, DoneState }, OnHoldState);
+            var simplified = simplify.FilterStatusChanges(changes).ToList();
+
+            List<CachedIssueStatusChange> expectedChanges = new List<CachedIssueStatusChange>()
+            {
+                new CachedIssueStatusChange(new DateTime(2010, 07, 09), DevState),
             };
 
             simplified.ShouldCompare(expectedChanges);
