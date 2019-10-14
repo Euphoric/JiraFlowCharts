@@ -24,7 +24,7 @@ namespace Jira.FlowCharts.Test
                 new CachedIssueStatusChange(new DateTime(2010, 07, 06), QaState),
             };
 
-            SimplifyStateChangeOrder simplify = new SimplifyStateChangeOrder();
+            SimplifyStateChangeOrder simplify = new SimplifyStateChangeOrder(new[] { DevState, QaState, DoneState });
             var simplified = simplify.FilterStatusChanges(changes).ToList();
 
             List<CachedIssueStatusChange> expectedChanges = new List<CachedIssueStatusChange>()
@@ -47,13 +47,69 @@ namespace Jira.FlowCharts.Test
                 new CachedIssueStatusChange(new DateTime(2010, 07, 06), QaState),
             };
 
-            SimplifyStateChangeOrder simplify = new SimplifyStateChangeOrder();
+            SimplifyStateChangeOrder simplify = new SimplifyStateChangeOrder(new[] { DevState, QaState, DoneState });
             var simplified = simplify.FilterStatusChanges(changes).ToList();
 
             List<CachedIssueStatusChange> expectedChanges = new List<CachedIssueStatusChange>()
             {
                 new CachedIssueStatusChange(new DateTime(2010, 07, 03), DevState),
                 new CachedIssueStatusChange(new DateTime(2010, 07, 04), QaState),
+            };
+
+            simplified.ShouldCompare(expectedChanges);
+        }
+
+        [Fact]
+        public void Should_not_include_undefined_state()
+        {
+            List<CachedIssueStatusChange> changes = new List<CachedIssueStatusChange>()
+            {
+                new CachedIssueStatusChange(new DateTime(2010, 07, 03), "UnknownState"),
+            };
+
+            SimplifyStateChangeOrder simplify = new SimplifyStateChangeOrder(new[] { DevState, QaState, DoneState });
+            var simplified = simplify.FilterStatusChanges(changes).ToList();
+
+            Assert.Empty(simplified);
+        }
+
+        [Fact]
+        public void Going_back_to_previously_unvisited_state_is_removed()
+        {
+            List<CachedIssueStatusChange> changes = new List<CachedIssueStatusChange>()
+            {
+                new CachedIssueStatusChange(new DateTime(2010, 07, 04), QaState),
+                new CachedIssueStatusChange(new DateTime(2010, 07, 05), DevState),
+            };
+
+            SimplifyStateChangeOrder simplify = new SimplifyStateChangeOrder(new[] { DevState, QaState, DoneState });
+            var simplified = simplify.FilterStatusChanges(changes).ToList();
+
+            List<CachedIssueStatusChange> expectedChanges = new List<CachedIssueStatusChange>()
+            {
+                new CachedIssueStatusChange(new DateTime(2010, 07, 04), QaState),
+            };
+
+            simplified.ShouldCompare(expectedChanges);
+        }
+
+        [Fact]
+        public void Going_back_to_previously_unvisited_state_multiple_is_removed()
+        {
+            List<CachedIssueStatusChange> changes = new List<CachedIssueStatusChange>()
+            {
+                new CachedIssueStatusChange(new DateTime(2010, 07, 04), "State4"),
+                new CachedIssueStatusChange(new DateTime(2010, 07, 05), "State1"),
+                new CachedIssueStatusChange(new DateTime(2010, 07, 06), "State2"),
+                new CachedIssueStatusChange(new DateTime(2010, 07, 07), "State3"),
+            };
+
+            SimplifyStateChangeOrder simplify = new SimplifyStateChangeOrder(new[] { "State1", "State2", "State3" , "State4" });
+            var simplified = simplify.FilterStatusChanges(changes).ToList();
+
+            List<CachedIssueStatusChange> expectedChanges = new List<CachedIssueStatusChange>()
+            {
+                new CachedIssueStatusChange(new DateTime(2010, 07, 04), "State4"),
             };
 
             simplified.ShouldCompare(expectedChanges);

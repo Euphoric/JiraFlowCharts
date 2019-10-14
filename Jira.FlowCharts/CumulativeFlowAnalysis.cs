@@ -45,7 +45,7 @@ namespace Jira.FlowCharts
             States = states.Reverse().ToArray();
             var stateIxs = States.Select((x, i) => new { i, x }).ToDictionary(x => x.x, x => x.i);
 
-            SimplifyStateChangeOrder simplifyState = new SimplifyStateChangeOrder();
+            SimplifyStateChangeOrder simplifyState = new SimplifyStateChangeOrder(states);
 
             List<ChangePoint> changes = new List<ChangePoint>();
             int[] statesCounter = new int[States.Length];

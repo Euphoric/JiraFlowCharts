@@ -47,26 +47,27 @@ namespace Jira.FlowCharts
 
             var stories = issues.Where(x => x.Type == "Story" || x.Type == "Bug");
 
+            var states = new[] { "Ready For Dev", "In Dev", "Ready for Peer Review", "Ready for QA", "In QA", "Ready for Done", "Done" };
+            SimplifyStateChangeOrder simplify = new SimplifyStateChangeOrder(states);
+
             var finishedStories = stories
                 .Where(x=>x.Resolution != "Cancelled" && x.Status == "Done")
-                .Select(CalculateDuration)
-                .Where(x=>x.Duration < 80)
+                .Select(x=>CalculateDuration(x, simplify))
+                .Where(x=>x.Duration < 150)
                 .Where(x=>x.End > startDate).ToArray();
 
             CycleTimeScatterplotTab.DataContext = new CycleTimeScatterplotViewModel(finishedStories);
             CycleTimeHistogram.DataContext = new CycleTimeHistogramViewModel(finishedStories);
             StoryPointCycleTime.DataContext = new StoryPointCycleTimeViewModel(finishedStories);
-            CumulativeFlow.DataContext = new CumulativeFlowViewModel(stories);
+            CumulativeFlow.DataContext = new CumulativeFlowViewModel(stories, states);
         }
 
-        private static FlowIssue CalculateDuration(CachedIssue issue)
+        private static FlowIssue CalculateDuration(CachedIssue issue, SimplifyStateChangeOrder simplify)
         {
-            SimplifyStateChangeOrder simplify = new SimplifyStateChangeOrder();
-
             var simplifiedIssues = simplify.FilterStatusChanges(issue.StatusChanges);
 
             var startTime = simplifiedIssues.First().ChangeTime;
-            var doneTime = simplifiedIssues.Last(x=>x.State == "Done").ChangeTime;
+            var doneTime = simplifiedIssues.Last().ChangeTime;
 
             TimeSpan duration = doneTime - startTime;
 
