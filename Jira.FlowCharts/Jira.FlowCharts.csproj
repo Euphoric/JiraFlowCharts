@@ -172,6 +172,7 @@
     </ApplicationDefinition>
     <Compile Include="CumulativeFlowAnalysis.cs" />
     <Compile Include="CumulativeFlowViewModel.cs" />
+    <Compile Include="SimplifyStateChangeOrder.cs" />
     <Compile Include="StoryPointCycleTimeViewModel.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>

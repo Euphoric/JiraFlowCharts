@@ -42,20 +42,17 @@ namespace Jira.FlowCharts
 
         public CumulativeFlowAnalysis(IEnumerable<CachedIssue> stories, string[] states, DateTime? from = null)
         {
-            // TODO : Follow correct order of states
-            // TODO : Last state should be taken from last occurence of change
-            // TODO : States going back to state that wasn't yet visited is ignored
-            // TODO : State changes in same day/time are in right order
-
             States = states.Reverse().ToArray();
             var stateIxs = States.Select((x, i) => new { i, x }).ToDictionary(x => x.x, x => x.i);
 
+            SimplifyStateChangeOrder simplifyState = new SimplifyStateChangeOrder();
+
             List<ChangePoint> changes = new List<ChangePoint>();
             int[] statesCounter = new int[States.Length];
-            var groupedStories =
+            var statusChangesGroups =
                 stories
                 .SelectMany(issue =>
-                    FilterStatusChanges(issue.StatusChanges)
+                    simplifyState.FilterStatusChanges(issue.StatusChanges)
                     .Select(statusChange => new { IssueKey = issue.Key, statusChange.ChangeTime, statusChange.State })
                     )
                 .Where(x => stateIxs.ContainsKey(x.State))
@@ -64,22 +61,22 @@ namespace Jira.FlowCharts
 
             Dictionary<string, int> activeStates = new Dictionary<string, int>();
 
-            foreach (var grp in groupedStories)
+            foreach (var statusChangeGroup in statusChangesGroups)
             {
-                foreach (var change in grp)
+                foreach (var statusChange in statusChangeGroup)
                 {
-                    var currentStateIx = stateIxs[change.State];
+                    var currentStateIx = stateIxs[statusChange.State];
                     statesCounter[currentStateIx]++;
 
-                    if (activeStates.TryGetValue(change.IssueKey, out int previousStateIx))
+                    if (activeStates.TryGetValue(statusChange.IssueKey, out int previousStateIx))
                     {
                         statesCounter[previousStateIx]--;
                     }
 
-                    activeStates[change.IssueKey] = stateIxs[change.State];
+                    activeStates[statusChange.IssueKey] = stateIxs[statusChange.State];
                 }
 
-                var cp = new ChangePoint() { Date = grp.Key, StateCounts = statesCounter.ToArray() };
+                var cp = new ChangePoint() { Date = statusChangeGroup.Key, StateCounts = statesCounter.ToArray() };
 
                 changes.Add(cp);
             }
@@ -120,18 +117,6 @@ namespace Jira.FlowCharts
                 }
 
                 previousChange = change;
-            }
-        }
-
-        private IEnumerable<CachedIssueStatusChange> FilterStatusChanges(IEnumerable<CachedIssueStatusChange> statusChanges)
-        {
-            HashSet<string> foundStates = new HashSet<string>();
-            foreach (var change in statusChanges)
-            {
-                if (foundStates.Add(change.State))
-                {
-                    yield return change;
-                }
             }
         }
     }
