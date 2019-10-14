@@ -12,8 +12,7 @@ namespace Jira.FlowCharts
         {
             var histogramNonzero =
                 flowIssues
-                    .Where(x=>x.Duration.HasValue)
-                    .GroupBy(x => (int)x.Duration.Value + 1)
+                    .GroupBy(x => (int)x.Duration + 1)
                     .Select(grp => new { Days = grp.Key, Counts = grp.Count() })
                     .ToDictionary(x => x.Days, x => x.Counts);
 

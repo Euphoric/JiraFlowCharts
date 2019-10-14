@@ -50,7 +50,7 @@ namespace Jira.FlowCharts
             var finishedStories = stories
                 .Where(x=>x.Resolution != "Cancelled" && x.Status == "Done")
                 .Select(CalculateDuration)
-                .Where(x=>x.Duration.HasValue && x.Duration.Value < 80)
+                .Where(x=>x.Duration < 80)
                 .Where(x=>x.End > startDate).ToArray();
 
             CycleTimeScatterplotTab.DataContext = new CycleTimeScatterplotViewModel(finishedStories);
@@ -65,10 +65,10 @@ namespace Jira.FlowCharts
 
             var simplifiedIssues = simplify.FilterStatusChanges(issue.StatusChanges);
 
-            var startTime = simplifiedIssues.FirstOrDefault()?.ChangeTime;
-            var doneTime = simplifiedIssues.LastOrDefault(x=>x.State == "Done")?.ChangeTime;
+            var startTime = simplifiedIssues.First().ChangeTime;
+            var doneTime = simplifiedIssues.Last(x=>x.State == "Done").ChangeTime;
 
-            TimeSpan? duration = doneTime - startTime;
+            TimeSpan duration = doneTime - startTime;
 
             var flowIssue = new FlowIssue()
             {
@@ -77,7 +77,7 @@ namespace Jira.FlowCharts
                 Type = issue.Type,
                 Start = startTime,
                 End = doneTime,
-                Duration = duration?.TotalDays,
+                Duration = duration.TotalDays,
                 StoryPoints = issue.StoryPoints,
                 TimeSpent = issue.TimeSpent
             };

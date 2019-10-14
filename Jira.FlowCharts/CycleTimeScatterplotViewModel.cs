@@ -42,17 +42,17 @@ namespace Jira.FlowCharts
             Stories = new ChartValues<IssuePoint>();
             Bugs = new ChartValues<IssuePoint>();
 
-            flowIssues = flowIssues.Where(x => x.Start.HasValue && x.End.HasValue).ToArray();
+            flowIssues = flowIssues.ToArray();
 
             foreach (var issue in flowIssues)
             {
-                var sinceStart = issue.End.Value - baseDate;
+                var sinceStart = issue.End - baseDate;
                 var label = ""
                             + issue.Key + Environment.NewLine
                             + issue.Title + Environment.NewLine
-                            + issue.End.Value.ToString(CultureInfo.InvariantCulture);
+                            + issue.End.ToString(CultureInfo.InvariantCulture);
 
-                var issuePoint = new IssuePoint(label, sinceStart.TotalDays, issue.Duration.Value);
+                var issuePoint = new IssuePoint(label, sinceStart.TotalDays, issue.Duration);
 
                 if (issue.Type == "Story")
                 {
@@ -64,7 +64,7 @@ namespace Jira.FlowCharts
                 }
             }
 
-            var durations = flowIssues.Select(x => x.Duration.Value).OrderBy(x => x).ToArray();
+            var durations = flowIssues.Select(x => x.Duration).OrderBy(x => x).ToArray();
 
             Percentile50 = durations[(int)(durations.Length * 0.50)];
             Percentile70 = durations[(int)(durations.Length * 0.70)];

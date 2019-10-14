@@ -15,20 +15,20 @@ namespace Jira.FlowCharts
         public StoryPointCycleTimeViewModel(FlowIssue[] flowIssues)
         {
             var storyPointGrouped = flowIssues
-                .Where(x => x.StoryPoints.HasValue && x.Duration.HasValue)
+                .Where(x => x.StoryPoints.HasValue)
                 .Where(x=>x.StoryPoints.Value > 0)
                 .GroupBy(x => x.StoryPoints.Value)
                 .Select(grp => new
                 {
                     StoryPoints = grp.Key,
-                    Min = grp.Min(x => x.Duration.Value),
-                    Percentile05 = Percentile(grp.Select(x => x.Duration.Value), 0.05),
-                    Percentile25 = Percentile(grp.Select(x => x.Duration.Value), 0.25),
-                    Percentile75 = Percentile(grp.Select(x => x.Duration.Value), 0.75),
-                    Percentile95 = Percentile(grp.Select(x => x.Duration.Value), 0.95),
-                    Max = grp.Max(x => x.Duration.Value),
-                    Average = grp.Average(x=>x.Duration.Value),
-                    Median = Percentile(grp.Select(x => x.Duration.Value), 0.5),
+                    Min = grp.Min(x => x.Duration),
+                    Percentile05 = Percentile(grp.Select(x => x.Duration), 0.05),
+                    Percentile25 = Percentile(grp.Select(x => x.Duration), 0.25),
+                    Percentile75 = Percentile(grp.Select(x => x.Duration), 0.75),
+                    Percentile95 = Percentile(grp.Select(x => x.Duration), 0.95),
+                    Max = grp.Max(x => x.Duration),
+                    Average = grp.Average(x=>x.Duration),
+                    Median = Percentile(grp.Select(x => x.Duration), 0.5),
                     Count = grp.Count()
                 })
                 .OrderBy(x=>x.StoryPoints)
