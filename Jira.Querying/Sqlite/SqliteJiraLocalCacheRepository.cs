@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -15,9 +15,12 @@ namespace Jira.Querying.Sqlite
 
         public bool IsDisposed { get; private set; }
 
-        public SqliteJiraLocalCacheRepository()
+        public SqliteJiraLocalCacheRepository(string databaseFile = null)
         {
-            _dbContext = new IssuesCacheContext();
+            var optionsBuilder = new DbContextOptionsBuilder<IssuesCacheContext>();
+            var connectionString = databaseFile == null ? "DataSource=:memory:" : $"DataSource={Path.GetFullPath(databaseFile)}";
+            optionsBuilder.UseSqlite(connectionString);
+            _dbContext = new IssuesCacheContext(optionsBuilder.Options);
 
             var config = new MapperConfiguration(cfg => {
                 cfg.CreateMap<CachedIssue, CachedIssueDb>();
@@ -32,7 +35,7 @@ namespace Jira.Querying.Sqlite
 
         public async Task Initialize()
         {
-            await _dbContext.Database.OpenConnectionAsync(); // needed for in-memory test (TODO : fix?)
+            await _dbContext.Database.OpenConnectionAsync();
             await _dbContext.Database.MigrateAsync();
         }
 

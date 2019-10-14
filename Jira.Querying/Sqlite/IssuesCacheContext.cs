@@ -4,14 +4,12 @@ namespace Jira.Querying.Sqlite
 {
     class IssuesCacheContext : DbContext
     {
-        public DbSet<CachedIssueDb> Issues { get; set; }
-
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        public IssuesCacheContext(DbContextOptions options)
+            :base(options)
         {
-            optionsBuilder.UseSqlite("DataSource=:memory:"); // TODO: use connection string from constructor
-
-            base.OnConfiguring(optionsBuilder);
         }
+
+        public DbSet<CachedIssueDb> Issues { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

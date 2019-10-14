@@ -1,13 +1,7 @@
 ﻿using System;
-using System.ComponentModel;
-using System.Globalization;
-using System.IO;
-using System.Xml;
-using System.Xml.Serialization;
 using System.Threading.Tasks;
-using Atlassian.Jira;
-using Newtonsoft.Json;
 using Jira.Querying;
+using Jira.Querying.Sqlite;
 using Microsoft.Extensions.Configuration;
 
 namespace JiraParse
@@ -38,20 +32,11 @@ namespace JiraParse
 
             DateTime lastUpdate = DateTime.Now.AddYears(-1);
 
-            using (JiraLocalCache jiraLocalCache = new JiraLocalCache(client, JiraLocalCache.CreateMemoryRepository()))
+            using (JiraLocalCache jiraLocalCache = new JiraLocalCache(client, new SqliteJiraLocalCacheRepository(@"../../../../Data/issuesCache.db")))
             {
                 await jiraLocalCache.Initialize(lastUpdate);
 
                 await jiraLocalCache.Update();
-
-                var updatedIssues = await jiraLocalCache.GetIssues();
-
-                // serialize JSON directly to a file
-                using (StreamWriter file = File.CreateText(@"../../../Data/issues.json"))
-                {
-                    JsonSerializer serializer = new JsonSerializer();
-                    serializer.Serialize(file, updatedIssues);
-                }
             }
 
             Console.WriteLine("Finished");
