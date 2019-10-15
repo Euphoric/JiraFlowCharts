@@ -35,8 +35,6 @@ namespace Jira.FlowCharts
                 });
             }
 
-            
-
             foreach (var change in cfa.Changes)
             {
                 for (int i = 0; i < cfa.States.Length; i++)

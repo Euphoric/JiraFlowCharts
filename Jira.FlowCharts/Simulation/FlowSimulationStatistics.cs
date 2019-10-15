@@ -1,0 +1,60 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using MathNet.Numerics.Statistics;
+
+namespace Jira.FlowCharts.Simulation
+{
+    static class FlowSimulationStatistics
+    {
+        public static FlowSimulationStatisticOutput RunSimulationStatistic(double newStoryRate)
+        {
+            List<double> simulationTimes = new List<double>();
+            List<double> avgWorkInProgress = new List<double>();
+            for (int i = 0; i < 1000; i++)
+            {
+                var simulation = new FlowSimulation(newStoryRate);
+                simulation.Run();
+
+                simulationTimes.Add(simulation.SimulationTime);
+                avgWorkInProgress.Add(simulation.AverageWorkInProgress);
+            }
+
+            FlowSimulationStatisticOutput output = FlowSimulationStatisticOutput.CreateOutput(simulationTimes);
+
+            return output;
+        }
+
+        private static void WriteSimulationTimeHistogram(FlowSimulationStatisticOutput output)
+        {
+            Console.WriteLine("Simulation Time");
+
+            for (int i = 0; i < output.HistogramValues.Length; i++)
+            {
+                Console.WriteLine($"{output.HistogramLabels[i]:F1} : {output.HistogramValues[i]}");
+            }
+
+            Console.WriteLine($"Percentile 50% : {output.percentile50:F2}");
+            Console.WriteLine($"Percentile 75% : {output.percentile75:F2}");
+            Console.WriteLine($"Percentile 85% : {output.percentile85:F2}");
+            Console.WriteLine($"Percentile 95% : {output.percentile95:F2}");
+            Console.WriteLine($"Percentile 99% : {output.percentile99:F2}");
+        }
+
+        private static void WriteWorkInProgressHistogram(List<double> averageWorkInProgres)
+        {
+            Console.WriteLine("Average work in progress");
+
+            var min = (int)Math.Floor(averageWorkInProgres.Min());
+            var max = (int)Math.Ceiling(averageWorkInProgres.Max());
+            var buckets = (max - min);
+            Histogram hist = new Histogram(averageWorkInProgres, buckets, min, max);
+
+            for (int i = 0; i < hist.BucketCount; i++)
+            {
+                var bucket = hist[i];
+                Console.WriteLine($"{bucket.LowerBound:F1} : {bucket.Count}");
+            }
+        }
+    }
+}

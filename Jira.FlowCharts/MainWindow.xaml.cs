@@ -62,6 +62,7 @@ namespace Jira.FlowCharts
             CycleTimeHistogram.DataContext = new CycleTimeHistogramViewModel(finishedStories);
             StoryPointCycleTime.DataContext = new StoryPointCycleTimeViewModel(finishedStories);
             CumulativeFlow.DataContext = new CumulativeFlowViewModel(stories, states);
+            Simulation.DataContext = new SimulationViewModel(finishedStories);
         }
 
         private static FlowIssue CalculateDuration(CachedIssue issue, SimplifyStateChangeOrder simplify)

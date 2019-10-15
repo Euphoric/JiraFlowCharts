@@ -91,6 +91,23 @@
                 </lvc:CartesianChart.AxisY>
             </lvc:CartesianChart>
         </TabItem>
-
+        <TabItem Header="Simulation" x:Name="Simulation">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <StackPanel Grid.Row="0" Orientation="Horizontal">
+                    <TextBlock>
+                         Story creation rate story/day: <Run Text="{Binding StoryCreationRate, Mode=OneWay, StringFormat=F3}" />
+                    </TextBlock>
+                </StackPanel>
+                <lvc:CartesianChart Series="{Binding SeriesCollection}" LegendLocation="Bottom" Grid.Row="1">
+                    <lvc:CartesianChart.AxisX>
+                        <lvc:Axis Labels="{Binding Labels}"/>
+                    </lvc:CartesianChart.AxisX>
+                </lvc:CartesianChart>
+            </Grid>
+        </TabItem>
     </TabControl>
 </Window>
