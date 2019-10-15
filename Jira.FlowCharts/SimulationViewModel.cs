@@ -29,14 +29,15 @@ namespace Jira.FlowCharts
             var to = stories.Max(x => x.End);
 
             StoryCreationRate = stories.Count() / (to - from).TotalDays;
+            var cycleTimes = stories.Select(x => x.Duration).ToArray();
 
-            var simStats = Simulation.FlowSimulationStatistics.RunSimulationStatistic(StoryCreationRate);
+            var simStats = Simulation.FlowSimulationStatistics.RunSimulationStatistic(StoryCreationRate, cycleTimes);
 
             SeriesCollection = new SeriesCollection
             {
                 new ColumnSeries
                 {
-                    Title = "Story count",
+                    Title = "Final time count",
                     Values = new ChartValues<double>(simStats.HistogramValues.Select(x=>(double)x))
                 }
             };

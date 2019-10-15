@@ -7,13 +7,13 @@ namespace Jira.FlowCharts.Simulation
 {
     static class FlowSimulationStatistics
     {
-        public static FlowSimulationStatisticOutput RunSimulationStatistic(double newStoryRate)
+        public static FlowSimulationStatisticOutput RunSimulationStatistic(double newStoryRate, double[] storyCycleTimes)
         {
             List<double> simulationTimes = new List<double>();
             List<double> avgWorkInProgress = new List<double>();
-            for (int i = 0; i < 1000; i++)
+            for (int i = 0; i < 10000; i++)
             {
-                var simulation = new FlowSimulation(newStoryRate);
+                var simulation = new FlowSimulation(newStoryRate, storyCycleTimes);
                 simulation.Run();
 
                 simulationTimes.Add(simulation.SimulationTime);
