@@ -45,9 +45,18 @@ namespace Jira.FlowCharts.Simulation
 
             SimulationTime = 0;
 
+            int? stopOnCompletedStories = null;
+
+            double simulationWarmupDays = 30;
+
             while (!events.IsEmpty)
             {
-                if (_simulatedStoryCycleTimes.Count >= _expectedCompletedStories)
+                if (stopOnCompletedStories == null && SimulationTime > simulationWarmupDays)
+                {
+                    stopOnCompletedStories = _simulatedStoryCycleTimes.Count + _expectedCompletedStories;
+                }
+
+                if (_simulatedStoryCycleTimes.Count >= stopOnCompletedStories)
                 {
                     break;
                 }
@@ -82,6 +91,7 @@ namespace Jira.FlowCharts.Simulation
                 }
             }
 
+            SimulationTime -= simulationWarmupDays;
             AverageWorkInProgress = _storiesInProgressSample.Average();
         }
 
