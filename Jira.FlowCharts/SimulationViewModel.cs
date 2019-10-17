@@ -31,7 +31,7 @@ namespace Jira.FlowCharts
             StoryCreationRate = stories.Count() / (to - from).TotalDays;
             var cycleTimes = stories.Select(x => x.Duration).ToArray();
 
-            var simStats = Simulation.FlowSimulationStatistics.RunSimulationStatistic(StoryCreationRate, cycleTimes);
+            var simStats = Simulation.FlowSimulationStatistics.RunSimulationStatistic(StoryCreationRate, cycleTimes, 10000, 20);
 
             SeriesCollection = new SeriesCollection
             {

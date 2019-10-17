@@ -14,16 +14,19 @@ namespace Jira.FlowCharts.Simulation
         private readonly List<double> _simulatedStoryCycleTimes;
         private readonly double _newStoryRate;
         private readonly double[] _storyCycleTimes;
+        private readonly int _expectedCompletedStories;
 
         private int _storyIdCounter;
 
         public double AverageWorkInProgress { get; private set; }
         public double SimulationTime { get; private set; }
 
-        public FlowSimulation(double newStoryRate, double[] storyCycleTimes)
+        public FlowSimulation(double newStoryRate, double[] storyCycleTimes, int expectedCompletedStories)
         {
             _newStoryRate = newStoryRate;
             _storyCycleTimes = storyCycleTimes;
+            _expectedCompletedStories = expectedCompletedStories;
+
             _storyIdCounter = 0;
             _simulatedStoryCycleTimes = new List<double>();
             _storiesInProgress = new System.Collections.Generic.HashSet<int>();
@@ -40,13 +43,11 @@ namespace Jira.FlowCharts.Simulation
             events.Add(new Event(0, 0, new EventValue(EventType.NewStory)));
             events.Add(new Event(0, 0, new EventValue(EventType.Sample)));
 
-            int expectedFinishedStories = 20;
-
             SimulationTime = 0;
 
             while (!events.IsEmpty)
             {
-                if (_simulatedStoryCycleTimes.Count >= expectedFinishedStories)
+                if (_simulatedStoryCycleTimes.Count >= _expectedCompletedStories)
                 {
                     break;
                 }

@@ -25,7 +25,7 @@ namespace Jira.FlowCharts.Simulation
             var max = (int)Math.Ceiling(orderedSimulationTimes[orderedSimulationTimes.Length * 995 / 1000]);
             var buckets = (max - min);
             Histogram hist = new Histogram(simulationTimes, buckets, min, max);
-
+            
             output.HistogramValues = new int[hist.BucketCount];
             output.HistogramLabels = new double[hist.BucketCount];
 
@@ -42,6 +42,15 @@ namespace Jira.FlowCharts.Simulation
             output.percentile95 = orderedSimulationTimes[orderedSimulationTimes.Length * 95 / 100];
             output.percentile99 = orderedSimulationTimes[orderedSimulationTimes.Length * 99 / 100];
             return output;
+        }
+
+        public Dictionary<int, double> NormalizedHistogram()
+        {
+            double total = HistogramValues.Sum();
+
+            return Enumerable
+                .Zip(HistogramLabels, HistogramValues, (label, value) => new {label = (int) label, value})
+                .ToDictionary(x => x.label, x => x.value / total);
         }
     }
 }

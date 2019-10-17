@@ -5,15 +5,15 @@ using MathNet.Numerics.Statistics;
 
 namespace Jira.FlowCharts.Simulation
 {
-    static class FlowSimulationStatistics
+    public static class FlowSimulationStatistics
     {
-        public static FlowSimulationStatisticOutput RunSimulationStatistic(double newStoryRate, double[] storyCycleTimes)
+        public static FlowSimulationStatisticOutput RunSimulationStatistic(double newStoryRate, double[] storyCycleTimes, int simulationRuns, int expectedCompletedStories)
         {
             List<double> simulationTimes = new List<double>();
             List<double> avgWorkInProgress = new List<double>();
-            for (int i = 0; i < 10000; i++)
+            for (int i = 0; i < simulationRuns; i++)
             {
-                var simulation = new FlowSimulation(newStoryRate, storyCycleTimes);
+                var simulation = new FlowSimulation(newStoryRate, storyCycleTimes, expectedCompletedStories);
                 simulation.Run();
 
                 simulationTimes.Add(simulation.SimulationTime);
