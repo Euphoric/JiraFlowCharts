@@ -96,6 +96,7 @@
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
                 <StackPanel Grid.Row="0" Orientation="Horizontal">
                     <TextBlock>
@@ -107,6 +108,14 @@
                         <lvc:Axis Labels="{Binding Labels}"/>
                     </lvc:CartesianChart.AxisX>
                 </lvc:CartesianChart>
+                <StackPanel Grid.Row="2" Orientation="Horizontal">
+                    <TextBlock>
+                        50%: <Run Text="{Binding Percentile50, Mode=OneWay, StringFormat=N1}" /> days,
+                        75%: <Run Text="{Binding Percentile75, Mode=OneWay, StringFormat=N1}" /> days,
+                        85%: <Run Text="{Binding Percentile85, Mode=OneWay, StringFormat=N1}" /> days,
+                        95%: <Run Text="{Binding Percentile95, Mode=OneWay, StringFormat=N1}" /> days.
+                    </TextBlock>
+                </StackPanel>
             </Grid>
         </TabItem>
     </TabControl>

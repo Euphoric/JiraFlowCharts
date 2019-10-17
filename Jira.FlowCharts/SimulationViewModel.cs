@@ -15,6 +15,11 @@ namespace Jira.FlowCharts
 
         public string[] Labels { get; private set; }
 
+        public double Percentile50 { get; private set; }
+        public double Percentile75 { get; private set; }
+        public double Percentile85 { get; private set; }
+        public double Percentile95 { get; private set; }
+
         public SimulationViewModel(FlowIssue[] finishedStories)
         {
             this.finishedStories = finishedStories;
@@ -43,6 +48,12 @@ namespace Jira.FlowCharts
             };
 
             Labels = simStats.HistogramLabels.Select(x => x.ToString("F1")).ToArray();
+
+            Percentile50 = simStats.percentile50;
+            Percentile75 = simStats.percentile75;
+            Percentile85 = simStats.percentile85;
+            Percentile95 = simStats.percentile95;
+
         }
     }
 }

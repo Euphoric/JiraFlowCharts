@@ -63,6 +63,20 @@ namespace Jira.FlowCharts
             StoryPointCycleTime.DataContext = new StoryPointCycleTimeViewModel(finishedStories);
             CumulativeFlow.DataContext = new CumulativeFlowViewModel(stories, states);
             Simulation.DataContext = new SimulationViewModel(finishedStories);
+
+            //List<double> daysItTakesToFinish = new List<double>();
+            //for (int i = -200; i < 0; i++)
+            //{
+            //    var sinceTime = DateTime.Now.AddDays(i);
+
+            //    var storiesFinishedSince = finishedStories.Where(x => x.Start > sinceTime).OrderBy(x => x.End).ToArray();
+            //    if (storiesFinishedSince.Length < 10)
+            //        break;
+            //    var lastFinishedStory = storiesFinishedSince.Take(10).Last();
+
+            //    var timeItTakesToFinishStories = (lastFinishedStory.End - sinceTime).TotalDays;
+            //    daysItTakesToFinish.Add(timeItTakesToFinishStories);
+            //}
         }
 
         private static FlowIssue CalculateDuration(CachedIssue issue, SimplifyStateChangeOrder simplify)
