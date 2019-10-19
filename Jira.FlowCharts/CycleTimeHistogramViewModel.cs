@@ -6,7 +6,7 @@ using LiveCharts.Wpf;
 
 namespace Jira.FlowCharts
 {
-    internal class CycleTimeHistogramViewModel
+    public class CycleTimeHistogramViewModel
     {
         public CycleTimeHistogramViewModel(FlowIssue[] flowIssues)
         {

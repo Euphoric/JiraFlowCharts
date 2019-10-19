@@ -10,7 +10,7 @@ using LiveCharts.Wpf;
 
 namespace Jira.FlowCharts
 {
-    internal class StoryPointCycleTimeViewModel
+    public class StoryPointCycleTimeViewModel
     {
         public StoryPointCycleTimeViewModel(FlowIssue[] flowIssues)
         {

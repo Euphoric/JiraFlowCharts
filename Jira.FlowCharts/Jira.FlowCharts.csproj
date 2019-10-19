@@ -179,6 +179,7 @@
     </ApplicationDefinition>
     <Compile Include="CumulativeFlowAnalysis.cs" />
     <Compile Include="CumulativeFlowViewModel.cs" />
+    <Compile Include="MainViewModel.cs" />
     <Compile Include="SimplifyStateChangeOrder.cs" />
     <Compile Include="SimulationViewModel.cs" />
     <Compile Include="Simulation\Distribution.cs" />
