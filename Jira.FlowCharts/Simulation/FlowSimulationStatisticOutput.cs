@@ -9,11 +9,11 @@ namespace Jira.FlowCharts.Simulation
     {
         public int[] HistogramValues { get; private set; }
         public double[] HistogramLabels { get; private set; }
-        public double percentile50 { get; private set; }
-        public double percentile75 { get; private set; }
-        public double percentile85 { get; private set; }
-        public double percentile95 { get; private set; }
-        public double percentile99 { get; private set; }
+        public double Percentile50 { get; private set; }
+        public double Percentile75 { get; private set; }
+        public double Percentile85 { get; private set; }
+        public double Percentile95 { get; private set; }
+        public double Percentile99 { get; private set; }
 
         public static FlowSimulationStatisticOutput CreateOutput(List<double> simulationTimes)
         {
@@ -36,11 +36,12 @@ namespace Jira.FlowCharts.Simulation
                 output.HistogramLabels[i] = bucket.LowerBound;
             }
 
-            output.percentile50 = orderedSimulationTimes[orderedSimulationTimes.Length * 50 / 100];
-            output.percentile75 = orderedSimulationTimes[orderedSimulationTimes.Length * 75 / 100];
-            output.percentile85 = orderedSimulationTimes[orderedSimulationTimes.Length * 85 / 100];
-            output.percentile95 = orderedSimulationTimes[orderedSimulationTimes.Length * 95 / 100];
-            output.percentile99 = orderedSimulationTimes[orderedSimulationTimes.Length * 99 / 100];
+            output.Percentile50 = orderedSimulationTimes[orderedSimulationTimes.Length * 50 / 100];
+            output.Percentile75 = orderedSimulationTimes[orderedSimulationTimes.Length * 75 / 100];
+            output.Percentile85 = orderedSimulationTimes[orderedSimulationTimes.Length * 85 / 100];
+            output.Percentile95 = orderedSimulationTimes[orderedSimulationTimes.Length * 95 / 100];
+            output.Percentile99 = orderedSimulationTimes[orderedSimulationTimes.Length * 99 / 100];
+
             return output;
         }
 

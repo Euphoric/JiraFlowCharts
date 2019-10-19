@@ -102,6 +102,7 @@
                     <TextBlock>
                          Story creation rate story/day: <Run Text="{Binding StoryCreationRate, Mode=OneWay, StringFormat=F3}" />
                     </TextBlock>
+                    <Button Command="{Binding RunSimulation}">Run</Button>
                 </StackPanel>
                 <lvc:CartesianChart Series="{Binding SeriesCollection}" LegendLocation="Bottom" Grid.Row="1">
                     <lvc:CartesianChart.AxisX>
@@ -110,10 +111,10 @@
                 </lvc:CartesianChart>
                 <StackPanel Grid.Row="2" Orientation="Horizontal">
                     <TextBlock>
-                        50%: <Run Text="{Binding Percentile50, Mode=OneWay, StringFormat=N1}" /> days,
-                        75%: <Run Text="{Binding Percentile75, Mode=OneWay, StringFormat=N1}" /> days,
-                        85%: <Run Text="{Binding Percentile85, Mode=OneWay, StringFormat=N1}" /> days,
-                        95%: <Run Text="{Binding Percentile95, Mode=OneWay, StringFormat=N1}" /> days.
+                        50%: <Run Text="{Binding SimulationOutput.Percentile50, Mode=OneWay, StringFormat=N1}" /> days,
+                        75%: <Run Text="{Binding SimulationOutput.Percentile75, Mode=OneWay, StringFormat=N1}" /> days,
+                        85%: <Run Text="{Binding SimulationOutput.Percentile85, Mode=OneWay, StringFormat=N1}" /> days,
+                        95%: <Run Text="{Binding SimulationOutput.Percentile95, Mode=OneWay, StringFormat=N1}" /> days.
                     </TextBlock>
                 </StackPanel>
             </Grid>

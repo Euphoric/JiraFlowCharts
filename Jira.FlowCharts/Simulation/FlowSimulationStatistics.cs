@@ -34,11 +34,11 @@ namespace Jira.FlowCharts.Simulation
                 Console.WriteLine($"{output.HistogramLabels[i]:F1} : {output.HistogramValues[i]}");
             }
 
-            Console.WriteLine($"Percentile 50% : {output.percentile50:F2}");
-            Console.WriteLine($"Percentile 75% : {output.percentile75:F2}");
-            Console.WriteLine($"Percentile 85% : {output.percentile85:F2}");
-            Console.WriteLine($"Percentile 95% : {output.percentile95:F2}");
-            Console.WriteLine($"Percentile 99% : {output.percentile99:F2}");
+            Console.WriteLine($"Percentile 50% : {output.Percentile50:F2}");
+            Console.WriteLine($"Percentile 75% : {output.Percentile75:F2}");
+            Console.WriteLine($"Percentile 85% : {output.Percentile85:F2}");
+            Console.WriteLine($"Percentile 95% : {output.Percentile95:F2}");
+            Console.WriteLine($"Percentile 99% : {output.Percentile99:F2}");
         }
 
         private static void WriteWorkInProgressHistogram(List<double> averageWorkInProgres)

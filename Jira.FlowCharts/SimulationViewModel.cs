@@ -1,29 +1,51 @@
 ﻿using LiveCharts;
 using LiveCharts.Defaults;
 using LiveCharts.Wpf;
+using ReactiveUI;
 using System.Linq;
+using System.Reactive;
+using System.Reactive.Linq;
+using System.Threading.Tasks;
 
 namespace Jira.FlowCharts
 {
-    public class SimulationViewModel
+    public class SimulationViewModel : ReactiveObject
     {
         private FlowIssue[] finishedStories;
+        private double storyCreationRate;
 
-        public double StoryCreationRate { get; private set; }
+        public double StoryCreationRate { get => storyCreationRate; private set => this.RaiseAndSetIfChanged(ref storyCreationRate, value); }
 
-        public SeriesCollection SeriesCollection { get; private set; }
+        private readonly ObservableAsPropertyHelper<Simulation.FlowSimulationStatisticOutput> _simulationOutput;
+        public Simulation.FlowSimulationStatisticOutput SimulationOutput => _simulationOutput.Value;
 
-        public string[] Labels { get; private set; }
+        private readonly ObservableAsPropertyHelper<SeriesCollection> _seriesCollection;
+        public SeriesCollection SeriesCollection => _seriesCollection.Value;
 
-        public double Percentile50 { get; private set; }
-        public double Percentile75 { get; private set; }
-        public double Percentile85 { get; private set; }
-        public double Percentile95 { get; private set; }
+        private readonly ObservableAsPropertyHelper<string[]> _labels;
+        public string[] Labels => _labels.Value;
+
+        public ReactiveCommand<Unit, Simulation.FlowSimulationStatisticOutput> RunSimulation { get; }
 
         public SimulationViewModel(FlowIssue[] finishedStories)
         {
             this.finishedStories = finishedStories;
 
+            RunSimulation = ReactiveCommand.CreateFromTask(RunSimulationInner);
+            RunSimulation.ToProperty(this, nameof(SimulationOutput), out _simulationOutput);
+
+            this
+                .WhenAnyValue(x => x.SimulationOutput)
+                .Select(SeriesCollectionFromHistogram)
+                .ToProperty(this, nameof(SeriesCollection), out _seriesCollection);
+
+            this.WhenAnyValue(x => x.SimulationOutput)
+                .Select(LabelsFromHistogram)
+                .ToProperty(this, nameof(Labels), out _labels);
+        }
+
+        private async Task<Simulation.FlowSimulationStatisticOutput> RunSimulationInner()
+        {
             var startTime = finishedStories.Max(x => x.End).AddMonths(-6);
 
             var stories =
@@ -36,9 +58,17 @@ namespace Jira.FlowCharts
             StoryCreationRate = stories.Count() / (to - from).TotalDays;
             var cycleTimes = stories.Select(x => x.Duration).ToArray();
 
-            var simStats = Simulation.FlowSimulationStatistics.RunSimulationStatistic(StoryCreationRate, cycleTimes, 10000, 10);
+            Simulation.FlowSimulationStatisticOutput simStats = await Task.Run(() => Simulation.FlowSimulationStatistics.RunSimulationStatistic(StoryCreationRate, cycleTimes, 20000, 10));
 
-            SeriesCollection = new SeriesCollection
+            return simStats;
+        }
+
+        private SeriesCollection SeriesCollectionFromHistogram(Simulation.FlowSimulationStatisticOutput simStats)
+        {
+            if (simStats == null)
+                return null;
+
+            return new SeriesCollection
             {
                 new ColumnSeries
                 {
@@ -46,14 +76,14 @@ namespace Jira.FlowCharts
                     Values = new ChartValues<double>(simStats.HistogramValues.Select(x=>(double)x))
                 }
             };
+        }
 
-            Labels = simStats.HistogramLabels.Select(x => x.ToString("F1")).ToArray();
+        private string[] LabelsFromHistogram(Simulation.FlowSimulationStatisticOutput simStats)
+        {
+            if (simStats == null)
+                return null;
 
-            Percentile50 = simStats.percentile50;
-            Percentile75 = simStats.percentile75;
-            Percentile85 = simStats.percentile85;
-            Percentile95 = simStats.percentile95;
-
+            return simStats.HistogramLabels.Select(x => x.ToString("F0")).ToArray();
         }
     }
 }
