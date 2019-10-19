@@ -99,10 +99,14 @@
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
                 <StackPanel Grid.Row="0" Orientation="Horizontal">
-                    <TextBlock>
+                    <TextBlock Margin="4">
                          Story creation rate story/day: <Run Text="{Binding StoryCreationRate, Mode=OneWay, StringFormat=F3}" />
                     </TextBlock>
-                    <Button Command="{Binding RunSimulation}">Run</Button>
+                    <StackPanel Orientation="Horizontal" Margin="4">
+                        <Label Margin="0" Padding="0">Stories to simulate:</Label>
+                        <TextBox Text="{Binding SimulatedStoriesCount}" />
+                    </StackPanel>
+                    <Button Command="{Binding RunSimulation}" Margin="4">Run</Button>
                 </StackPanel>
                 <lvc:CartesianChart Series="{Binding SeriesCollection}" LegendLocation="Bottom" Grid.Row="1">
                     <lvc:CartesianChart.AxisX>

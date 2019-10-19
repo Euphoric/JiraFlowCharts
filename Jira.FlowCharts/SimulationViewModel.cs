@@ -13,6 +13,7 @@ namespace Jira.FlowCharts
     {
         private FlowIssue[] finishedStories;
         private double storyCreationRate;
+        private int simulatedStoriesCount;
 
         public double StoryCreationRate { get => storyCreationRate; private set => this.RaiseAndSetIfChanged(ref storyCreationRate, value); }
 
@@ -27,9 +28,16 @@ namespace Jira.FlowCharts
 
         public ReactiveCommand<Unit, Simulation.FlowSimulationStatisticOutput> RunSimulation { get; }
 
+        public int SimulatedStoriesCount
+        {
+            get => simulatedStoriesCount;
+            set => this.RaiseAndSetIfChanged(ref simulatedStoriesCount, value);
+        }
+
         public SimulationViewModel(FlowIssue[] finishedStories)
         {
             this.finishedStories = finishedStories;
+            SimulatedStoriesCount = 10;
 
             RunSimulation = ReactiveCommand.CreateFromTask(RunSimulationInner);
             RunSimulation.ToProperty(this, nameof(SimulationOutput), out _simulationOutput);
@@ -58,7 +66,7 @@ namespace Jira.FlowCharts
             StoryCreationRate = stories.Count() / (to - from).TotalDays;
             var cycleTimes = stories.Select(x => x.Duration).ToArray();
 
-            Simulation.FlowSimulationStatisticOutput simStats = await Task.Run(() => Simulation.FlowSimulationStatistics.RunSimulationStatistic(StoryCreationRate, cycleTimes, 20000, 10));
+            Simulation.FlowSimulationStatisticOutput simStats = await Task.Run(() => Simulation.FlowSimulationStatistics.RunSimulationStatistic(StoryCreationRate, cycleTimes, 20000, SimulatedStoriesCount));
 
             return simStats;
         }
