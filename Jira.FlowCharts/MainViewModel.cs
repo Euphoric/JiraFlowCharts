@@ -4,11 +4,18 @@ using System.Linq;
 using System.Threading.Tasks;
 using Jira.Querying;
 using Jira.Querying.Sqlite;
+using ReactiveUI;
 
 namespace Jira.FlowCharts
 {
-    public class MainViewModel
+    public class MainViewModel : ReactiveObject
     {
+        private CycleTimeScatterplotViewModel cycleTimeScatterplotViewModel;
+        private CycleTimeHistogramViewModel cycleTimeHistogramViewModel;
+        private StoryPointCycleTimeViewModel storyPointCycleTimeViewModel;
+        private CumulativeFlowViewModel cumulativeFlowViewModel;
+        private SimulationViewModel simulationViewModel;
+
         public async Task Initialize()
         {
             var issues = await RetrieveIssues();
@@ -50,11 +57,11 @@ namespace Jira.FlowCharts
             SimulationViewModel = new SimulationViewModel(finishedStories);
         }
 
-        public CycleTimeScatterplotViewModel CycleTimeScatterplotViewModel { get; private set; }
-        public CycleTimeHistogramViewModel CycleTimeHistogramViewModel { get; private set; }
-        public StoryPointCycleTimeViewModel StoryPointCycleTimeViewModel { get; private set; }
-        public CumulativeFlowViewModel CumulativeFlowViewModel { get; private set; }
-        public SimulationViewModel SimulationViewModel { get; private set; }
+        public CycleTimeScatterplotViewModel CycleTimeScatterplotViewModel { get => cycleTimeScatterplotViewModel; private set => this.RaiseAndSetIfChanged(ref cycleTimeScatterplotViewModel, value); }
+        public CycleTimeHistogramViewModel CycleTimeHistogramViewModel { get => cycleTimeHistogramViewModel; private set => this.RaiseAndSetIfChanged(ref cycleTimeHistogramViewModel, value); }
+        public StoryPointCycleTimeViewModel StoryPointCycleTimeViewModel { get => storyPointCycleTimeViewModel; private set => this.RaiseAndSetIfChanged(ref storyPointCycleTimeViewModel, value); }
+        public CumulativeFlowViewModel CumulativeFlowViewModel { get => cumulativeFlowViewModel; private set => this.RaiseAndSetIfChanged(ref cumulativeFlowViewModel, value); }
+        public SimulationViewModel SimulationViewModel { get => simulationViewModel; private set => this.RaiseAndSetIfChanged(ref simulationViewModel, value); }
 
         private static FlowIssue CalculateDuration(CachedIssue issue, SimplifyStateChangeOrder simplify)
         {
