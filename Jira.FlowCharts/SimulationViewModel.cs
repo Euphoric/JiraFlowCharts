@@ -11,7 +11,7 @@ namespace Jira.FlowCharts
 {
     public class SimulationViewModel : ReactiveScreen
     {
-        private FlowIssue[] _flowTasks;
+        private FlowIssue[] finishedStories;
         private double storyCreationRate;
         private int simulatedStoriesCount;
 
@@ -34,12 +34,11 @@ namespace Jira.FlowCharts
             set => this.RaiseAndSetIfChanged(ref simulatedStoriesCount, value);
         }
 
-        public SimulationViewModel(FlowIssue[] flowTasks)
+        public SimulationViewModel(FlowIssue[] finishedStories)
         {
-            _flowTasks = flowTasks;
-
             DisplayName = "Simulation";
 
+            this.finishedStories = finishedStories;
             SimulatedStoriesCount = 10;
 
             RunSimulation = ReactiveCommand.CreateFromTask(RunSimulationInner);
@@ -57,8 +56,6 @@ namespace Jira.FlowCharts
 
         private async Task<Simulation.FlowSimulationStatisticOutput> RunSimulationInner()
         {
-            var finishedStories = _flowTasks.Where(x => x.IsDone).ToArray();
-
             var startTime = finishedStories.Max(x => x.End).AddMonths(-6);
 
             var stories =

@@ -26,16 +26,16 @@ namespace Jira.FlowCharts
 
             DateTime startDate = DateTime.Now.AddMonths(-12);
 
-            var flowTasks = stories
-                .Select(x => CreateFlowIssue(x, simplify))
-                .Where(x => x.End > startDate)
-                .ToArray();
+            var finishedStories = stories
+                .Where(x => x.Status == "Done")
+                .Select(x => CalculateDuration(x, simplify))
+                .Where(x => x.End > startDate).ToArray();
 
             Items.Add(new CumulativeFlowViewModel(stories, states));
-            Items.Add(new CycleTimeScatterplotViewModel(flowTasks));
-            Items.Add(new CycleTimeHistogramViewModel(flowTasks));
-            Items.Add(new StoryPointCycleTimeViewModel(flowTasks));
-            Items.Add(new SimulationViewModel(flowTasks));
+            Items.Add(new CycleTimeScatterplotViewModel(finishedStories));
+            Items.Add(new CycleTimeHistogramViewModel(finishedStories));
+            Items.Add(new StoryPointCycleTimeViewModel(finishedStories));
+            Items.Add(new SimulationViewModel(finishedStories));
 
             //List<double> daysItTakesToFinish = new List<double>();
             //for (int i = -200; i < 0; i++)
@@ -57,7 +57,7 @@ namespace Jira.FlowCharts
             await InitializeAsync();
         }
 
-        private static FlowIssue CreateFlowIssue(CachedIssue issue, SimplifyStateChangeOrder simplify)
+        private static FlowIssue CalculateDuration(CachedIssue issue, SimplifyStateChangeOrder simplify)
         {
             var simplifiedIssues = simplify.FilterStatusChanges(issue.StatusChanges);
 
@@ -75,8 +75,7 @@ namespace Jira.FlowCharts
                 End = doneTime,
                 Duration = duration.TotalDays,
                 StoryPoints = issue.StoryPoints,
-                TimeSpent = issue.TimeSpent,
-                IsDone = issue.Status == "Done"
+                TimeSpent = issue.TimeSpent
             };
 
             return flowIssue;

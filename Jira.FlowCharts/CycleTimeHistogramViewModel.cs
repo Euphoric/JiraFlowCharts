@@ -11,7 +11,7 @@ namespace Jira.FlowCharts
 {
     public class CycleTimeHistogramViewModel : Screen
     {
-        private readonly FlowIssue[] _flowTasks;
+        private readonly FlowIssue[] _flowIssues;
         private SeriesCollection _seriesCollection;
         private string[] _labels;
         private Func<double, string> _formatter;
@@ -34,17 +34,16 @@ namespace Jira.FlowCharts
             private set => Set(ref _formatter, value);
         }
 
-        public CycleTimeHistogramViewModel(FlowIssue[] flowTasks)
+        public CycleTimeHistogramViewModel(FlowIssue[] flowIssues)
         {
-            _flowTasks = flowTasks;
+            _flowIssues = flowIssues;
             DisplayName = "Cycle time histogram";
         }
 
         protected override Task OnActivateAsync(CancellationToken cancellationToken)
         {
             var histogramNonzero =
-                _flowTasks
-                    .Where(x => x.IsDone)
+                _flowIssues
                     .GroupBy(x => (int)x.Duration + 1)
                     .Select(grp => new { Days = grp.Key, Counts = grp.Count() })
                     .ToDictionary(x => x.Days, x => x.Counts);

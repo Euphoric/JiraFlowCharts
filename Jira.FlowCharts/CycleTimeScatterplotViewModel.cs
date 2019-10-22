@@ -36,7 +36,7 @@ namespace Jira.FlowCharts
         }
 
         readonly DateTime _baseDate = new DateTime(1980, 1, 1, 0, 0, 0);
-        private readonly FlowIssue[] _flowTasks;
+        private readonly FlowIssue[] _flowIssues;
         private ChartValues<IssuePoint> _stories;
         private ChartValues<IssuePoint> _bugs;
         private Func<ChartPoint, string> _labelPoint;
@@ -94,9 +94,9 @@ namespace Jira.FlowCharts
             private set => Set(ref _percentile95, value);
         }
 
-        public CycleTimeScatterplotViewModel(FlowIssue[] flowTasks)
+        public CycleTimeScatterplotViewModel(FlowIssue[] flowIssues)
         {
-            _flowTasks = flowTasks;
+            _flowIssues = flowIssues.ToArray();
 
             DisplayName = "Cycle time scatterplot";
         }
@@ -106,7 +106,7 @@ namespace Jira.FlowCharts
             Stories = new ChartValues<IssuePoint>();
             Bugs = new ChartValues<IssuePoint>();
 
-            foreach (var issue in _flowTasks.Where(x => x.IsDone))
+            foreach (var issue in _flowIssues)
             {
                 var sinceStart = issue.End - _baseDate;
                 var label = ""
@@ -126,7 +126,7 @@ namespace Jira.FlowCharts
                 }
             }
 
-            var durations = _flowTasks.Select(x => x.Duration).OrderBy(x => x).ToArray();
+            var durations = _flowIssues.Select(x => x.Duration).OrderBy(x => x).ToArray();
 
             Percentile50 = durations[(int)(durations.Length * 0.50)];
             Percentile70 = durations[(int)(durations.Length * 0.70)];
