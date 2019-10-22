@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Caliburn.Micro;
 using Jira.Querying;
@@ -16,7 +17,7 @@ namespace Jira.FlowCharts
         private CumulativeFlowViewModel cumulativeFlowViewModel;
         private SimulationViewModel simulationViewModel;
 
-        public async Task Initialize()
+        private async Task InitializeAsync()
         {
             var issues = await RetrieveIssues();
 
@@ -61,6 +62,11 @@ namespace Jira.FlowCharts
             Items.Add(StoryPointCycleTimeViewModel);
             Items.Add(CumulativeFlowViewModel);
             Items.Add(SimulationViewModel);
+        }
+
+        protected override async Task OnInitializeAsync(CancellationToken cancellationToken)
+        {
+            await InitializeAsync();
         }
 
         public CycleTimeScatterplotViewModel CycleTimeScatterplotViewModel { get => cycleTimeScatterplotViewModel; private set => this.Set(ref cycleTimeScatterplotViewModel, value); }

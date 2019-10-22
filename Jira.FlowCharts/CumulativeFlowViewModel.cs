@@ -5,6 +5,8 @@ using LiveCharts.Wpf;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using Caliburn.Micro;
 
 namespace Jira.FlowCharts
@@ -12,21 +14,30 @@ namespace Jira.FlowCharts
 
     public class CumulativeFlowViewModel : Screen
     {
+        private readonly IEnumerable<CachedIssue> _stories;
+        private readonly string[] _states;
+
         public CumulativeFlowViewModel(IEnumerable<CachedIssue> stories, string[] states)
         {
+            _states = states;
+            _stories = stories;
+
             DisplayName = "Cumulative flow";
 
-            var currentStatus = stories.Select(x => x.Status).Distinct().ToArray();
-            var currentResolution = stories.Select(x => x.Resolution).Distinct().ToArray();
-            var allStates = stories.SelectMany(x => x.StatusChanges).Select(x => x.State).Distinct().ToArray();
+            SeriesCollection = new SeriesCollection();
+            XFormatter = val => new DateTime((long)val).ToShortDateString();
+        }
 
+        public SeriesCollection SeriesCollection { get; private set; }
+        public Func<double, string> XFormatter { get; private set; }
+
+        protected override Task OnActivateAsync(CancellationToken token)
+        {
             var fromDate = DateTime.Now.AddMonths(-3);
 
-            var cfa = new CumulativeFlowAnalysis(stories, states, fromDate);
+            var cfa = new CumulativeFlowAnalysis(_stories, _states, fromDate);
 
-            var qqq = cfa.Changes;
-
-            SeriesCollection = new SeriesCollection();
+            SeriesCollection.Clear();
 
             foreach (var state in cfa.States)
             {
@@ -46,10 +57,7 @@ namespace Jira.FlowCharts
                 }
             }
 
-            XFormatter = val => new DateTime((long)val).ToShortDateString();
+            return Task.CompletedTask;
         }
-
-        public SeriesCollection SeriesCollection { get; private set; }
-        public Func<double, string> XFormatter { get; private set; }
     }
 }

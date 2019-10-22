@@ -31,21 +31,9 @@ namespace Jira.FlowCharts
             LiveCharts.Charting.For<CycleTimeScatterplotViewModel.IssuePoint>(mapper1);
         }
 
-        private readonly MainViewModel _viewModel;
-
         public MainView()
         {
             InitializeComponent();
-
-            _viewModel = new MainViewModel();
-            DataContext = _viewModel;
-
-            Loaded += MainWindow_Loaded;
-        }
-
-        private async void MainWindow_Loaded(object sender, RoutedEventArgs e)
-        {
-            await _viewModel.Initialize();
         }
     }
 }
