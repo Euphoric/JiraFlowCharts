@@ -14,14 +14,11 @@ namespace Jira.FlowCharts
 
     public class CumulativeFlowViewModel : Screen
     {
-        private readonly IEnumerable<CachedIssue> _stories;
-        private readonly string[] _states;
+        private readonly TasksSource _source;
 
-        public CumulativeFlowViewModel(IEnumerable<CachedIssue> stories, string[] states)
+        public CumulativeFlowViewModel(TasksSource source)
         {
-            _states = states;
-            _stories = stories;
-
+            _source = source;
             DisplayName = "Cumulative flow";
 
             SeriesCollection = new SeriesCollection();
@@ -31,11 +28,11 @@ namespace Jira.FlowCharts
         public SeriesCollection SeriesCollection { get; private set; }
         public Func<double, string> XFormatter { get; private set; }
 
-        protected override Task OnActivateAsync(CancellationToken token)
+        protected override async Task OnActivateAsync(CancellationToken token)
         {
             var fromDate = DateTime.Now.AddMonths(-3);
 
-            var cfa = new CumulativeFlowAnalysis(_stories, _states, fromDate);
+            var cfa = new CumulativeFlowAnalysis(await _source.GetAllTasks(), _source.States, fromDate);
 
             SeriesCollection.Clear();
 
@@ -56,8 +53,6 @@ namespace Jira.FlowCharts
                     SeriesCollection[i].Values.Add(new DateTimePoint(change.Date, change.StateCounts[i]));
                 }
             }
-
-            return Task.CompletedTask;
         }
     }
 }

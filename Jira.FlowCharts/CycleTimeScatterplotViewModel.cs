@@ -36,7 +36,7 @@ namespace Jira.FlowCharts
         }
 
         readonly DateTime _baseDate = new DateTime(1980, 1, 1, 0, 0, 0);
-        private readonly FlowIssue[] _flowIssues;
+        private readonly TasksSource _taskSource;
         private ChartValues<IssuePoint> _stories;
         private ChartValues<IssuePoint> _bugs;
         private Func<ChartPoint, string> _labelPoint;
@@ -94,19 +94,20 @@ namespace Jira.FlowCharts
             private set => Set(ref _percentile95, value);
         }
 
-        public CycleTimeScatterplotViewModel(FlowIssue[] flowIssues)
+        public CycleTimeScatterplotViewModel(TasksSource taskSource)
         {
-            _flowIssues = flowIssues.ToArray();
+            _taskSource = taskSource;
 
             DisplayName = "Cycle time scatterplot";
         }
 
-        protected override Task OnActivateAsync(CancellationToken cancellationToken)
+        protected override async Task OnActivateAsync(CancellationToken cancellationToken)
         {
             Stories = new ChartValues<IssuePoint>();
             Bugs = new ChartValues<IssuePoint>();
 
-            foreach (var issue in _flowIssues)
+            var finishedTasks = await _taskSource.GetFinishedTasks();
+            foreach (var issue in finishedTasks)
             {
                 var sinceStart = issue.End - _baseDate;
                 var label = ""
@@ -126,7 +127,7 @@ namespace Jira.FlowCharts
                 }
             }
 
-            var durations = _flowIssues.Select(x => x.Duration).OrderBy(x => x).ToArray();
+            var durations = finishedTasks.Select(x => x.Duration).OrderBy(x => x).ToArray();
 
             Percentile50 = durations[(int)(durations.Length * 0.50)];
             Percentile70 = durations[(int)(durations.Length * 0.70)];
@@ -135,8 +136,6 @@ namespace Jira.FlowCharts
 
             LabelPoint = x => IssuePointLabel((IssuePoint)x.Instance);
             Formatter = x => (_baseDate + TimeSpan.FromDays(x)).ToString("d/M/yy", CultureInfo.InvariantCulture);
-
-            return base.OnActivateAsync(cancellationToken);
         }
 
         private static string IssuePointLabel(IssuePoint issuePoint)

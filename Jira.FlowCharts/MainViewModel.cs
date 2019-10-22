@@ -6,17 +6,17 @@ namespace Jira.FlowCharts
 {
     public class MainViewModel : Conductor<IScreen>.Collection.OneActive
     {
-        private async Task InitializeAsync()
+        private Task InitializeAsync()
         {
             TasksSource source = new TasksSource();
 
-            FlowIssue[] finishedStories = await source.GetFinishedTasks();
+            Items.Add(new CumulativeFlowViewModel(source));
+            Items.Add(new CycleTimeScatterplotViewModel(source));
+            Items.Add(new CycleTimeHistogramViewModel(source));
+            Items.Add(new StoryPointCycleTimeViewModel(source));
+            Items.Add(new SimulationViewModel(source));
 
-            Items.Add(new CumulativeFlowViewModel(await source.GetAllTasks(), source.States));
-            Items.Add(new CycleTimeScatterplotViewModel(finishedStories));
-            Items.Add(new CycleTimeHistogramViewModel(finishedStories));
-            Items.Add(new StoryPointCycleTimeViewModel(finishedStories));
-            Items.Add(new SimulationViewModel(finishedStories));
+            return Task.CompletedTask;
         }
 
         protected override async Task OnInitializeAsync(CancellationToken cancellationToken)

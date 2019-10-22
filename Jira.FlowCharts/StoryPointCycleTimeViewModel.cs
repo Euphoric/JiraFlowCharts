@@ -15,7 +15,7 @@ namespace Jira.FlowCharts
 {
     public class StoryPointCycleTimeViewModel : Screen
     {
-        private readonly FlowIssue[] _flowIssues;
+        private readonly TasksSource _tasksSource;
         private string[] _labels;
         private SeriesCollection _seriesCollection;
 
@@ -31,15 +31,15 @@ namespace Jira.FlowCharts
             set => Set(ref _labels, value);
         }
 
-        public StoryPointCycleTimeViewModel(FlowIssue[] flowIssues)
+        public StoryPointCycleTimeViewModel(TasksSource tasksSource)
         {
-            _flowIssues = flowIssues;
+            _tasksSource = tasksSource;
             DisplayName = "Story point vs. cycle time";
         }
 
-        protected override Task OnActivateAsync(CancellationToken cancellationToken)
+        protected override async Task OnActivateAsync(CancellationToken cancellationToken)
         {
-            var storyPointGrouped = _flowIssues
+            var storyPointGrouped = (await _tasksSource.GetFinishedTasks())
                 .Where(x => x.StoryPoints.HasValue)
                 .Where(x => x.StoryPoints.Value > 0)
                 .GroupBy(x => x.StoryPoints.Value)
@@ -87,8 +87,6 @@ namespace Jira.FlowCharts
             };
 
             Labels = storyPointGrouped.Select(x => x.StoryPoints.ToString()).ToArray();
-
-            return base.OnActivateAsync(cancellationToken);
         }
 
         private double Percentile(IEnumerable<double> values, double percentile)
