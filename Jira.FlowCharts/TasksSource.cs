@@ -22,7 +22,7 @@ namespace Jira.FlowCharts
         {
             using(var cache = new JiraLocalCache(new SqliteJiraLocalCacheRepository(@"../../../Data/issuesCache.db")))
             {
-                await cache.Initialize(DateTime.MinValue);
+                await cache.Initialize();
 
                 return (await cache.GetIssues()).ToList();
             }

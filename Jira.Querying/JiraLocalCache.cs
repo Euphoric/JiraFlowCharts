@@ -69,7 +69,7 @@ namespace Jira.Querying
 
         private readonly IRepository _repository;
 
-        private DateTime? _startUpdateDate;
+        private bool _isInitialized;
 
         public JiraLocalCache(IRepository repository)
         {
@@ -81,28 +81,28 @@ namespace Jira.Querying
             return await _repository.GetIssues();
         }
 
-        public async Task Initialize(DateTime startDateTime)
+        public async Task Initialize()
         {
-            _startUpdateDate = startDateTime;
-
             await _repository.Initialize();
+
+            _isInitialized = true;
         }
 
-        public async Task Update(IJiraClient client)
+        public async Task Update(IJiraClient client, DateTime startUpdateDate)
         {
             if (client == null)
             {
                 throw new ArgumentNullException(nameof(client));
             }
 
-            if (!_startUpdateDate.HasValue)
+            if (!_isInitialized)
             {
                 throw new InvalidOperationException($"Must call {nameof(Initialize)} before updating.");
             }
 
             string projectName = "AC"; // TODO : Parametrize project
 
-            DateTime lastUpdateDate = await GetLastUpdateDateTime();
+            DateTime lastUpdateDate = await GetLastUpdateDateTime(startUpdateDate);
 
             int itemPaging = 0;
             while (true)
@@ -130,9 +130,9 @@ namespace Jira.Querying
         /// <summary>
         /// Retrieves last updated date. If there are no issues, uses set default. If there are, uses date time of last updated issue.
         /// </summary>
-        private async Task<DateTime> GetLastUpdateDateTime()
+        private async Task<DateTime> GetLastUpdateDateTime(DateTime startUpdatedDate)
         {
-            DateTime lastUpdateDate = _startUpdateDate.Value;
+            DateTime lastUpdateDate = startUpdatedDate;
 
             var lastIssueUpdate = await _repository.LastUpdatedIssueTime();
 
