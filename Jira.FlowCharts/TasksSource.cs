@@ -20,11 +20,11 @@ namespace Jira.FlowCharts
 
         private static async Task<List<CachedIssue>> RetrieveIssues()
         {
-            using (var cacheRepo = new SqliteJiraLocalCacheRepository(@"../../../Data/issuesCache.db"))
+            using(var cache = new JiraLocalCache(new SqliteJiraLocalCacheRepository(@"../../../Data/issuesCache.db")))
             {
-                await cacheRepo.Initialize();
+                await cache.Initialize(DateTime.MinValue);
 
-                return (await cacheRepo.GetIssues()).ToList();
+                return (await cache.GetIssues()).ToList();
             }
         }
 
