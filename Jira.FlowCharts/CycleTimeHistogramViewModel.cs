@@ -11,7 +11,7 @@ namespace Jira.FlowCharts
 {
     public class CycleTimeHistogramViewModel : Screen
     {
-        private readonly FinishedTask[] _flowTasks;
+        private readonly FlowIssue[] _flowTasks;
         private SeriesCollection _seriesCollection;
         private string[] _labels;
         private Func<double, string> _formatter;
@@ -34,7 +34,7 @@ namespace Jira.FlowCharts
             private set => Set(ref _formatter, value);
         }
 
-        public CycleTimeHistogramViewModel(FinishedTask[] flowTasks)
+        public CycleTimeHistogramViewModel(FlowIssue[] flowTasks)
         {
             _flowTasks = flowTasks;
             DisplayName = "Cycle time histogram";
