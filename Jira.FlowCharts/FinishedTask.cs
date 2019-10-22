@@ -2,7 +2,7 @@
 
 namespace Jira.FlowCharts
 {
-    public class FlowIssue
+    public class FinishedTask
     {
         public string Key { get; set; }
         public string Title { get; set; }
