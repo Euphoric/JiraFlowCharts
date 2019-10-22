@@ -223,10 +223,22 @@
     </ApplicationDefinition>
     <Compile Include="Bootstrapper.cs" />
     <Compile Include="CumulativeFlowAnalysis.cs" />
+    <Compile Include="CumulativeFlowView.xaml.cs">
+      <DependentUpon>CumulativeFlowView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="CumulativeFlowViewModel.cs" />
+    <Compile Include="CycleTimeHistogramView.xaml.cs">
+      <DependentUpon>CycleTimeHistogramView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="CycleTimeScatterplotView.xaml.cs">
+      <DependentUpon>CycleTimeScatterplotView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="MainViewModel.cs" />
     <Compile Include="ReactiveScreen.cs" />
     <Compile Include="SimplifyStateChangeOrder.cs" />
+    <Compile Include="SimulationView.xaml.cs">
+      <DependentUpon>SimulationView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="SimulationViewModel.cs" />
     <Compile Include="Simulation\Distribution.cs" />
     <Compile Include="Simulation\Event.cs" />
@@ -236,7 +248,22 @@
     <Compile Include="Simulation\FlowSimulationStatistics.cs" />
     <Compile Include="Simulation\NewEvent.cs" />
     <Compile Include="Simulation\FlowSimulation.cs" />
+    <Compile Include="StoryPointCycleTimeView.xaml.cs">
+      <DependentUpon>StoryPointCycleTimeView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="StoryPointCycleTimeViewModel.cs" />
+    <Page Include="CumulativeFlowView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="CycleTimeHistogramView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="CycleTimeScatterplotView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="MainView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -252,6 +279,14 @@
       <DependentUpon>MainView.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="SimulationView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="StoryPointCycleTimeView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs">
@@ -286,6 +321,7 @@
       <Name>Jira.Querying</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\SQLitePCLRaw.lib.e_sqlite3.linux.1.1.12\build\net35\SQLitePCLRaw.lib.e_sqlite3.linux.targets" Condition="Exists('..\packages\SQLitePCLRaw.lib.e_sqlite3.linux.1.1.12\build\net35\SQLitePCLRaw.lib.e_sqlite3.linux.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

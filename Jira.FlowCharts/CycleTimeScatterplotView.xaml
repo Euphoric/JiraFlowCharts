@@ -1,0 +1,60 @@
+﻿<UserControl x:Class="Jira.FlowCharts.CycleTimeScatterplotView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Jira.FlowCharts"
+             xmlns:lvc="clr-namespace:LiveCharts.Wpf;assembly=LiveCharts.Wpf"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <lvc:CartesianChart LegendLocation="None" >
+            <lvc:CartesianChart.Series>
+                <lvc:ScatterSeries Title="Story" Values="{Binding Stories}" MaxPointShapeDiameter="7" LabelPoint="{Binding LabelPoint}" />
+                <lvc:ScatterSeries Title="Bug" Values="{Binding Bugs}" MaxPointShapeDiameter="7" LabelPoint="{Binding LabelPoint}" />
+            </lvc:CartesianChart.Series>
+            <lvc:CartesianChart.AxisY>
+                <lvc:Axis>
+                    <lvc:Axis.Sections>
+                        <lvc:AxisSection Value="{Binding Percentile50}"
+                                             Stroke="Black" 
+                                             StrokeDashArray="5,10"
+                                             StrokeThickness="1"/>
+                        <lvc:AxisSection Value="{Binding Percentile70}" 
+                                             Stroke="Black" 
+                                             StrokeDashArray="5,10"
+                                             StrokeThickness="1"/>
+                        <lvc:AxisSection Value="{Binding Percentile85}" 
+                                             Stroke="Black" 
+                                             StrokeDashArray="5,10"
+                                             StrokeThickness="1"/>
+                        <lvc:AxisSection Value="{Binding Percentile95}" 
+                                             Stroke="Black" 
+                                             StrokeDashArray="5,10"
+                                             StrokeThickness="1"/>
+                    </lvc:Axis.Sections>
+                </lvc:Axis>
+            </lvc:CartesianChart.AxisY>
+            <lvc:CartesianChart.AxisX>
+                <lvc:Axis LabelFormatter="{Binding Formatter}">
+                    <lvc:Axis.Separator>
+                        <lvc:Separator IsEnabled="True" Step="30"></lvc:Separator>
+                    </lvc:Axis.Separator>
+                </lvc:Axis>
+            </lvc:CartesianChart.AxisX>
+        </lvc:CartesianChart>
+
+        <StackPanel Grid.Row="1" Orientation="Horizontal">
+            <TextBlock>
+                     50%: <Run Text="{Binding Percentile50, Mode=OneWay, StringFormat=N1}" /> days,
+                     70%: <Run Text="{Binding Percentile70, Mode=OneWay, StringFormat=N1}" /> days,
+                     85%: <Run Text="{Binding Percentile85, Mode=OneWay, StringFormat=N1}" /> days,
+                     95%: <Run Text="{Binding Percentile95, Mode=OneWay, StringFormat=N1}" /> days.
+            </TextBlock>
+        </StackPanel>
+    </Grid>
+</UserControl>
