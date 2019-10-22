@@ -249,6 +249,7 @@
       <DependentUpon>StoryPointCycleTimeView.xaml</DependentUpon>
     </Compile>
     <Compile Include="StoryPointCycleTimeViewModel.cs" />
+    <Compile Include="TasksSource.cs" />
     <Page Include="CumulativeFlowView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
