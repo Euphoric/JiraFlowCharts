@@ -23,14 +23,6 @@ namespace Jira.FlowCharts
     /// </summary>
     public partial class MainView : UserControl
     {
-        static MainView()
-        {
-            var mapper1 = Mappers.Xy<CycleTimeScatterplotViewModel.IssuePoint>()
-                .X(value => value.X)
-                .Y(value => value.Y);
-            LiveCharts.Charting.For<CycleTimeScatterplotViewModel.IssuePoint>(mapper1);
-        }
-
         public MainView()
         {
             InitializeComponent();
