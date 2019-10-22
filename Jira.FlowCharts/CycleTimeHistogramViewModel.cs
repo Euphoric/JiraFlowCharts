@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using Caliburn.Micro;
 using LiveCharts;
 using LiveCharts.Wpf;
@@ -9,12 +11,39 @@ namespace Jira.FlowCharts
 {
     public class CycleTimeHistogramViewModel : Screen
     {
+        private readonly FlowIssue[] _flowIssues;
+        private SeriesCollection _seriesCollection;
+        private string[] _labels;
+        private Func<double, string> _formatter;
+
+        public SeriesCollection SeriesCollection
+        {
+            get => _seriesCollection;
+            private set => Set(ref _seriesCollection, value);
+        }
+
+        public string[] Labels
+        {
+            get => _labels;
+            private set => Set(ref _labels, value);
+        }
+
+        public Func<double, string> Formatter
+        {
+            get => _formatter;
+            private set => Set(ref _formatter, value);
+        }
+
         public CycleTimeHistogramViewModel(FlowIssue[] flowIssues)
         {
+            _flowIssues = flowIssues;
             DisplayName = "Cycle time histogram";
+        }
 
+        protected override Task OnActivateAsync(CancellationToken cancellationToken)
+        {
             var histogramNonzero =
-                flowIssues
+                _flowIssues
                     .GroupBy(x => (int)x.Duration + 1)
                     .Select(grp => new { Days = grp.Key, Counts = grp.Count() })
                     .ToDictionary(x => x.Days, x => x.Counts);
@@ -37,12 +66,9 @@ namespace Jira.FlowCharts
 
             Labels = histogram.Select(x => x.Days.ToString()).ToArray();
             Formatter = value => value.ToString("N0");
+
+            return base.OnActivateAsync(cancellationToken);
         }
-
-        public SeriesCollection SeriesCollection { get; set; }
-        public string[] Labels { get; set; }
-        public Func<double, string> Formatter { get; set; }
-
 
         private static int HistogramValue<TKey>(Dictionary<TKey, int> histogramNonzero, TKey key)
         {
