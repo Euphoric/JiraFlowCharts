@@ -11,17 +11,9 @@ namespace Jira.FlowCharts
 {
     public class MainViewModel : Conductor<IScreen>.Collection.OneActive
     {
-        private CycleTimeScatterplotViewModel cycleTimeScatterplotViewModel;
-        private CycleTimeHistogramViewModel cycleTimeHistogramViewModel;
-        private StoryPointCycleTimeViewModel storyPointCycleTimeViewModel;
-        private CumulativeFlowViewModel cumulativeFlowViewModel;
-        private SimulationViewModel simulationViewModel;
-
         private async Task InitializeAsync()
         {
             var issues = await RetrieveIssues();
-
-            DateTime startDate = DateTime.Now.AddMonths(-12);
 
             var stories = issues
                 .Where(x => x.Type == "Story" || x.Type == "Bug")
@@ -32,10 +24,18 @@ namespace Jira.FlowCharts
             var resetStates = new[] { "On Hold", "Not Started", "Withdrawn" };
             SimplifyStateChangeOrder simplify = new SimplifyStateChangeOrder(states, resetStates);
 
+            DateTime startDate = DateTime.Now.AddMonths(-12);
+
             var finishedStories = stories
                 .Where(x => x.Status == "Done")
                 .Select(x => CalculateDuration(x, simplify))
                 .Where(x => x.End > startDate).ToArray();
+
+            Items.Add(new CumulativeFlowViewModel(stories, states));
+            Items.Add(new CycleTimeScatterplotViewModel(finishedStories));
+            Items.Add(new CycleTimeHistogramViewModel(finishedStories));
+            Items.Add(new StoryPointCycleTimeViewModel(finishedStories));
+            Items.Add(new SimulationViewModel(finishedStories));
 
             //List<double> daysItTakesToFinish = new List<double>();
             //for (int i = -200; i < 0; i++)
@@ -50,30 +50,12 @@ namespace Jira.FlowCharts
             //    var timeItTakesToFinishStories = (lastFinishedStory.End - sinceTime).TotalDays;
             //    daysItTakesToFinish.Add(timeItTakesToFinishStories);
             //}
-
-            CycleTimeScatterplotViewModel = new CycleTimeScatterplotViewModel(finishedStories);
-            CycleTimeHistogramViewModel = new CycleTimeHistogramViewModel(finishedStories);
-            StoryPointCycleTimeViewModel = new StoryPointCycleTimeViewModel(finishedStories);
-            CumulativeFlowViewModel = new CumulativeFlowViewModel(stories, states);
-            SimulationViewModel = new SimulationViewModel(finishedStories);
-
-            Items.Add(CycleTimeScatterplotViewModel);
-            Items.Add(CycleTimeHistogramViewModel);
-            Items.Add(StoryPointCycleTimeViewModel);
-            Items.Add(CumulativeFlowViewModel);
-            Items.Add(SimulationViewModel);
         }
 
         protected override async Task OnInitializeAsync(CancellationToken cancellationToken)
         {
             await InitializeAsync();
         }
-
-        public CycleTimeScatterplotViewModel CycleTimeScatterplotViewModel { get => cycleTimeScatterplotViewModel; private set => this.Set(ref cycleTimeScatterplotViewModel, value); }
-        public CycleTimeHistogramViewModel CycleTimeHistogramViewModel { get => cycleTimeHistogramViewModel; private set => this.Set(ref cycleTimeHistogramViewModel, value); }
-        public StoryPointCycleTimeViewModel StoryPointCycleTimeViewModel { get => storyPointCycleTimeViewModel; private set => this.Set(ref storyPointCycleTimeViewModel, value); }
-        public CumulativeFlowViewModel CumulativeFlowViewModel { get => cumulativeFlowViewModel; private set => this.Set(ref cumulativeFlowViewModel, value); }
-        public SimulationViewModel SimulationViewModel { get => simulationViewModel; private set => this.Set(ref simulationViewModel, value); }
 
         private static FlowIssue CalculateDuration(CachedIssue issue, SimplifyStateChangeOrder simplify)
         {
