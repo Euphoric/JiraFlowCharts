@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Jira.FlowCharts
 {
-    public class SimulationViewModel : ReactiveObject
+    public class SimulationViewModel : ReactiveScreen
     {
         private FlowIssue[] finishedStories;
         private double storyCreationRate;

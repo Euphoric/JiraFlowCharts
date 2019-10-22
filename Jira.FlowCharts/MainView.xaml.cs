@@ -21,9 +21,9 @@ namespace Jira.FlowCharts
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class MainView : UserControl
     {
-        static MainWindow()
+        static MainView()
         {
             var mapper1 = Mappers.Xy<CycleTimeScatterplotViewModel.IssuePoint>()
                 .X(value => value.X)
@@ -33,7 +33,7 @@ namespace Jira.FlowCharts
 
         private readonly MainViewModel _viewModel;
 
-        public MainWindow()
+        public MainView()
         {
             InitializeComponent();
 

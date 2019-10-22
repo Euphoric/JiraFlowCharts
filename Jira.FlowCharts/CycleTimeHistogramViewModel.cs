@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Caliburn.Micro;
 using LiveCharts;
 using LiveCharts.Wpf;
 
 namespace Jira.FlowCharts
 {
-    public class CycleTimeHistogramViewModel
+    public class CycleTimeHistogramViewModel : Screen
     {
         public CycleTimeHistogramViewModel(FlowIssue[] flowIssues)
         {

@@ -4,13 +4,14 @@ using System.Globalization;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using Caliburn.Micro;
 using LiveCharts;
 using LiveCharts.Defaults;
 using LiveCharts.Wpf;
 
 namespace Jira.FlowCharts
 {
-    public class CycleTimeScatterplotViewModel
+    public class CycleTimeScatterplotViewModel : Screen
     {
         public class IssuePoint : ObservablePoint
         {

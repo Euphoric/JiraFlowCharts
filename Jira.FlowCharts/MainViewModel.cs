@@ -2,13 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Caliburn.Micro;
 using Jira.Querying;
 using Jira.Querying.Sqlite;
-using ReactiveUI;
 
 namespace Jira.FlowCharts
 {
-    public class MainViewModel : ReactiveObject
+    public class MainViewModel : Conductor<IScreen>.Collection.OneActive
     {
         private CycleTimeScatterplotViewModel cycleTimeScatterplotViewModel;
         private CycleTimeHistogramViewModel cycleTimeHistogramViewModel;
@@ -55,13 +55,19 @@ namespace Jira.FlowCharts
             StoryPointCycleTimeViewModel = new StoryPointCycleTimeViewModel(finishedStories);
             CumulativeFlowViewModel = new CumulativeFlowViewModel(stories, states);
             SimulationViewModel = new SimulationViewModel(finishedStories);
+
+            Items.Add(CycleTimeScatterplotViewModel);
+            Items.Add(CycleTimeHistogramViewModel);
+            Items.Add(StoryPointCycleTimeViewModel);
+            Items.Add(CumulativeFlowViewModel);
+            Items.Add(SimulationViewModel);
         }
 
-        public CycleTimeScatterplotViewModel CycleTimeScatterplotViewModel { get => cycleTimeScatterplotViewModel; private set => this.RaiseAndSetIfChanged(ref cycleTimeScatterplotViewModel, value); }
-        public CycleTimeHistogramViewModel CycleTimeHistogramViewModel { get => cycleTimeHistogramViewModel; private set => this.RaiseAndSetIfChanged(ref cycleTimeHistogramViewModel, value); }
-        public StoryPointCycleTimeViewModel StoryPointCycleTimeViewModel { get => storyPointCycleTimeViewModel; private set => this.RaiseAndSetIfChanged(ref storyPointCycleTimeViewModel, value); }
-        public CumulativeFlowViewModel CumulativeFlowViewModel { get => cumulativeFlowViewModel; private set => this.RaiseAndSetIfChanged(ref cumulativeFlowViewModel, value); }
-        public SimulationViewModel SimulationViewModel { get => simulationViewModel; private set => this.RaiseAndSetIfChanged(ref simulationViewModel, value); }
+        public CycleTimeScatterplotViewModel CycleTimeScatterplotViewModel { get => cycleTimeScatterplotViewModel; private set => this.Set(ref cycleTimeScatterplotViewModel, value); }
+        public CycleTimeHistogramViewModel CycleTimeHistogramViewModel { get => cycleTimeHistogramViewModel; private set => this.Set(ref cycleTimeHistogramViewModel, value); }
+        public StoryPointCycleTimeViewModel StoryPointCycleTimeViewModel { get => storyPointCycleTimeViewModel; private set => this.Set(ref storyPointCycleTimeViewModel, value); }
+        public CumulativeFlowViewModel CumulativeFlowViewModel { get => cumulativeFlowViewModel; private set => this.Set(ref cumulativeFlowViewModel, value); }
+        public SimulationViewModel SimulationViewModel { get => simulationViewModel; private set => this.Set(ref simulationViewModel, value); }
 
         private static FlowIssue CalculateDuration(CachedIssue issue, SimplifyStateChangeOrder simplify)
         {

@@ -4,13 +4,14 @@ using System.ComponentModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Media;
+using Caliburn.Micro;
 using LiveCharts;
 using LiveCharts.Defaults;
 using LiveCharts.Wpf;
 
 namespace Jira.FlowCharts
 {
-    public class StoryPointCycleTimeViewModel
+    public class StoryPointCycleTimeViewModel : Screen
     {
         public StoryPointCycleTimeViewModel(FlowIssue[] flowIssues)
         {

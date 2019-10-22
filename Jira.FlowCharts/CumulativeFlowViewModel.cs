@@ -5,11 +5,12 @@ using LiveCharts.Wpf;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Caliburn.Micro;
 
 namespace Jira.FlowCharts
 {
 
-    public class CumulativeFlowViewModel
+    public class CumulativeFlowViewModel : Screen
     {
         public CumulativeFlowViewModel(IEnumerable<CachedIssue> stories, string[] states)
         {
