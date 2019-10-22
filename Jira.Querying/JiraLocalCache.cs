@@ -67,14 +67,12 @@ namespace Jira.Querying
             return new InMemoryRepository();
         }
 
-        private readonly IJiraClient _client;
         private readonly IRepository _repository;
 
         private DateTime? _startUpdateDate;
 
-        public JiraLocalCache(IJiraClient client, IRepository repository)
+        public JiraLocalCache(IRepository repository)
         {
-            _client = client;
             _repository = repository;
         }
 
@@ -90,8 +88,13 @@ namespace Jira.Querying
             await _repository.Initialize();
         }
 
-        public async Task Update()
+        public async Task Update(IJiraClient client)
         {
+            if (client == null)
+            {
+                throw new ArgumentNullException(nameof(client));
+            }
+
             if (!_startUpdateDate.HasValue)
             {
                 throw new InvalidOperationException($"Must call {nameof(Initialize)} before updating.");
@@ -106,11 +109,11 @@ namespace Jira.Querying
             {
                 const int QueryLimit = 50;
 
-                IJiraIssue[] updatedIssues = await _client.GetIssues(projectName, lastUpdateDate, QueryLimit, itemPaging);
+                IJiraIssue[] updatedIssues = await client.GetIssues(projectName, lastUpdateDate, QueryLimit, itemPaging);
 
                 foreach (var issue in updatedIssues)
                 {
-                    CachedIssue flatIssue = await _client.RetrieveDetails(issue);
+                    CachedIssue flatIssue = await client.RetrieveDetails(issue);
 
                     await _repository.AddOrReplaceCachedIssue(flatIssue);
                 }

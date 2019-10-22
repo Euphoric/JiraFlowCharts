@@ -132,13 +132,18 @@ namespace Jira.Querying
         {
             _client = new FakeJiraClient();
             Repository = repository;
-            Cache = new JiraLocalCache(_client, repository);
+            Cache = new JiraLocalCache(repository);
+        }
+
+        private Task CacheUpdate()
+        {
+            return Cache.Update(_client);
         }
 
         [Fact]
         public async Task Update_without_start_date_is_error()
         {
-            var ex = await Assert.ThrowsAsync<InvalidOperationException>(() => Cache.Update());
+            var ex = await Assert.ThrowsAsync<InvalidOperationException>(CacheUpdate);
             Assert.Equal("Must call Initialize before updating.", ex.Message);
         }
 
@@ -161,10 +166,17 @@ namespace Jira.Querying
         }
 
         [Fact]
+        public async Task Update_parameter_check()
+        {
+            await Cache.Initialize(new DateTime(2018, 1, 1));
+            await Assert.ThrowsAsync<ArgumentNullException>(()=> Cache.Update(null));
+        }
+
+        [Fact]
         public async Task Updates_no_issues()
         {
             await Cache.Initialize(new DateTime(2018, 1, 1));
-            await Cache.Update();
+            await CacheUpdate();
 
             Assert.Empty(await Cache.GetIssues());
         }
@@ -175,7 +187,7 @@ namespace Jira.Querying
             _client.UpdateIssue("KEY-1");
 
             await Cache.Initialize(new DateTime(2018, 1, 1));
-            await Cache.Update();
+            await CacheUpdate();
 
             var cachedKeys = (await Cache.GetIssues()).Select(x => x.Key).ToArray();
 
@@ -190,7 +202,7 @@ namespace Jira.Querying
             _client.UpdateIssue("KEY-3");
 
             await Cache.Initialize(new DateTime(2018, 1, 1));
-            await Cache.Update();
+            await CacheUpdate();
 
             var cachedKeys = (await Cache.GetIssues()).Select(x => x.Key).ToArray();
 
@@ -205,7 +217,7 @@ namespace Jira.Querying
             _client.UpdateIssue("KEY-3");
 
             await Cache.Initialize(new DateTime(2018, 1, 1));
-            await Cache.Update();
+            await CacheUpdate();
 
             var cachedKeys = (await Cache.GetIssues()).Select(x => x.Key).ToArray();
 
@@ -222,7 +234,7 @@ namespace Jira.Querying
             _client.UpdateIssue("KEY-1");
 
             await Cache.Initialize(new DateTime(2019, 1, 2));
-            await Cache.Update();
+            await CacheUpdate();
 
             var cachedKeys = (await Cache.GetIssues()).Select(x => x.Key).ToArray();
 
@@ -241,7 +253,7 @@ namespace Jira.Querying
             }
 
             await Cache.Initialize(new DateTime(2018, 1, 1));
-            await Cache.Update();
+            await CacheUpdate();
 
             var cachedKeys = (await Cache.GetIssues()).Select(x => x.Key).ToArray();
 
@@ -260,7 +272,7 @@ namespace Jira.Querying
             }
 
             await Cache.Initialize(new DateTime(2018, 1, 1));
-            await Cache.Update();
+            await CacheUpdate();
 
             var cachedKeys = (await Cache.GetIssues()).Select(x => x.Key).ToArray();
 
@@ -281,7 +293,7 @@ namespace Jira.Querying
             }
 
             await Cache.Initialize(new DateTime(2018, 1, 1));
-            await Cache.Update();
+            await CacheUpdate();
 
             var cachedKeys = (await Cache.GetIssues()).Select(x => x.Key).ToArray();
 
@@ -295,11 +307,11 @@ namespace Jira.Querying
 
             _client.UpdateIssue("KEY-1");
             
-            await Cache.Update();
+            await CacheUpdate();
 
             _client.UpdateIssue("KEY-1");
 
-            await Cache.Update();
+            await CacheUpdate();
 
             var cachedIssue = Assert.Single(await Cache.GetIssues());
 
@@ -316,13 +328,13 @@ namespace Jira.Querying
             _client.UpdateIssue("KEY-1");
             _client.UpdateIssue("KEY-2");
 
-            await Cache.Update();
+            await CacheUpdate();
 
             _client.UpdateIssue("KEY-2");
 
             _client.FailIfIssueWereToBeRetrieved = "KEY-1";
 
-            await Cache.Update();
+            await CacheUpdate();
         }
 
         [Fact]
@@ -333,17 +345,17 @@ namespace Jira.Querying
             _client.UpdateIssue("KEY-1");
             _client.UpdateIssue("KEY-2");
             
-            await Cache.Update();
+            await CacheUpdate();
 
             _client.UpdateIssue("KEY-1");
 
-            await Cache.Update();
+            await CacheUpdate();
 
             _client.UpdateIssue("KEY-1");
 
             _client.FailIfIssueWereToBeRetrieved = "KEY-2";
 
-            await Cache.Update();
+            await CacheUpdate();
         }
 
         [Theory, AutoData]

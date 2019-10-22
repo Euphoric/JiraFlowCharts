@@ -32,11 +32,11 @@ namespace JiraParse
 
             DateTime lastUpdate = DateTime.Now.AddYears(-1);
 
-            using (JiraLocalCache jiraLocalCache = new JiraLocalCache(client, new SqliteJiraLocalCacheRepository(@"../../../../Data/issuesCache.db")))
+            using (JiraLocalCache jiraLocalCache = new JiraLocalCache(new SqliteJiraLocalCacheRepository(@"../../../../Data/issuesCache.db")))
             {
                 await jiraLocalCache.Initialize(lastUpdate);
 
-                await jiraLocalCache.Update();
+                await jiraLocalCache.Update(client);
             }
 
             Console.WriteLine("Finished");
