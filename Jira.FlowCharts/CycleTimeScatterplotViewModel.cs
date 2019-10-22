@@ -40,6 +40,8 @@ namespace Jira.FlowCharts
 
         public CycleTimeScatterplotViewModel(FlowIssue[] flowIssues)
         {
+            DisplayName = "Cycle time scatterplot";
+
             Stories = new ChartValues<IssuePoint>();
             Bugs = new ChartValues<IssuePoint>();
 

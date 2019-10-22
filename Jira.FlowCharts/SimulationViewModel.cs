@@ -36,6 +36,8 @@ namespace Jira.FlowCharts
 
         public SimulationViewModel(FlowIssue[] finishedStories)
         {
+            DisplayName = "Simulation";
+
             this.finishedStories = finishedStories;
             SimulatedStoriesCount = 10;
 

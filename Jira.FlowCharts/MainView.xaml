@@ -9,7 +9,7 @@
         mc:Ignorable="d" Height="450" Width="800">
     <Grid>
         <TabControl x:Name="Items" Visibility="Collapsed" />
-    
+
         <TabControl>
             <TabItem Header="Cycle time scatterplot" x:Name="CycleTimeScatterplotTab" IsSelected="true" DataContext="{Binding CycleTimeScatterplotViewModel}">
                 <Grid>

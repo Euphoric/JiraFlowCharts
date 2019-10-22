@@ -15,6 +15,8 @@ namespace Jira.FlowCharts
     {
         public StoryPointCycleTimeViewModel(FlowIssue[] flowIssues)
         {
+            DisplayName = "Story point vs. cycle time";
+
             var storyPointGrouped = flowIssues
                 .Where(x => x.StoryPoints.HasValue)
                 .Where(x=>x.StoryPoints.Value > 0)

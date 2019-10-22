@@ -11,6 +11,8 @@ namespace Jira.FlowCharts
     {
         public CycleTimeHistogramViewModel(FlowIssue[] flowIssues)
         {
+            DisplayName = "Cycle time histogram";
+
             var histogramNonzero =
                 flowIssues
                     .GroupBy(x => (int)x.Duration + 1)
