@@ -18,7 +18,6 @@ namespace Jira.FlowCharts
     {
         public App()
         {
-            Locator.CurrentMutable.RegisterViewsForViewModels(Assembly.GetCallingAssembly());
         }
     }
 }

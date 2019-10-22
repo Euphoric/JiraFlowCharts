@@ -21,7 +21,7 @@ namespace Jira.FlowCharts
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : ReactiveWindow<MainViewModel>
+    public partial class MainWindow : Window
     {
         static MainWindow()
         {
@@ -31,19 +31,21 @@ namespace Jira.FlowCharts
             LiveCharts.Charting.For<CycleTimeScatterplotViewModel.IssuePoint>(mapper1);
         }
 
+        private readonly MainViewModel _viewModel;
+
         public MainWindow()
         {
             InitializeComponent();
 
-            ViewModel = new MainViewModel();
-            DataContext = ViewModel;
+            _viewModel = new MainViewModel();
+            DataContext = _viewModel;
 
             Loaded += MainWindow_Loaded;
         }
 
         private async void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
-            await ViewModel.Initialize();
+            await _viewModel.Initialize();
         }
     }
 }
