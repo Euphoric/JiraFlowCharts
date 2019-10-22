@@ -14,5 +14,6 @@ namespace Jira.FlowCharts
         public double Duration { get; set; }
         public int? StoryPoints { get; set; }
         public double? TimeSpent { get; set; }
+        public bool IsDone { get; set; }
     }
 }
