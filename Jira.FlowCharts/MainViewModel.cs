@@ -57,7 +57,7 @@ namespace Jira.FlowCharts
             await InitializeAsync();
         }
 
-        private static FlowIssue CreateFlowIssue(CachedIssue issue, SimplifyStateChangeOrder simplify)
+        private static FinishedTask CreateFlowIssue(CachedIssue issue, SimplifyStateChangeOrder simplify)
         {
             var simplifiedIssues = simplify.FilterStatusChanges(issue.StatusChanges);
 
@@ -66,7 +66,7 @@ namespace Jira.FlowCharts
 
             TimeSpan duration = doneTime - startTime;
 
-            var flowIssue = new FlowIssue()
+            var flowIssue = new FinishedTask()
             {
                 Key = issue.Key,
                 Title = issue.Title,

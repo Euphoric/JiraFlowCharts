@@ -15,7 +15,7 @@ namespace Jira.FlowCharts
 {
     public class StoryPointCycleTimeViewModel : Screen
     {
-        private readonly FlowIssue[] _flowTasks;
+        private readonly FinishedTask[] _flowTasks;
         private string[] _labels;
         private SeriesCollection _seriesCollection;
 
@@ -31,7 +31,7 @@ namespace Jira.FlowCharts
             set => Set(ref _labels, value);
         }
 
-        public StoryPointCycleTimeViewModel(FlowIssue[] flowTasks)
+        public StoryPointCycleTimeViewModel(FinishedTask[] flowTasks)
         {
             _flowTasks = flowTasks;
             DisplayName = "Story point vs. cycle time";

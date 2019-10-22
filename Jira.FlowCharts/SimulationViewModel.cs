@@ -11,7 +11,7 @@ namespace Jira.FlowCharts
 {
     public class SimulationViewModel : ReactiveScreen
     {
-        private FlowIssue[] _flowTasks;
+        private FinishedTask[] _flowTasks;
         private double storyCreationRate;
         private int simulatedStoriesCount;
 
@@ -34,7 +34,7 @@ namespace Jira.FlowCharts
             set => this.RaiseAndSetIfChanged(ref simulatedStoriesCount, value);
         }
 
-        public SimulationViewModel(FlowIssue[] flowTasks)
+        public SimulationViewModel(FinishedTask[] flowTasks)
         {
             _flowTasks = flowTasks;
 

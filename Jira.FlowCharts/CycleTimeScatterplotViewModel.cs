@@ -36,7 +36,7 @@ namespace Jira.FlowCharts
         }
 
         readonly DateTime _baseDate = new DateTime(1980, 1, 1, 0, 0, 0);
-        private readonly FlowIssue[] _flowTasks;
+        private readonly FinishedTask[] _flowTasks;
         private ChartValues<IssuePoint> _stories;
         private ChartValues<IssuePoint> _bugs;
         private Func<ChartPoint, string> _labelPoint;
@@ -94,7 +94,7 @@ namespace Jira.FlowCharts
             private set => Set(ref _percentile95, value);
         }
 
-        public CycleTimeScatterplotViewModel(FlowIssue[] flowTasks)
+        public CycleTimeScatterplotViewModel(FinishedTask[] flowTasks)
         {
             _flowTasks = flowTasks;
 

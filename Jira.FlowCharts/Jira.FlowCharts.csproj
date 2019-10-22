@@ -271,7 +271,7 @@
     </Compile>
     <Compile Include="CycleTimeHistogramViewModel.cs" />
     <Compile Include="CycleTimeScatterplotViewModel.cs" />
-    <Compile Include="FlowIssue.cs" />
+    <Compile Include="FinishedTask.cs" />
     <Compile Include="MainView.xaml.cs">
       <DependentUpon>MainView.xaml</DependentUpon>
       <SubType>Code</SubType>
