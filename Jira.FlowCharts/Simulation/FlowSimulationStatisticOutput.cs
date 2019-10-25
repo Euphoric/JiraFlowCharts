@@ -22,7 +22,7 @@ namespace Jira.FlowCharts.Simulation
             var orderedSimulationTimes = simulationTimes.OrderBy(x => x).ToArray();
 
             var min = (int)Math.Floor(orderedSimulationTimes[0]);
-            var max = (int)Math.Ceiling(orderedSimulationTimes[orderedSimulationTimes.Length * 995 / 1000]);
+            var max = (int)Math.Ceiling(orderedSimulationTimes[orderedSimulationTimes.Length * 9995 / 10000]); // limit the histogram to 99.95% of times, to hide extremes and shorten the tail
             var buckets = (max - min);
             Histogram hist = new Histogram(simulationTimes, buckets, min, max);
             
@@ -40,7 +40,7 @@ namespace Jira.FlowCharts.Simulation
             output.Percentile75 = orderedSimulationTimes[orderedSimulationTimes.Length * 75 / 100];
             output.Percentile85 = orderedSimulationTimes[orderedSimulationTimes.Length * 85 / 100];
             output.Percentile95 = orderedSimulationTimes[orderedSimulationTimes.Length * 95 / 100];
-            output.Percentile99 = orderedSimulationTimes[orderedSimulationTimes.Length * 99 / 100];
+            output.Percentile99 = orderedSimulationTimes[orderedSimulationTimes.Length * 99 / 1000];
 
             return output;
         }
