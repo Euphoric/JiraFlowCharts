@@ -230,6 +230,10 @@
     <Compile Include="CycleTimeScatterplot\CycleTimeScatterplotView.xaml.cs">
       <DependentUpon>CycleTimeScatterplotView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="JiraUpdate\JiraUpdateView.xaml.cs">
+      <DependentUpon>JiraUpdateView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="JiraUpdate\JiraUpdateViewModel.cs" />
     <Compile Include="MainViewModel.cs" />
     <Compile Include="ReactiveScreen.cs" />
     <Compile Include="SimplifyStateChangeOrder.cs" />
@@ -259,6 +263,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="CycleTimeScatterplot\CycleTimeScatterplotView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="JiraUpdate\JiraUpdateView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
