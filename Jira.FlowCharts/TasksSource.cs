@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
+using System.Security;
 using System.Threading.Tasks;
+using Jira.FlowCharts.JiraUpdate;
 using Jira.Querying;
 using Jira.Querying.Sqlite;
 
@@ -78,6 +81,32 @@ namespace Jira.FlowCharts
             };
 
             return flowIssue;
+        }
+
+        public async Task UpdateIssues(JiraLoginParameters jiraLoginParameters)
+        {
+            using (var cache = new JiraLocalCache(new SqliteJiraLocalCacheRepository(@"../../../Data/issuesCache.db")))
+            {
+                await cache.Initialize();
+
+                var client = new JiraClient(jiraLoginParameters.JiraUrl, jiraLoginParameters.JiraUsername, SecureStringToString(jiraLoginParameters.JiraPassword));
+
+                await cache.Update(client, DateTime.MinValue);
+            }
+        }
+
+        private static String SecureStringToString(SecureString value)
+        {
+            IntPtr valuePtr = IntPtr.Zero;
+            try
+            {
+                valuePtr = Marshal.SecureStringToGlobalAllocUnicode(value);
+                return Marshal.PtrToStringUni(valuePtr);
+            }
+            finally
+            {
+                Marshal.ZeroFreeGlobalAllocUnicode(valuePtr);
+            }
         }
     }
 }

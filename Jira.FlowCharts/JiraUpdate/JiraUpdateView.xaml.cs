@@ -18,11 +18,20 @@ namespace Jira.FlowCharts.JiraUpdate
     /// <summary>
     /// Interaction logic for JiraUpdateView.xaml
     /// </summary>
-    public partial class JiraUpdateView : UserControl
+    public partial class JiraUpdateView : UserControl, IJiraUpdateView
     {
         public JiraUpdateView()
         {
             InitializeComponent();
+        }
+
+        public JiraLoginParameters GetLoginParameters()
+        {
+            return new JiraLoginParameters(
+                JiraUrlBox.Text,
+                JiraUsernameBox.Text,
+                JiraPasswordBox.SecurePassword
+                );
         }
     }
 }

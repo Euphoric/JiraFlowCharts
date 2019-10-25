@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reactive;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using ReactiveUI;
 
 namespace Jira.FlowCharts.JiraUpdate
 {
@@ -12,11 +14,14 @@ namespace Jira.FlowCharts.JiraUpdate
         private readonly TasksSource _tasksSource;
         private int _cachedIssuesCount;
         private DateTime? _lastUpdatedIssue;
+        private string _updateError;
 
         public JiraUpdateViewModel(TasksSource tasksSource)
         {
             _tasksSource = tasksSource;
             DisplayName = "Jira update";
+
+            UpdateCommand = ReactiveCommand.CreateFromTask(UpdateJira);
         }
 
         public int CachedIssuesCount
@@ -31,11 +36,41 @@ namespace Jira.FlowCharts.JiraUpdate
             private set => Set(ref _lastUpdatedIssue, value);
         }
 
+        public ReactiveCommand<Unit, Unit> UpdateCommand { get; }
+
+        public string UpdateError
+        {
+            get => _updateError;
+            private set => Set(ref _updateError, value);
+        }
+
         protected override async Task OnInitializeAsync(CancellationToken cancellationToken)
         {
             var allTasks = (await _tasksSource.GetAllTasks()).ToList();
             CachedIssuesCount = allTasks.Count;
             LastUpdatedIssue = allTasks.Max(x => x.Updated);
+        }
+
+        private async Task UpdateJira()
+        {
+            UpdateError = null;
+            try
+            {
+                var view = GetView() as IJiraUpdateView;
+
+                if (view == null)
+                {
+                    throw new InvalidOperationException("Attached view was not correct");
+                }
+
+                var jiraLoginParameters = view.GetLoginParameters();
+
+                await _tasksSource.UpdateIssues(jiraLoginParameters);
+            }
+            catch (Exception e)
+            {
+                UpdateError = e.ToString();
+            }
         }
     }
 }
