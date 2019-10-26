@@ -2,7 +2,7 @@
 using System.Runtime.InteropServices;
 using System.Security;
 
-namespace Jira.FlowCharts.JiraUpdate
+namespace Jira.Querying
 {
     public class JiraLoginParameters
     {
@@ -22,7 +22,7 @@ namespace Jira.FlowCharts.JiraUpdate
             return SecureStringToString(JiraPassword);
         }
 
-        private static String SecureStringToString(SecureString value)
+        private static string SecureStringToString(SecureString value)
         {
             IntPtr valuePtr = IntPtr.Zero;
             try

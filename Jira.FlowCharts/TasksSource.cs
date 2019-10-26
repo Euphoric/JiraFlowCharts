@@ -4,7 +4,6 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Security;
 using System.Threading.Tasks;
-using Jira.FlowCharts.JiraUpdate;
 using Jira.Querying;
 using Jira.Querying.Sqlite;
 
@@ -93,7 +92,7 @@ namespace Jira.FlowCharts
             {
                 await cache.Initialize();
 
-                var client = new JiraClient(jiraLoginParameters.JiraUrl, jiraLoginParameters.JiraUsername, jiraLoginParameters.PasswordAsNakedString());
+                var client = new JiraClient(jiraLoginParameters);
 
                 await cache.Update(client, DateTime.MinValue);
             }

@@ -1,4 +1,6 @@
-﻿namespace Jira.FlowCharts.JiraUpdate
+﻿using Jira.Querying;
+
+namespace Jira.FlowCharts.JiraUpdate
 {
     public interface IJiraUpdateView
     {

@@ -10,6 +10,11 @@ namespace Jira.Querying
     {
         readonly Atlassian.Jira.Jira _jiraRestClient;
 
+        public JiraClient(JiraLoginParameters loginParameters)
+            :this(loginParameters.JiraUrl, loginParameters.JiraUsername, loginParameters.PasswordAsNakedString())
+        {
+        }
+
         public JiraClient(string site, string username, string password)
         {
             _jiraRestClient = Atlassian.Jira.Jira.CreateRestClient(site, username, password);

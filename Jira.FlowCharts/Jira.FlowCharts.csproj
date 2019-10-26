@@ -238,7 +238,6 @@
       <DependentUpon>CycleTimeScatterplotView.xaml</DependentUpon>
     </Compile>
     <Compile Include="JiraUpdate\IJiraUpdateView.cs" />
-    <Compile Include="JiraUpdate\JiraLoginParameters.cs" />
     <Compile Include="JiraUpdate\JiraUpdateView.xaml.cs">
       <DependentUpon>JiraUpdateView.xaml</DependentUpon>
     </Compile>
