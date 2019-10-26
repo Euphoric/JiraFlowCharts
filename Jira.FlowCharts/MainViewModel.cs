@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Caliburn.Micro;
 using Jira.FlowCharts.JiraUpdate;
+using Jira.Querying;
 using Jira.Querying.Sqlite;
 
 namespace Jira.FlowCharts
@@ -10,7 +11,10 @@ namespace Jira.FlowCharts
     {
         public MainViewModel()
         {
-            TasksSource source = new TasksSource(()=>new SqliteJiraLocalCacheRepository(@"../../../Data/issuesCache.db"));
+            TasksSource source = new TasksSource(
+                ()=>new SqliteJiraLocalCacheRepository(@"../../../Data/issuesCache.db"),
+                jlp=>new JiraClient(jlp)
+                );
 
             Items.Add(new JiraUpdateViewModel(source));
             Items.Add(new CumulativeFlowViewModel(source));
