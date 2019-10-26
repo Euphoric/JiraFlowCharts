@@ -9,7 +9,7 @@ using ReactiveUI;
 
 namespace Jira.FlowCharts.JiraUpdate
 {
-    class JiraUpdateViewModel : ReactiveScreen
+    public class JiraUpdateViewModel : ReactiveScreen
     {
         private readonly TasksSource _tasksSource;
         private int _cachedIssuesCount;

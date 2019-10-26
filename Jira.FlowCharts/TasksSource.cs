@@ -12,18 +12,22 @@ namespace Jira.FlowCharts
 {
     public class TasksSource
     {
+        private readonly Func<JiraLocalCache.IRepository> _cacheRepositoryFactory;
+
         public string[] States { get; }
         public string[] ResetStates { get; }
 
-        public TasksSource()
+        public TasksSource(Func<JiraLocalCache.IRepository> cacheRepositoryFactory)
         {
+            _cacheRepositoryFactory = cacheRepositoryFactory;
+
             States = new[] { "Ready For Dev", "In Dev", "Ready for Peer Review", "Ready for QA", "In QA", "Ready for Done", "Done" };
             ResetStates = new[] { "On Hold", "Not Started", "Withdrawn" };
         }
 
-        private static async Task<List<CachedIssue>> RetrieveIssues()
+        private async Task<List<CachedIssue>> RetrieveIssues()
         {
-            using(var cache = new JiraLocalCache(new SqliteJiraLocalCacheRepository(@"../../../Data/issuesCache.db")))
+            using (var cache = new JiraLocalCache(_cacheRepositoryFactory()))
             {
                 await cache.Initialize();
 
@@ -85,7 +89,7 @@ namespace Jira.FlowCharts
 
         public async Task UpdateIssues(JiraLoginParameters jiraLoginParameters)
         {
-            using (var cache = new JiraLocalCache(new SqliteJiraLocalCacheRepository(@"../../../Data/issuesCache.db")))
+            using (var cache = new JiraLocalCache(_cacheRepositoryFactory()))
             {
                 await cache.Initialize();
 
