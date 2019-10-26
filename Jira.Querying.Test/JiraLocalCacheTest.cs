@@ -111,12 +111,48 @@ namespace Jira.Querying
         }
     }
 
+    public struct ReportedIssueUpdate
+    {
+        public ReportedIssueUpdate(string key, DateTime updated)
+        {
+            Key = key;
+            Updated = updated;
+        }
+
+        public string Key { get; private set; }
+        public DateTime Updated { get; private set; }
+
+        public override string ToString()
+        {
+            return $"{Key};{Updated}";
+        }
+    }
+
+    public class MemoryCacheUpdateProgress : ICacheUpdateProgress
+    {
+        List<ReportedIssueUpdate> _updatedIssues = new List<ReportedIssueUpdate>();
+
+        public void UpdatedIssue(string key, DateTime updated)
+        {
+            _updatedIssues.Add(new ReportedIssueUpdate(key, updated));
+        }
+
+        public void AssertReported(params ReportedIssueUpdate[] expectedReports)
+        {
+            Assert.Equal(expectedReports, _updatedIssues);
+
+            _updatedIssues.Clear();
+        }
+    }
+
     public class JiraLocalCacheTest : IDisposable
     {
         private readonly FakeJiraClient _client;
 
         protected JiraLocalCache.IRepository Repository { get; }
         protected JiraLocalCache Cache { get; }
+
+        private readonly MemoryCacheUpdateProgress _cacheUpdateProgress;
 
         public JiraLocalCacheTest()
             :this(JiraLocalCache.CreateMemoryRepository())
@@ -133,11 +169,12 @@ namespace Jira.Querying
             _client = new FakeJiraClient();
             Repository = repository;
             Cache = new JiraLocalCache(repository);
+            _cacheUpdateProgress = new MemoryCacheUpdateProgress();
         }
 
         private Task CacheUpdate(DateTime? startUpdateDate = null)
         {
-            return Cache.Update(_client, startUpdateDate ?? new DateTime(2018, 1, 1));
+            return Cache.Update(_client, startUpdateDate ?? new DateTime(2018, 1, 1), _cacheUpdateProgress);
         }
 
         [Fact]
@@ -404,6 +441,37 @@ namespace Jira.Querying
             var retrievedIssue = (await Repository.GetIssues()).SingleOrDefault();
 
             issue2.ShouldCompare(retrievedIssue);
+        }
+
+        [Fact]
+        public async Task Issues_reported_when_updated()
+        {
+            await Cache.Initialize();
+
+            _client.UpdateIssue("KEY-1");
+            _client.UpdateIssue("KEY-2");
+            await CacheUpdate();
+            _cacheUpdateProgress.AssertReported(
+                new ReportedIssueUpdate("KEY-1", new DateTime(2019, 1, 1)),
+                new ReportedIssueUpdate("KEY-2", new DateTime(2019, 1, 2))
+                );
+
+            _client.UpdateIssue("KEY-3");
+            _client.UpdateIssue("KEY-4");
+            await CacheUpdate();
+            _cacheUpdateProgress.AssertReported(
+                new ReportedIssueUpdate("KEY-2", new DateTime(2019, 1, 2)),
+                new ReportedIssueUpdate("KEY-3", new DateTime(2019, 1, 3)),
+                new ReportedIssueUpdate("KEY-4", new DateTime(2019, 1, 4))
+                );
+
+            _client.UpdateIssue("KEY-1");
+            _client.UpdateIssue("KEY-4");
+            await CacheUpdate();
+            _cacheUpdateProgress.AssertReported(
+                new ReportedIssueUpdate("KEY-1", new DateTime(2019, 1, 5)),
+                new ReportedIssueUpdate("KEY-4", new DateTime(2019, 1, 6))
+                );
         }
     }
 }

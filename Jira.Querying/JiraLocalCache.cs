@@ -7,6 +7,19 @@ using System.Threading.Tasks;
 
 namespace Jira.Querying
 {
+    public interface ICacheUpdateProgress
+    {
+        void UpdatedIssue(string key, DateTime updated);
+    }
+
+    public class NullCacheUpdateProgres : ICacheUpdateProgress
+    {
+        public void UpdatedIssue(string key, DateTime updated)
+        {
+            // NULL operation
+        }
+    }
+
     public class JiraLocalCache : IDisposable
     {
         public interface IRepository : IDisposable
@@ -88,8 +101,10 @@ namespace Jira.Querying
             _isInitialized = true;
         }
 
-        public async Task Update(IJiraClient client, DateTime startUpdateDate)
+        public async Task Update(IJiraClient client, DateTime startUpdateDate, ICacheUpdateProgress progress = null)
         {
+            progress = progress ?? new NullCacheUpdateProgres();
+
             if (client == null)
             {
                 throw new ArgumentNullException(nameof(client));
@@ -116,6 +131,7 @@ namespace Jira.Querying
                     CachedIssue flatIssue = await client.RetrieveDetails(issue);
 
                     await _repository.AddOrReplaceCachedIssue(flatIssue);
+                    progress.UpdatedIssue(flatIssue.Key, flatIssue.Updated.Value);
                 }
 
                 itemPaging += QueryLimit;
