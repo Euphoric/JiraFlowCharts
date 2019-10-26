@@ -93,23 +93,9 @@ namespace Jira.FlowCharts
             {
                 await cache.Initialize();
 
-                var client = new JiraClient(jiraLoginParameters.JiraUrl, jiraLoginParameters.JiraUsername, SecureStringToString(jiraLoginParameters.JiraPassword));
+                var client = new JiraClient(jiraLoginParameters.JiraUrl, jiraLoginParameters.JiraUsername, jiraLoginParameters.PasswordAsNakedString());
 
                 await cache.Update(client, DateTime.MinValue);
-            }
-        }
-
-        private static String SecureStringToString(SecureString value)
-        {
-            IntPtr valuePtr = IntPtr.Zero;
-            try
-            {
-                valuePtr = Marshal.SecureStringToGlobalAllocUnicode(value);
-                return Marshal.PtrToStringUni(valuePtr);
-            }
-            finally
-            {
-                Marshal.ZeroFreeGlobalAllocUnicode(valuePtr);
             }
         }
     }
