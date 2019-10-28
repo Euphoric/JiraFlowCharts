@@ -11,7 +11,7 @@ using Xunit;
 
 namespace Jira.FlowCharts
 {
-    public class JiraUpdateViewModelTest
+    public class JiraUpdateViewModelTest : IAsyncLifetime
     {
         private class TestView : IJiraUpdateView
         {
@@ -52,20 +52,28 @@ namespace Jira.FlowCharts
             (_vm as IViewAware).AttachView(_view);
         }
 
-        [Fact]
-        public async Task Activating_updates_current_status()
+        public async Task InitializeAsync()
         {
             await (_vm as IScreen).ActivateAsync();
+        }
 
+        public async Task DisposeAsync()
+        {
+            await (_vm as IScreen).DeactivateAsync(false);
+        }
+
+        [Fact]
+        public Task Activating_updates_current_status()
+        {
             Assert.Equal(0, _vm.CachedIssuesCount);
             Assert.Null(_vm.LastUpdatedIssue);
+
+            return Task.CompletedTask;
         }
 
         [Fact]
         public async Task Update()
         {
-            await (_vm as IScreen).ActivateAsync();
-
             _view.LoginParameters = new JiraLoginParameters("http://url", "usrName", new System.Security.SecureString());
 
             await _vm.UpdateCommand.Execute().ToTask();
