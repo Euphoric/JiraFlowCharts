@@ -11,16 +11,14 @@ namespace Jira.FlowCharts
 {
     public class TasksSource
     {
-        private readonly TasksSourceJiraCacheAdapter _jiraCache;
+        private readonly ITasksSourceJiraCacheAdapter _jiraCache;
 
         public string[] States { get; }
         public string[] ResetStates { get; }
 
-        public TasksSource(
-            Func<JiraLocalCache.IRepository> cacheRepositoryFactory, 
-            Func<JiraLoginParameters, IJiraClient> clientFactory)
+        public TasksSource(ITasksSourceJiraCacheAdapter jiraCacheAdapter)
         {
-            _jiraCache = new TasksSourceJiraCacheAdapter(cacheRepositoryFactory, clientFactory);
+            _jiraCache = jiraCacheAdapter;
 
             States = new[] { "Ready For Dev", "In Dev", "Ready for Peer Review", "Ready for QA", "In QA", "Ready for Done", "Done" };
             ResetStates = new[] { "On Hold", "Not Started", "Withdrawn" };

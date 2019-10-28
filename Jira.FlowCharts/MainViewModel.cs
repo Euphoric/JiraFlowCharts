@@ -11,10 +11,10 @@ namespace Jira.FlowCharts
     {
         public MainViewModel()
         {
-            TasksSource source = new TasksSource(
-                ()=>new SqliteJiraLocalCacheRepository(@"../../../Data/issuesCache.db"),
-                jlp=>new JiraClient(jlp)
-                );
+            var adapter = new TasksSourceJiraCacheAdapter(
+                () => new SqliteJiraLocalCacheRepository(@"../../../Data/issuesCache.db"),
+                jlp => new JiraClient(jlp));
+            TasksSource source = new TasksSource(adapter);
 
             Items.Add(new JiraUpdateViewModel(source));
             Items.Add(new CumulativeFlowViewModel(source));

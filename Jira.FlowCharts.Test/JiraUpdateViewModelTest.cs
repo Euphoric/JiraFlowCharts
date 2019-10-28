@@ -26,13 +26,25 @@ namespace Jira.FlowCharts
             }
         }
 
+        private class TestJiraCacheAdapter : ITasksSourceJiraCacheAdapter
+        {
+            public Task<List<CachedIssue>> GetIssues()
+            {
+                return Task.FromResult(new List<CachedIssue>());
+            }
+
+            public Task UpdateIssues(JiraLoginParameters jiraLoginParameters)
+            {
+                return Task.CompletedTask;
+            }
+        }
+
         JiraUpdateViewModel _vm;
         TestView _view;
 
         public JiraUpdateViewModelTest()
         {
-            var repository = JiraLocalCache.CreateMemoryRepository();
-            var tasksSource = new TasksSource(() => repository, _ => new FakeJiraClient());
+            var tasksSource = new TasksSource(new TestJiraCacheAdapter());
             _vm = new JiraUpdateViewModel(tasksSource);
 
             _view = new TestView();

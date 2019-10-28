@@ -6,7 +6,13 @@ using Jira.Querying;
 
 namespace Jira.FlowCharts
 {
-    public class TasksSourceJiraCacheAdapter
+    public interface ITasksSourceJiraCacheAdapter
+    {
+        Task<List<CachedIssue>> GetIssues();
+        Task UpdateIssues(JiraLoginParameters jiraLoginParameters);
+    }
+
+    public class TasksSourceJiraCacheAdapter : ITasksSourceJiraCacheAdapter
     {
         private Func<JiraLocalCache.IRepository> _cacheRepositoryFactory;
         private readonly Func<JiraLoginParameters, IJiraClient> _clientFactory;
@@ -19,7 +25,7 @@ namespace Jira.FlowCharts
             _clientFactory = clientFactory;
         }
 
-        internal async Task<List<CachedIssue>> GetIssues()
+        public async Task<List<CachedIssue>> GetIssues()
         {
             using (var cache = new JiraLocalCache(_cacheRepositoryFactory()))
             {
@@ -29,7 +35,7 @@ namespace Jira.FlowCharts
             }
         }
 
-        internal async Task UpdateIssues(JiraLoginParameters jiraLoginParameters)
+        public async Task UpdateIssues(JiraLoginParameters jiraLoginParameters)
         {
             using (var cache = new JiraLocalCache(_cacheRepositoryFactory()))
             {
