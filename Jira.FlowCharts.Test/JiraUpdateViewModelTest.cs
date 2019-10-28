@@ -26,26 +26,13 @@ namespace Jira.FlowCharts
             }
         }
 
-        private class TestJiraClient : IJiraClient
-        {
-            public Task<IJiraIssue[]> GetIssues(string project, DateTime lastUpdated, int count, int skipCount)
-            {
-                return Task.FromResult(new IJiraIssue[0]);
-            }
-
-            public Task<CachedIssue> RetrieveDetails(IJiraIssue issue)
-            {
-                throw new NotImplementedException();
-            }
-        }
-
         JiraUpdateViewModel _vm;
         TestView _view;
 
         public JiraUpdateViewModelTest()
         {
             var repository = JiraLocalCache.CreateMemoryRepository();
-            var tasksSource = new TasksSource(() => repository, _ => new TestJiraClient());
+            var tasksSource = new TasksSource(() => repository, _ => new FakeJiraClient());
             _vm = new JiraUpdateViewModel(tasksSource);
 
             _view = new TestView();
