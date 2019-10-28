@@ -262,6 +262,7 @@
     </Compile>
     <Compile Include="StoryPointCycleTime\StoryPointCycleTimeViewModel.cs" />
     <Compile Include="TasksSource.cs" />
+    <Compile Include="TasksSourceJiraCacheAdapter.cs" />
     <Page Include="CummulativeFlow\CumulativeFlowView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

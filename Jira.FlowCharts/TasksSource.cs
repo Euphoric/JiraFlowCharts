@@ -11,8 +11,7 @@ namespace Jira.FlowCharts
 {
     public class TasksSource
     {
-        private readonly Func<JiraLocalCache.IRepository> _cacheRepositoryFactory;
-        private readonly Func<JiraLoginParameters, IJiraClient> _clientFactory;
+        private readonly TasksSourceJiraCacheAdapter _jiraCache;
 
         public string[] States { get; }
         public string[] ResetStates { get; }
@@ -21,8 +20,7 @@ namespace Jira.FlowCharts
             Func<JiraLocalCache.IRepository> cacheRepositoryFactory, 
             Func<JiraLoginParameters, IJiraClient> clientFactory)
         {
-            _cacheRepositoryFactory = cacheRepositoryFactory;
-            _clientFactory = clientFactory;
+            _jiraCache = new TasksSourceJiraCacheAdapter(cacheRepositoryFactory, clientFactory);
 
             States = new[] { "Ready For Dev", "In Dev", "Ready for Peer Review", "Ready for QA", "In QA", "Ready for Done", "Done" };
             ResetStates = new[] { "On Hold", "Not Started", "Withdrawn" };
@@ -30,12 +28,7 @@ namespace Jira.FlowCharts
 
         private async Task<List<CachedIssue>> RetrieveIssues()
         {
-            using (var cache = new JiraLocalCache(_cacheRepositoryFactory()))
-            {
-                await cache.Initialize();
-
-                return (await cache.GetIssues()).ToList();
-            }
+            return await _jiraCache.GetIssues();
         }
 
         public async Task<IEnumerable<CachedIssue>> GetAllTasks()
@@ -92,14 +85,7 @@ namespace Jira.FlowCharts
 
         public async Task UpdateIssues(JiraLoginParameters jiraLoginParameters)
         {
-            using (var cache = new JiraLocalCache(_cacheRepositoryFactory()))
-            {
-                await cache.Initialize();
-
-                var client = _clientFactory(jiraLoginParameters);
-
-                await cache.Update(client, DateTime.MinValue);
-            }
+            await _jiraCache.UpdateIssues(jiraLoginParameters);
         }
     }
 }
