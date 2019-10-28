@@ -56,7 +56,7 @@ namespace Jira.FlowCharts
 
         private async Task<Simulation.FlowSimulationStatisticOutput> RunSimulationInner()
         {
-            var finishedStories = await _taskSource.GetFinishedTasks();
+            var finishedStories = await _taskSource.GetFinishedStories();
 
             var startTime = finishedStories.Max(x => x.End).AddMonths(-6);
 

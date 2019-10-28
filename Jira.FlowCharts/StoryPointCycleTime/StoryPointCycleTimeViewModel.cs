@@ -39,7 +39,7 @@ namespace Jira.FlowCharts
 
         protected override async Task OnActivateAsync(CancellationToken cancellationToken)
         {
-            var storyPointGrouped = (await _tasksSource.GetFinishedTasks())
+            var storyPointGrouped = (await _tasksSource.GetFinishedStories())
                 .Where(x => x.StoryPoints.HasValue)
                 .Where(x => x.StoryPoints.Value > 0)
                 .GroupBy(x => x.StoryPoints.Value)

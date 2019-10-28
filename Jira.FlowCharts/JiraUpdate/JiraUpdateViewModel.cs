@@ -46,7 +46,12 @@ namespace Jira.FlowCharts.JiraUpdate
 
         protected override async Task OnInitializeAsync(CancellationToken cancellationToken)
         {
-            var allTasks = (await _tasksSource.GetAllTasks()).ToList();
+            await UpdateDisplay();
+        }
+
+        private async Task UpdateDisplay()
+        {
+            var allTasks = (await _tasksSource.GetAllIssues()).ToList();
             CachedIssuesCount = allTasks.Count;
             LastUpdatedIssue = allTasks.Max(x => x.Updated);
         }
@@ -66,6 +71,8 @@ namespace Jira.FlowCharts.JiraUpdate
                 var jiraLoginParameters = view.GetLoginParameters();
 
                 await _tasksSource.UpdateIssues(jiraLoginParameters);
+
+                await UpdateDisplay();
             }
             catch (Exception e)
             {

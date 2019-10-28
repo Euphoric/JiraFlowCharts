@@ -43,7 +43,7 @@ namespace Jira.FlowCharts
         protected override async Task OnActivateAsync(CancellationToken cancellationToken)
         {
             var histogramNonzero =
-                (await _taskSource.GetFinishedTasks())
+                (await _taskSource.GetFinishedStories())
                     .GroupBy(x => (int)x.Duration + 1)
                     .Select(grp => new { Days = grp.Key, Counts = grp.Count() })
                     .ToDictionary(x => x.Days, x => x.Counts);

@@ -24,14 +24,14 @@ namespace Jira.FlowCharts
             ResetStates = new[] { "On Hold", "Not Started", "Withdrawn" };
         }
 
-        private async Task<List<CachedIssue>> RetrieveIssues()
+        public async Task<IEnumerable<CachedIssue>> GetAllIssues()
         {
             return await _jiraCache.GetIssues();
         }
 
-        public async Task<IEnumerable<CachedIssue>> GetAllTasks()
+        public async Task<IEnumerable<CachedIssue>> GetStories()
         {
-            var issues = await RetrieveIssues();
+            var issues = await GetAllIssues();
 
             IEnumerable<CachedIssue> stories = issues
                 .Where(x => x.Type == "Story" || x.Type == "Bug")
@@ -41,9 +41,9 @@ namespace Jira.FlowCharts
             return stories;
         }
 
-        public async Task<FinishedTask[]> GetFinishedTasks()
+        public async Task<FinishedTask[]> GetFinishedStories()
         {
-            IEnumerable<CachedIssue> stories = await GetAllTasks();
+            IEnumerable<CachedIssue> stories = await GetStories();
 
             SimplifyStateChangeOrder simplify = new SimplifyStateChangeOrder(States, ResetStates);
 
