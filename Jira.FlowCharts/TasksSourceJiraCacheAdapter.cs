@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Jira.Querying;
+using Jira.Querying.Sqlite;
 
 namespace Jira.FlowCharts
 {
@@ -14,20 +15,14 @@ namespace Jira.FlowCharts
 
     public class TasksSourceJiraCacheAdapter : ITasksSourceJiraCacheAdapter
     {
-        private Func<JiraLocalCache.IRepository> _cacheRepositoryFactory;
-        private readonly Func<JiraLoginParameters, IJiraClient> _clientFactory;
-
-        public TasksSourceJiraCacheAdapter(
-            Func<JiraLocalCache.IRepository> cacheRepositoryFactory,
-            Func<JiraLoginParameters, IJiraClient> clientFactory)
+        private JiraLocalCache.IRepository CreateRepository()
         {
-            _cacheRepositoryFactory = cacheRepositoryFactory;
-            _clientFactory = clientFactory;
+            return new SqliteJiraLocalCacheRepository(@"../../../Data/issuesCache.db");
         }
 
         public async Task<List<CachedIssue>> GetIssues()
         {
-            using (var cache = new JiraLocalCache(_cacheRepositoryFactory()))
+            using (var cache = new JiraLocalCache(CreateRepository()))
             {
                 await cache.Initialize();
 
@@ -37,11 +32,11 @@ namespace Jira.FlowCharts
 
         public async Task UpdateIssues(JiraLoginParameters jiraLoginParameters)
         {
-            using (var cache = new JiraLocalCache(_cacheRepositoryFactory()))
+            using (var cache = new JiraLocalCache(CreateRepository()))
             {
                 await cache.Initialize();
 
-                var client = _clientFactory(jiraLoginParameters);
+                var client = new JiraClient(jiraLoginParameters);
 
                 await cache.Update(client, DateTime.MinValue);
             }
