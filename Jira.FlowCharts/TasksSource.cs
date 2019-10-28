@@ -81,9 +81,9 @@ namespace Jira.FlowCharts
             return flowIssue;
         }
 
-        public async Task UpdateIssues(JiraLoginParameters jiraLoginParameters)
+        public async Task UpdateIssues(JiraLoginParameters jiraLoginParameters, ICacheUpdateProgress cacheUpdateProgress)
         {
-            await _jiraCache.UpdateIssues(jiraLoginParameters);
+            await _jiraCache.UpdateIssues(jiraLoginParameters, cacheUpdateProgress);
         }
     }
 }

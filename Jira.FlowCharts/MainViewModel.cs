@@ -12,8 +12,8 @@ namespace Jira.FlowCharts
         public MainViewModel()
         {
             TasksSource source = new TasksSource(new TasksSourceJiraCacheAdapter());
-
-            Items.Add(new JiraUpdateViewModel(source));
+            
+            Items.Add(new JiraUpdateViewModel(source, new CurrentTime()));
             Items.Add(new CumulativeFlowViewModel(source));
             Items.Add(new CycleTimeScatterplotViewModel(source));
             Items.Add(new CycleTimeHistogramViewModel(source));

@@ -231,12 +231,14 @@
       <DependentUpon>CumulativeFlowView.xaml</DependentUpon>
     </Compile>
     <Compile Include="CummulativeFlow\CumulativeFlowViewModel.cs" />
+    <Compile Include="CurrentTime.cs" />
     <Compile Include="CycleTimeHistogram\CycleTimeHistogramView.xaml.cs">
       <DependentUpon>CycleTimeHistogramView.xaml</DependentUpon>
     </Compile>
     <Compile Include="CycleTimeScatterplot\CycleTimeScatterplotView.xaml.cs">
       <DependentUpon>CycleTimeScatterplotView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="JiraUpdate\ICurrentTime.cs" />
     <Compile Include="JiraUpdate\IJiraUpdateView.cs" />
     <Compile Include="JiraUpdate\JiraUpdateView.xaml.cs">
       <DependentUpon>JiraUpdateView.xaml</DependentUpon>

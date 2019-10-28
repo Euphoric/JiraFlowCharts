@@ -5,23 +5,29 @@ using System.Reactive;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Jira.Querying;
 using ReactiveUI;
 
 namespace Jira.FlowCharts.JiraUpdate
 {
-    public class JiraUpdateViewModel : ReactiveScreen
+    public class JiraUpdateViewModel : ReactiveScreen, ICacheUpdateProgress
     {
         private readonly TasksSource _tasksSource;
+        private readonly ICurrentTime _currentTime;
         private int _cachedIssuesCount;
         private DateTime? _lastUpdatedIssue;
         private string _updateError;
+        DateTime? _updateProgressReportStartTime;
 
-        public JiraUpdateViewModel(TasksSource tasksSource)
+        public JiraUpdateViewModel(TasksSource tasksSource, ICurrentTime currentTime)
         {
             _tasksSource = tasksSource;
+            _currentTime = currentTime;
+
             DisplayName = "Jira update";
 
             UpdateCommand = ReactiveCommand.CreateFromTask(UpdateJira);
+            UpdateProgress = -1;
         }
 
         public int CachedIssuesCount
@@ -44,6 +50,13 @@ namespace Jira.FlowCharts.JiraUpdate
             private set => Set(ref _updateError, value);
         }
 
+        double _updateProgress;
+        public double UpdateProgress
+        {
+            get => _updateProgress;
+            private set => Set(ref _updateProgress, value);
+        }
+
         protected override async Task OnInitializeAsync(CancellationToken cancellationToken)
         {
             await UpdateDisplay();
@@ -59,6 +72,8 @@ namespace Jira.FlowCharts.JiraUpdate
         private async Task UpdateJira()
         {
             UpdateError = null;
+            UpdateProgress = 0;
+            _updateProgressReportStartTime = null;
             try
             {
                 var view = GetView() as IJiraUpdateView;
@@ -70,13 +85,30 @@ namespace Jira.FlowCharts.JiraUpdate
 
                 var jiraLoginParameters = view.GetLoginParameters();
 
-                await _tasksSource.UpdateIssues(jiraLoginParameters);
+                await _tasksSource.UpdateIssues(jiraLoginParameters, this);
 
                 await UpdateDisplay();
+
+                UpdateProgress = 100;
             }
             catch (Exception e)
             {
                 UpdateError = e.ToString();
+            }
+        }
+
+        void ICacheUpdateProgress.UpdatedIssue(string key, DateTime updated)
+        {
+            if (!_updateProgressReportStartTime.HasValue)
+            {
+                UpdateProgress = 1;
+                _updateProgressReportStartTime = updated;
+            }
+            else
+            {
+                var maxTimeSpan = _currentTime.UtcNow - _updateProgressReportStartTime.Value;
+                var actualTimeSpan = _currentTime.UtcNow - updated;
+                UpdateProgress = (1 - (actualTimeSpan.TotalDays / maxTimeSpan.TotalDays)) * 99 + 1;
             }
         }
     }
