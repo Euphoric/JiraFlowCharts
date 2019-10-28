@@ -4,105 +4,12 @@ using Jira.Querying.Sqlite;
 using KellermanSoftware.CompareNetObjects;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
 
 namespace Jira.Querying
 {
-    public class FakeJiraIssue : IJiraIssue
-    {
-        public FakeJiraIssue(string key)
-        {
-            Key = key;
-        }
-
-        public string Key { get; private set; }
-        public DateTime? Created { get; set; }
-        public DateTime? Updated { get; set; }
-    }
-
-    public class FakeJiraClient : IJiraClient
-    {
-        readonly List<FakeJiraIssue> Issues = new List<FakeJiraIssue>();
-        private DateTime _currentDateTime;
-
-        /// <summary>
-        /// Will fail a query if issue with given key were to be retrieved. NULL for no-op.
-        /// </summary>
-        public string FailIfIssueWereToBeRetrieved { get; set; }
-
-        public FakeJiraClient()
-            :this(new DateTime(2019, 1, 1))
-        {
-
-        }
-
-        private FakeJiraClient(DateTime dateTime)
-        {
-            _currentDateTime = dateTime;
-        }
-
-        /// <summary>
-        /// Get issues that emulates how JIRA REST API works. With all it's quirks and limitations.
-        /// </summary>
-        public Task<IJiraIssue[]> GetIssues(string project, DateTime lastUpdated, int count, int skipCount)
-        {
-            Assert.InRange(count, 0, 50); // Must query between 0 and 50 items
-            FakeJiraIssue[] returnedJiraIssues = Issues
-                .Where(x => WithoutSeconds(x.Updated) >= WithoutSeconds(lastUpdated))
-                .OrderBy(x => x.Updated)
-                .Skip(skipCount)
-                .Take(count)
-                .ToArray();
-
-            if (FailIfIssueWereToBeRetrieved != null)
-            {
-                var isReturningIssue = returnedJiraIssues.Any(x => x.Key == FailIfIssueWereToBeRetrieved);
-                Assert.False(isReturningIssue, $"Should not have returned issue with key : {FailIfIssueWereToBeRetrieved}");
-            }
-
-            return Task.FromResult<IJiraIssue[]>(returnedJiraIssues);
-        }
-
-        private static DateTime? WithoutSeconds(DateTime? dateTime)
-        {
-            if (!dateTime.HasValue)
-                return null;
-            var d = dateTime.Value;
-            return new DateTime(d.Year, d.Month, d.Day, d.Hour, d.Minute, 0);
-        }
-
-        public Task<CachedIssue> RetrieveDetails(IJiraIssue issue)
-        {
-            var fake = (FakeJiraIssue)issue;
-            CachedIssue cachedIssue = new CachedIssue()
-            {
-                Key = fake.Key,
-                Created = fake.Created,
-                Updated = fake.Updated,
-                StatusChanges = new Collection<CachedIssueStatusChange>()
-            };
-
-            return Task.FromResult(cachedIssue);
-        }
-
-        internal void UpdateIssue(string key, TimeSpan? step = null)
-        {
-            var existingIssue = Issues.FirstOrDefault(x => x.Key == key);
-            if (existingIssue == null)
-            {
-                Issues.Add(new FakeJiraIssue(key) { Created = _currentDateTime, Updated = _currentDateTime });
-            }
-            else
-            {
-                existingIssue.Updated = _currentDateTime;
-            }
-            _currentDateTime = _currentDateTime.Add(step ?? TimeSpan.FromDays(1));
-        }
-    }
-    
     public class JiraLocalCacheTestSqlite : JiraLocalCacheTest
     {
         public JiraLocalCacheTestSqlite()
