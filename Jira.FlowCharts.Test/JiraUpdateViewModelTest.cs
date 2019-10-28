@@ -28,6 +28,8 @@ namespace Jira.FlowCharts
 
         private class TestJiraCacheAdapter : ITasksSourceJiraCacheAdapter
         {
+            public JiraLoginParameters ExpectedLoginParameters { get; internal set; }
+
             public Task<List<CachedIssue>> GetIssues()
             {
                 return Task.FromResult(new List<CachedIssue>());
@@ -35,20 +37,30 @@ namespace Jira.FlowCharts
 
             public Task UpdateIssues(JiraLoginParameters jiraLoginParameters)
             {
+                if (ExpectedLoginParameters != null)
+                {
+                    Assert.Equal(ExpectedLoginParameters, jiraLoginParameters);
+                }
+
                 return Task.CompletedTask;
             }
         }
 
         JiraUpdateViewModel _vm;
         TestView _view;
+        TestJiraCacheAdapter _jiraCacheAdapter;
 
         public JiraUpdateViewModelTest()
         {
-            var tasksSource = new TasksSource(new TestJiraCacheAdapter());
+            _jiraCacheAdapter = new TestJiraCacheAdapter();
+
+            var tasksSource = new TasksSource(_jiraCacheAdapter);
             _vm = new JiraUpdateViewModel(tasksSource);
 
             _view = new TestView();
             (_vm as IViewAware).AttachView(_view);
+
+            _view.LoginParameters = new JiraLoginParameters("http://url", "usrName", new System.Security.SecureString());
         }
 
         public async Task InitializeAsync()
@@ -71,9 +83,9 @@ namespace Jira.FlowCharts
         }
 
         [Fact]
-        public async Task Update()
+        public async Task Update_sends_right_parameters_and_doesnt_error()
         {
-            _view.LoginParameters = new JiraLoginParameters("http://url", "usrName", new System.Security.SecureString());
+            _jiraCacheAdapter.ExpectedLoginParameters = _view.LoginParameters;
 
             await _vm.UpdateCommand.Execute().ToTask();
             Assert.Null(_vm.UpdateError);
