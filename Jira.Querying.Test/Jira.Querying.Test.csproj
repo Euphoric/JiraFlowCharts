@@ -24,6 +24,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Jira.Querying.Fakes\Jira.Querying.Fakes.csproj" />
     <ProjectReference Include="..\Jira.Querying\Jira.Querying.csproj" />
   </ItemGroup>
 

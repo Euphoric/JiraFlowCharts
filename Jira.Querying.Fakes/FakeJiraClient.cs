@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
-using Xunit;
 
 namespace Jira.Querying
 {
@@ -45,7 +44,11 @@ namespace Jira.Querying
         /// </summary>
         public Task<IJiraIssue[]> GetIssues(string project, DateTime lastUpdated, int count, int skipCount)
         {
-            Assert.InRange(count, 0, 50); // Must query between 0 and 50 items
+            if (0 <= count && count < 50)
+            {
+                throw new ArgumentException("Count must be between 0 and 50", nameof(count));
+            }
+
             FakeJiraIssue[] returnedJiraIssues = Issues
                 .Where(x => WithoutSeconds(x.Updated) >= WithoutSeconds(lastUpdated))
                 .OrderBy(x => x.Updated)
@@ -56,7 +59,10 @@ namespace Jira.Querying
             if (FailIfIssueWereToBeRetrieved != null)
             {
                 var isReturningIssue = returnedJiraIssues.Any(x => x.Key == FailIfIssueWereToBeRetrieved);
-                Assert.False(isReturningIssue, $"Should not have returned issue with key : {FailIfIssueWereToBeRetrieved}");
+                if (isReturningIssue)
+                {
+                    throw new Exception($"Should not have returned issue with key : {FailIfIssueWereToBeRetrieved}");
+                }
             }
 
             return Task.FromResult<IJiraIssue[]>(returnedJiraIssues);
@@ -84,7 +90,7 @@ namespace Jira.Querying
             return Task.FromResult(cachedIssue);
         }
 
-        internal void UpdateIssue(string key, TimeSpan? step = null)
+        public void UpdateIssue(string key, TimeSpan? step = null)
         {
             var existingIssue = Issues.FirstOrDefault(x => x.Key == key);
             if (existingIssue == null)

@@ -15,6 +15,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Jira.FlowCharts.Test", "Jir
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Jira.Simulation.Test", "Jira.Simulation.Test\Jira.Simulation.Test.csproj", "{CEF44AD0-3645-4F0E-BAC1-C9F145D34141}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Jira.Querying.Fakes", "Jira.Querying.Fakes\Jira.Querying.Fakes.csproj", "{E864C4DC-2543-4EE3-8417-1DEC4FF9D7E8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -45,6 +47,10 @@ Global
 		{CEF44AD0-3645-4F0E-BAC1-C9F145D34141}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CEF44AD0-3645-4F0E-BAC1-C9F145D34141}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CEF44AD0-3645-4F0E-BAC1-C9F145D34141}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E864C4DC-2543-4EE3-8417-1DEC4FF9D7E8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E864C4DC-2543-4EE3-8417-1DEC4FF9D7E8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E864C4DC-2543-4EE3-8417-1DEC4FF9D7E8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E864C4DC-2543-4EE3-8417-1DEC4FF9D7E8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
