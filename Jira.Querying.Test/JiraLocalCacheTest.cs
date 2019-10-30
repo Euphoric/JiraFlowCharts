@@ -79,9 +79,9 @@ namespace Jira.Querying
             _cacheUpdateProgress = new MemoryCacheUpdateProgress();
         }
 
-        private Task CacheUpdate(DateTime? startUpdateDate = null)
+        private Task CacheUpdate(DateTime? startUpdateDate = null, string projectKey = "AB")
         {
-            return Cache.Update(_client, startUpdateDate ?? new DateTime(2018, 1, 1), _cacheUpdateProgress);
+            return Cache.Update(_client, startUpdateDate ?? new DateTime(2018, 1, 1), projectKey, _cacheUpdateProgress);
         }
 
         [Fact]
@@ -113,7 +113,14 @@ namespace Jira.Querying
         public async Task Update_parameter_check()
         {
             await Cache.Initialize();
-            await Assert.ThrowsAsync<ArgumentNullException>(()=> Cache.Update(null, new DateTime(2018, 1, 1)));
+            await Assert.ThrowsAsync<ArgumentNullException>(()=> Cache.Update(null, new DateTime(2018, 1, 1), "AB"));
+        }
+
+        [Fact]
+        public async Task Project_key_cannot_be_empty()
+        {
+            await Cache.Initialize();
+            await Assert.ThrowsAsync<ArgumentNullException>(() => Cache.Update(_client, new DateTime(2018, 1, 1), ""));
         }
 
         [Fact]
@@ -121,6 +128,18 @@ namespace Jira.Querying
         {
             await Cache.Initialize();
             await CacheUpdate();
+
+            Assert.Empty(await Cache.GetIssues());
+        }
+
+        [Fact]
+        public async Task Update_passes_right_project_key()
+        {
+            await Cache.Initialize();
+
+            _client.ExpectedProjectKey = "EFG";
+
+            await CacheUpdate(projectKey: "EFG");
 
             Assert.Empty(await Cache.GetIssues());
         }

@@ -38,7 +38,7 @@ namespace Jira.FlowCharts
 
                 var client = new JiraClient(jiraLoginParameters);
 
-                await cache.Update(client, DateTime.MinValue, cacheUpdateProgress);
+                await cache.Update(client, DateTime.MinValue, projectKey, cacheUpdateProgress);
             }
         }
     }

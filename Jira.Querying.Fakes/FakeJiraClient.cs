@@ -28,6 +28,8 @@ namespace Jira.Querying
         /// </summary>
         public string FailIfIssueWereToBeRetrieved { get; set; }
 
+        public string ExpectedProjectKey { get; set; }
+
         public FakeJiraClient()
             :this(new DateTime(2019, 1, 1))
         {
@@ -47,6 +49,14 @@ namespace Jira.Querying
             if (0 <= count && count < 50)
             {
                 throw new ArgumentException("Count must be between 0 and 50", nameof(count));
+            }
+
+            if (ExpectedProjectKey != null)
+            {
+                if (ExpectedProjectKey != project)
+                {
+                    throw new InvalidOperationException($"{nameof(project)} parameter must be same as {nameof(ExpectedProjectKey)}");
+                }
             }
 
             FakeJiraIssue[] returnedJiraIssues = Issues

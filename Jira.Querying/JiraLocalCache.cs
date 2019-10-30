@@ -101,7 +101,7 @@ namespace Jira.Querying
             _isInitialized = true;
         }
 
-        public async Task Update(IJiraClient client, DateTime startUpdateDate, ICacheUpdateProgress progress = null)
+        public async Task Update(IJiraClient client, DateTime startUpdateDate, string projectKey, ICacheUpdateProgress progress = null)
         {
             progress = progress ?? new NullCacheUpdateProgres();
 
@@ -110,12 +110,15 @@ namespace Jira.Querying
                 throw new ArgumentNullException(nameof(client));
             }
 
+            if (string.IsNullOrWhiteSpace(projectKey))
+            {
+                throw new ArgumentNullException(nameof(projectKey));
+            }
+
             if (!_isInitialized)
             {
                 throw new InvalidOperationException($"Must call {nameof(Initialize)} before updating.");
             }
-
-            string projectName = "AC"; // TODO : Parametrize project
 
             DateTime lastUpdateDate = await GetLastUpdateDateTime(startUpdateDate);
 
@@ -124,7 +127,7 @@ namespace Jira.Querying
             {
                 const int QueryLimit = 50;
 
-                IJiraIssue[] updatedIssues = await client.GetIssues(projectName, lastUpdateDate, QueryLimit, itemPaging);
+                IJiraIssue[] updatedIssues = await client.GetIssues(projectKey, lastUpdateDate, QueryLimit, itemPaging);
 
                 foreach (var issue in updatedIssues)
                 {

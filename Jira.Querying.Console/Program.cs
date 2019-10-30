@@ -36,7 +36,7 @@ namespace JiraParse
             {
                 await jiraLocalCache.Initialize();
 
-                await jiraLocalCache.Update(client, lastUpdate);
+                await jiraLocalCache.Update(client, lastUpdate, "AC");
             }
 
             Console.WriteLine("Finished");
