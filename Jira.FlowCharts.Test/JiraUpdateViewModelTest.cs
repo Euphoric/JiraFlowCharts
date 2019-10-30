@@ -40,12 +40,14 @@ namespace Jira.FlowCharts
             }
 
             public List<CachedIssue> IssuesToUpdateWith { get; private set; } = new List<CachedIssue>();
+            public string ExpectedProjectKey { get; internal set; }
 
-            public Task UpdateIssues(JiraLoginParameters jiraLoginParameters, ICacheUpdateProgress cacheUpdateProgress)
+            public Task UpdateIssues(JiraLoginParameters jiraLoginParameters, string projectKey, ICacheUpdateProgress cacheUpdateProgress)
             {
                 if (ExpectedLoginParameters != null)
                 {
                     Assert.Equal(ExpectedLoginParameters, jiraLoginParameters);
+                    Assert.Equal(ExpectedProjectKey, projectKey);
                 }
 
                 foreach (var item in IssuesToUpdateWith)
@@ -107,6 +109,9 @@ namespace Jira.FlowCharts
         public async Task Update_sends_right_parameters_and_doesnt_error()
         {
             _jiraCacheAdapter.ExpectedLoginParameters = _view.LoginParameters;
+
+            _vm.ProjectKey = "Abcd";
+            _jiraCacheAdapter.ExpectedProjectKey = "Abcd";
 
             await _vm.UpdateCommand.Execute().ToTask();
             Assert.Null(_vm.UpdateError);

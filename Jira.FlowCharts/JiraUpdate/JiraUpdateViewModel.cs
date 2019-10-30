@@ -30,6 +30,8 @@ namespace Jira.FlowCharts.JiraUpdate
             UpdateProgress = -1;
         }
 
+        public string ProjectKey { get; set; }
+
         public int CachedIssuesCount
         {
             get => _cachedIssuesCount;
@@ -85,7 +87,7 @@ namespace Jira.FlowCharts.JiraUpdate
 
                 var jiraLoginParameters = view.GetLoginParameters();
 
-                await _tasksSource.UpdateIssues(jiraLoginParameters, this);
+                await _tasksSource.UpdateIssues(jiraLoginParameters, ProjectKey, this);
 
                 await UpdateDisplay();
 
