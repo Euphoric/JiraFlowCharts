@@ -259,6 +259,10 @@
     <Compile Include="Simulation\FlowSimulationStatistics.cs" />
     <Compile Include="Simulation\NewEvent.cs" />
     <Compile Include="Simulation\FlowSimulation.cs" />
+    <Compile Include="StoryFiltering\StoryFilteringView.xaml.cs">
+      <DependentUpon>StoryFilteringView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="StoryFiltering\StoryFilteringViewModel.cs" />
     <Compile Include="StoryPointCycleTime\StoryPointCycleTimeView.xaml.cs">
       <DependentUpon>StoryPointCycleTimeView.xaml</DependentUpon>
     </Compile>
@@ -297,6 +301,10 @@
       <SubType>Code</SubType>
     </Compile>
     <Page Include="Simulation\SimulationView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="StoryFiltering\StoryFilteringView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
