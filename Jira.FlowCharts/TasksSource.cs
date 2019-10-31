@@ -12,6 +12,7 @@ namespace Jira.FlowCharts
     public interface IStatesRepository
     {
         string[] GetFilteredStates();
+        string[] GetResetStates();
     }
 
     public class MemoryStatesRepository : IStatesRepository
@@ -19,6 +20,11 @@ namespace Jira.FlowCharts
         public string[] GetFilteredStates()
         {
             return new[] { "Ready For Dev", "In Dev", "Ready for Peer Review", "Ready for QA", "In QA", "Ready for Done", "Done" };
+        }
+
+        public string[] GetResetStates()
+        {
+            return new[] {"On Hold", "Not Started", "Withdrawn"};
         }
     }
 
@@ -44,7 +50,7 @@ namespace Jira.FlowCharts
         public Task ReloadStates()
         {
             States = _statesRepository.GetFilteredStates();
-            ResetStates = new[] { "On Hold", "Not Started", "Withdrawn" };
+            ResetStates = _statesRepository.GetResetStates();
 
             return Task.CompletedTask;
         }

@@ -28,5 +28,10 @@
             <ListBox ItemsSource="{Binding FilteredStates}" />
         </DockPanel>
 
+        <DockPanel Grid.Column="2" Grid.Row="2">
+            <TextBlock DockPanel.Dock="Top">Reset states</TextBlock>
+            <ListBox ItemsSource="{Binding ResetStates}" />
+        </DockPanel>
+
     </Grid>
 </UserControl>

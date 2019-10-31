@@ -16,6 +16,7 @@ namespace Jira.FlowCharts.StoryFiltering
         public StoryFilteringViewModel(TasksSource tasksSource)
         {
             _tasksSource = tasksSource;
+
             DisplayName = "Story and state filtering";
 
             AvailableStates = new ObservableCollection<string>();
@@ -35,12 +36,15 @@ namespace Jira.FlowCharts.StoryFiltering
 
             string[] allStates = await _tasksSource.GetAllStates();
             string[] filteredStates = _tasksSource.States;
+            string[] resetStates = _tasksSource.ResetStates;
 
             AvailableStates.Clear();
             FilteredStates.Clear();
+            ResetStates.Clear();
 
-            AvailableStates.AddRange(allStates.Except(filteredStates));
+            AvailableStates.AddRange(allStates.Except(filteredStates).Except(resetStates));
             FilteredStates.AddRange(filteredStates);
+            ResetStates.AddRange(resetStates);
 
             await base.OnActivateAsync(cancellationToken);
         }

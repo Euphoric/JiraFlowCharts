@@ -62,23 +62,7 @@ namespace Jira.FlowCharts
         }
 
         [Fact]
-        public async Task Reactivating_multiple_should_keep_the_states_same()
-        {
-            var allStates = new[] { "A", "B", "C" };
-            _jiraCacheAdapter.AllStates = allStates;
-
-            var filteredStates = new[] { "B", "C" };
-            _statesRepository.FilteredStates = filteredStates;
-
-            await Reactivate();
-            await Reactivate();
-
-            Assert.Equal(new[] { "A" }, _vm.AvailableStates);
-            Assert.Equal(filteredStates, _vm.FilteredStates);
-        }
-
-        [Fact]
-        public async Task States_from_repository_are_in_States_but_not_in_Available_states()
+        public async Task Filtered_states_from_repository_are_in_filtered_states_but_not_in_Available_states()
         {
             var allStates = new[] { "A", "B", "C" };
             _jiraCacheAdapter.AllStates = allStates;
@@ -93,6 +77,44 @@ namespace Jira.FlowCharts
             Assert.Equal(filteredStates, _vm.FilteredStates);
 
             Assert.Empty(_vm.ResetStates);
+        }
+
+        [Fact]
+        public async Task Reset_states_from_repository_are_in_Reset_states_but_not_in_Available_states()
+        {
+            var allStates = new[] { "A", "B", "C", "D" };
+            _jiraCacheAdapter.AllStates = allStates;
+
+            var resetStates = new[] { "D" };
+            _statesRepository.ResetStates = resetStates;
+
+            await Reactivate();
+
+            Assert.Equal(new[] { "A", "B", "C" }, _vm.AvailableStates);
+
+            Assert.Equal(resetStates, _vm.ResetStates);
+
+            Assert.Empty(_vm.FilteredStates);
+        }
+
+        [Fact]
+        public async Task Reactivating_multiple_should_keep_the_states_same()
+        {
+            var allStates = new[] { "A", "B", "C", "D" };
+            _jiraCacheAdapter.AllStates = allStates;
+
+            var filteredStates = new[] { "B", "C" };
+            _statesRepository.FilteredStates = filteredStates;
+
+            var resetStates = new[] { "D" };
+            _statesRepository.ResetStates = resetStates;
+
+            await Reactivate();
+            await Reactivate();
+
+            Assert.Equal(new[] { "A" }, _vm.AvailableStates);
+            Assert.Equal(filteredStates, _vm.FilteredStates);
+            Assert.Equal(resetStates, _vm.ResetStates);
         }
     }
 }
