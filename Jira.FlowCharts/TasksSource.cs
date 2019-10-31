@@ -24,6 +24,11 @@ namespace Jira.FlowCharts
             ResetStates = new[] { "On Hold", "Not Started", "Withdrawn" };
         }
 
+        public async Task<string[]> GetAllStates()
+        {
+            return await _jiraCache.GetAllStates();
+        }
+
         public async Task<IEnumerable<CachedIssue>> GetAllIssues()
         {
             return await _jiraCache.GetIssues();

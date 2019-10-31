@@ -7,6 +7,21 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
-            
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="165*"/>
+            <ColumnDefinition Width="72*"/>
+            <ColumnDefinition Width="203*"/>
+            <ColumnDefinition Width="360*"/>
+        </Grid.ColumnDefinitions>
+
+        <DockPanel Grid.Column="0" Grid.RowSpan="2">
+            <TextBlock DockPanel.Dock="Top">Available states</TextBlock>
+            <ListBox ItemsSource="{Binding AvailableStates}" />
+        </DockPanel>
+
     </Grid>
 </UserControl>

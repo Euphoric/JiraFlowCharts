@@ -112,6 +112,8 @@
     <Compile Include="ObservableRecording.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SimplifyStateChangeOrderTest.cs" />
+    <Compile Include="StoryFilteringViewModelTest.cs" />
+    <Compile Include="TestJiraCacheAdapter.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

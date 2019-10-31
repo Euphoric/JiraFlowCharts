@@ -26,42 +26,6 @@ namespace Jira.FlowCharts
             }
         }
 
-        private class TestJiraCacheAdapter : ITasksSourceJiraCacheAdapter
-        {
-            public JiraLoginParameters ExpectedLoginParameters { get; internal set; }
-
-            List<CachedIssue> _issues = new List<CachedIssue>();
-
-            public Task<List<CachedIssue>> GetIssues()
-            {
-                return Task.FromResult(_issues);
-            }
-
-            public List<CachedIssue> IssuesToUpdateWith { get; private set; } = new List<CachedIssue>();
-            public string ExpectedProjectKey { get; internal set; }
-
-            public Task UpdateIssues(JiraLoginParameters jiraLoginParameters, string projectKey, ICacheUpdateProgress cacheUpdateProgress)
-            {
-                if (ExpectedLoginParameters != null)
-                {
-                    Assert.Equal(ExpectedLoginParameters.JiraUrl, jiraLoginParameters.JiraUrl);
-                    Assert.Equal(ExpectedLoginParameters.JiraUsername, jiraLoginParameters.JiraUsername);
-                    Assert.Equal(ExpectedLoginParameters.JiraPassword, jiraLoginParameters.JiraPassword);
-                    Assert.Equal(ExpectedProjectKey, projectKey);
-                }
-
-                foreach (var item in IssuesToUpdateWith)
-                {
-                    cacheUpdateProgress.UpdatedIssue(item.Key, item.Updated.Value);
-                }
-
-                _issues.AddRange(IssuesToUpdateWith);
-                IssuesToUpdateWith.Clear();
-
-                return Task.CompletedTask;
-            }
-        }
-
         private class TestCurrentTime : ICurrentTime
         {
             public DateTime UtcNow { get; set; }
