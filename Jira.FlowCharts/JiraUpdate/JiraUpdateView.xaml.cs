@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -26,13 +27,9 @@ namespace Jira.FlowCharts.JiraUpdate
             InitializeComponent();
         }
 
-        public JiraLoginParameters GetLoginParameters()
+        public SecureString GetLoginPassword()
         {
-            return new JiraLoginParameters(
-                JiraUrlBox.Text,
-                JiraUsernameBox.Text,
-                JiraPasswordBox.SecurePassword
-                );
+            return JiraPasswordBox.SecurePassword;
         }
     }
 }

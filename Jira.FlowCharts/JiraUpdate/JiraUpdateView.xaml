@@ -29,9 +29,9 @@
             Last updated issue: <Run Text="{Binding LastUpdatedIssue, Mode=OneWay}"/>
         </TextBlock>
         <TextBlock Margin="2" Grid.Row="1" Grid.Column="0">Jira URL:</TextBlock>
-        <TextBox Grid.Row="1" Grid.Column="1" MinWidth="500" x:Name="JiraUrlBox" />
+        <TextBox Grid.Row="1" Grid.Column="1" MinWidth="500" Text="{Binding JiraUrl}" />
         <TextBlock Margin="2" Grid.Row="2" Grid.Column="0">Jira username:</TextBlock>
-        <TextBox Grid.Row="2" Grid.Column="1" MinWidth="500" x:Name="JiraUsernameBox" />
+        <TextBox Grid.Row="2" Grid.Column="1" MinWidth="500" Text="{Binding JiraUsername}" />
         <TextBlock Margin="2" Grid.Row="3" Grid.Column="0">Jira password:</TextBlock>
         <PasswordBox Grid.Row="3" Grid.Column="1" MinWidth="500" x:Name="JiraPasswordBox" />
 

@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Xunit;
 using System.Reactive.Linq;
+using System.Security;
 using IScreen = Caliburn.Micro.IScreen;
 
 namespace Jira.FlowCharts
@@ -17,14 +18,11 @@ namespace Jira.FlowCharts
     {
         private class TestView : IJiraUpdateView
         {
-            public JiraLoginParameters LoginParameters { get; set; }
+            public SecureString LoginPassword { get; set; }
 
-            public JiraLoginParameters GetLoginParameters()
+            public SecureString GetLoginPassword()
             {
-                if (LoginParameters == null)
-                    throw new Exception("Login parameters weren't set in test.");
-
-                return LoginParameters;
+                return LoginPassword;
             }
         }
 
@@ -46,7 +44,9 @@ namespace Jira.FlowCharts
             {
                 if (ExpectedLoginParameters != null)
                 {
-                    Assert.Equal(ExpectedLoginParameters, jiraLoginParameters);
+                    Assert.Equal(ExpectedLoginParameters.JiraUrl, jiraLoginParameters.JiraUrl);
+                    Assert.Equal(ExpectedLoginParameters.JiraUsername, jiraLoginParameters.JiraUsername);
+                    Assert.Equal(ExpectedLoginParameters.JiraPassword, jiraLoginParameters.JiraPassword);
                     Assert.Equal(ExpectedProjectKey, projectKey);
                 }
 
@@ -82,8 +82,6 @@ namespace Jira.FlowCharts
 
             _view = new TestView();
             (_vm as IViewAware).AttachView(_view);
-
-            _view.LoginParameters = new JiraLoginParameters("http://url", "usrName", new System.Security.SecureString());
         }
 
         public async Task InitializeAsync()
@@ -108,11 +106,19 @@ namespace Jira.FlowCharts
         [Fact]
         public async Task Update_sends_right_parameters_and_doesnt_error()
         {
-            _jiraCacheAdapter.ExpectedLoginParameters = _view.LoginParameters;
+            var jiraPassword = new SecureString();
 
+            // user enters values
+            _vm.JiraUrl = "http://url";
+            _vm.JiraUsername = "usrName";
             _vm.ProjectKey = "Abcd";
+            _view.LoginPassword = jiraPassword;
+
+            // expected parameters passed into adapter
+            _jiraCacheAdapter.ExpectedLoginParameters = new JiraLoginParameters("http://url", "usrName", jiraPassword);
             _jiraCacheAdapter.ExpectedProjectKey = "Abcd";
 
+            // execute and assert
             await _vm.UpdateCommand.Execute().ToTask();
             Assert.Null(_vm.UpdateError);
         }

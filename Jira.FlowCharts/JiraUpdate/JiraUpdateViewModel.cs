@@ -30,6 +30,10 @@ namespace Jira.FlowCharts.JiraUpdate
             UpdateProgress = -1;
         }
 
+        public string JiraUrl { get; set; }
+
+        public string JiraUsername { get; set; }
+
         public string ProjectKey { get; set; }
 
         public int CachedIssuesCount
@@ -85,7 +89,7 @@ namespace Jira.FlowCharts.JiraUpdate
                     throw new InvalidOperationException("Attached view was not correct");
                 }
 
-                var jiraLoginParameters = view.GetLoginParameters();
+                var jiraLoginParameters = new JiraLoginParameters(JiraUrl, JiraUsername, view.GetLoginPassword());
 
                 await _tasksSource.UpdateIssues(jiraLoginParameters, ProjectKey, this);
 

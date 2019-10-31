@@ -1,9 +1,9 @@
-﻿using Jira.Querying;
+﻿using System.Security;
 
 namespace Jira.FlowCharts.JiraUpdate
 {
     public interface IJiraUpdateView
     {
-        JiraLoginParameters GetLoginParameters();
+        SecureString GetLoginPassword();
     }
 }
