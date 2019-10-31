@@ -13,12 +13,13 @@ namespace Jira.FlowCharts
     {
         private StoryFilteringViewModel _vm;
         private TestJiraCacheAdapter _jiraCacheAdapter;
+        private TestStatesRepository _statesRepository;
 
         public StoryFilteringViewModelTest()
         {
             _jiraCacheAdapter = new TestJiraCacheAdapter();
-
-            var tasksSource = new TasksSource(_jiraCacheAdapter);
+            _statesRepository = new TestStatesRepository();
+            var tasksSource = new TasksSource(_jiraCacheAdapter, _statesRepository);
             _vm = new StoryFilteringViewModel(tasksSource);
         }
 
@@ -42,7 +43,7 @@ namespace Jira.FlowCharts
         public void No_states_have_empty_collections()
         {
             Assert.Empty(_vm.AvailableStates);
-            Assert.Empty(_vm.States);
+            Assert.Empty(_vm.FilteredStates);
             Assert.Empty(_vm.ResetStates);
         }
 
@@ -56,23 +57,42 @@ namespace Jira.FlowCharts
 
             Assert.Equal(allStates, _vm.AvailableStates);
 
-            Assert.Empty(_vm.States);
+            Assert.Empty(_vm.FilteredStates);
             Assert.Empty(_vm.ResetStates);
         }
 
         [Fact]
-        public async Task Reactivating_should_keep_the_states_same()
+        public async Task Reactivating_multiple_should_keep_the_states_same()
         {
             var allStates = new[] { "A", "B", "C" };
             _jiraCacheAdapter.AllStates = allStates;
 
+            var filteredStates = new[] { "B", "C" };
+            _statesRepository.FilteredStates = filteredStates;
+
+            await Reactivate();
             await Reactivate();
 
-            Assert.Equal(allStates, _vm.AvailableStates);
+            Assert.Equal(new[] { "A" }, _vm.AvailableStates);
+            Assert.Equal(filteredStates, _vm.FilteredStates);
+        }
+
+        [Fact]
+        public async Task States_from_repository_are_in_States_but_not_in_Available_states()
+        {
+            var allStates = new[] { "A", "B", "C" };
+            _jiraCacheAdapter.AllStates = allStates;
+
+            var filteredStates = new[] {"B", "C"};
+            _statesRepository.FilteredStates = filteredStates;
 
             await Reactivate();
 
-            Assert.Equal(allStates, _vm.AvailableStates);
+            Assert.Equal(new[] {"A"}, _vm.AvailableStates);
+
+            Assert.Equal(filteredStates, _vm.FilteredStates);
+
+            Assert.Empty(_vm.ResetStates);
         }
     }
 }

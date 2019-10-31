@@ -114,6 +114,7 @@
     <Compile Include="SimplifyStateChangeOrderTest.cs" />
     <Compile Include="StoryFilteringViewModelTest.cs" />
     <Compile Include="TestJiraCacheAdapter.cs" />
+    <Compile Include="TestStatesRepository.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

@@ -10,19 +10,26 @@ namespace Jira.FlowCharts
 {
     public class MainViewModel : Conductor<IScreen>.Collection.OneActive
     {
+        private TasksSource _tasksSource;
+
         public MainViewModel()
         {
             DisplayName = "Jira flow metrics";
 
-            TasksSource source = new TasksSource(new TasksSourceJiraCacheAdapter());
+            _tasksSource = new TasksSource(new TasksSourceJiraCacheAdapter(), new MemoryStatesRepository());
             
-            Items.Add(new JiraUpdateViewModel(source, new CurrentTime()));
-            Items.Add(new StoryFilteringViewModel(source));
-            Items.Add(new CumulativeFlowViewModel(source));
-            Items.Add(new CycleTimeScatterplotViewModel(source));
-            Items.Add(new CycleTimeHistogramViewModel(source));
-            Items.Add(new StoryPointCycleTimeViewModel(source));
-            Items.Add(new SimulationViewModel(source));
+            Items.Add(new JiraUpdateViewModel(_tasksSource, new CurrentTime()));
+            Items.Add(new StoryFilteringViewModel(_tasksSource));
+            Items.Add(new CumulativeFlowViewModel(_tasksSource));
+            Items.Add(new CycleTimeScatterplotViewModel(_tasksSource));
+            Items.Add(new CycleTimeHistogramViewModel(_tasksSource));
+            Items.Add(new StoryPointCycleTimeViewModel(_tasksSource));
+            Items.Add(new SimulationViewModel(_tasksSource));
+        }
+
+        protected override async Task OnInitializeAsync(CancellationToken cancellationToken)
+        {
+            await _tasksSource.ReloadStates();
         }
     }
 }

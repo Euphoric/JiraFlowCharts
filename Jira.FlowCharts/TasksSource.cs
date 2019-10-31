@@ -9,24 +9,44 @@ using Jira.Querying.Sqlite;
 
 namespace Jira.FlowCharts
 {
+    public interface IStatesRepository
+    {
+        string[] GetFilteredStates();
+    }
+
+    public class MemoryStatesRepository : IStatesRepository
+    {
+        public string[] GetFilteredStates()
+        {
+            return new[] { "Ready For Dev", "In Dev", "Ready for Peer Review", "Ready for QA", "In QA", "Ready for Done", "Done" };
+        }
+    }
+
     public class TasksSource
     {
         private readonly ITasksSourceJiraCacheAdapter _jiraCache;
+        private readonly IStatesRepository _statesRepository;
 
-        public string[] States { get; }
-        public string[] ResetStates { get; }
+        public string[] States { get; private set; }
+        public string[] ResetStates { get; private set; }
 
-        public TasksSource(ITasksSourceJiraCacheAdapter jiraCacheAdapter)
+        public TasksSource(ITasksSourceJiraCacheAdapter jiraCacheAdapter, IStatesRepository statesRepository)
         {
             _jiraCache = jiraCacheAdapter;
-
-            States = new[] { "Ready For Dev", "In Dev", "Ready for Peer Review", "Ready for QA", "In QA", "Ready for Done", "Done" };
-            ResetStates = new[] { "On Hold", "Not Started", "Withdrawn" };
+            _statesRepository = statesRepository;
         }
 
         public async Task<string[]> GetAllStates()
         {
             return await _jiraCache.GetAllStates();
+        }
+
+        public Task ReloadStates()
+        {
+            States = _statesRepository.GetFilteredStates();
+            ResetStates = new[] { "On Hold", "Not Started", "Withdrawn" };
+
+            return Task.CompletedTask;
         }
 
         public async Task<IEnumerable<CachedIssue>> GetAllIssues()

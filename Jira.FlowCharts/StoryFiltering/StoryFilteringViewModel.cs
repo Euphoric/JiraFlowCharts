@@ -19,22 +19,28 @@ namespace Jira.FlowCharts.StoryFiltering
             DisplayName = "Story and state filtering";
 
             AvailableStates = new ObservableCollection<string>();
-            States = new ObservableCollection<string>();
+            FilteredStates = new ObservableCollection<string>();
             ResetStates = new ObservableCollection<string>();
         }
 
         public ObservableCollection<string> AvailableStates { get; }
 
-        public ObservableCollection<string> States { get; }
+        public ObservableCollection<string> FilteredStates { get; }
 
         public ObservableCollection<string> ResetStates { get; }
 
         protected override async Task OnActivateAsync(CancellationToken cancellationToken)
         {
+            await _tasksSource.ReloadStates();
+
             string[] allStates = await _tasksSource.GetAllStates();
+            string[] filteredStates = _tasksSource.States;
 
             AvailableStates.Clear();
-            AvailableStates.AddRange(allStates);
+            FilteredStates.Clear();
+
+            AvailableStates.AddRange(allStates.Except(filteredStates));
+            FilteredStates.AddRange(filteredStates);
 
             await base.OnActivateAsync(cancellationToken);
         }
