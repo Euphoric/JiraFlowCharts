@@ -32,14 +32,16 @@ namespace Jira.FlowCharts
         private readonly ITasksSourceJiraCacheAdapter _jiraCache;
         private readonly IStatesRepository _statesRepository;
 
+        public ObservableCollection<string> AvailableStates { get; }
         public ObservableCollection<string> FilteredStates { get; }
         public ObservableCollection<string> ResetStates { get; }
-
+        
         public TasksSource(ITasksSourceJiraCacheAdapter jiraCacheAdapter, IStatesRepository statesRepository)
         {
             _jiraCache = jiraCacheAdapter;
             _statesRepository = statesRepository;
 
+            AvailableStates = new ObservableCollection<string>();
             FilteredStates = new ObservableCollection<string>();
             ResetStates = new ObservableCollection<string>();
         }
@@ -49,15 +51,19 @@ namespace Jira.FlowCharts
             return await _jiraCache.GetAllStates();
         }
 
-        public Task ReloadStates()
+        public async Task ReloadStates()
         {
+            AvailableStates.Clear();
             FilteredStates.Clear();
             ResetStates.Clear();
 
-            FilteredStates.AddRange(_statesRepository.GetFilteredStates());
-            ResetStates.AddRange(_statesRepository.GetResetStates());
+            var allStates = await GetAllStates();
+            var filteredStates = _statesRepository.GetFilteredStates();
+            var resetStates = _statesRepository.GetResetStates();
 
-            return Task.CompletedTask;
+            AvailableStates.AddRange(allStates.Except(filteredStates).Except(resetStates));
+            FilteredStates.AddRange(filteredStates);
+            ResetStates.AddRange(resetStates);
         }
 
         public async Task<IEnumerable<CachedIssue>> GetAllIssues()
@@ -79,11 +85,13 @@ namespace Jira.FlowCharts
 
         internal void AddFilteredState(string state)
         {
+            AvailableStates.Remove(state);
             FilteredStates.Add(state);
         }
 
         internal void RemoveFilteredState(string state)
         {
+            AvailableStates.Add(state);
             FilteredStates.Remove(state);
         }
 

@@ -21,14 +21,12 @@ namespace Jira.FlowCharts.StoryFiltering
 
             DisplayName = "Story and state filtering";
 
-            AvailableStates = new ObservableCollection<string>();
-
             MoveStateToFiltered = ReactiveCommand.CreateFromTask(MoveStateToFilteredInner);
             MoveStateFromFiltered = ReactiveCommand.CreateFromTask(MoveStateFromFilteredInner);
         }
 
         public string SelectedAvailableState { get; set; }
-        public ObservableCollection<string> AvailableStates { get; }
+        public ObservableCollection<string> AvailableStates { get { return _tasksSource.AvailableStates; } }
 
         public string SelectedFilteredState { get; set; }
         public ObservableCollection<string> FilteredStates { get { return _tasksSource.FilteredStates; } }
@@ -43,14 +41,6 @@ namespace Jira.FlowCharts.StoryFiltering
         {
             await _tasksSource.ReloadStates();
 
-            var allStates = await _tasksSource.GetAllStates();
-            var filteredStates = _tasksSource.FilteredStates;
-            var resetStates = _tasksSource.ResetStates;
-
-            AvailableStates.Clear();
-
-            AvailableStates.AddRange(allStates.Except(filteredStates).Except(resetStates));
-
             await base.OnActivateAsync(cancellationToken);
         }
 
@@ -59,7 +49,6 @@ namespace Jira.FlowCharts.StoryFiltering
             string selectedAvailableState = SelectedAvailableState;
             if (selectedAvailableState != null)
             {
-                AvailableStates.Remove(selectedAvailableState);
                 _tasksSource.AddFilteredState(selectedAvailableState);
             }
         }
@@ -69,7 +58,6 @@ namespace Jira.FlowCharts.StoryFiltering
             string selectedFilteredState = SelectedFilteredState;
             if (selectedFilteredState != null)
             {
-                AvailableStates.Add(selectedFilteredState);
                 _tasksSource.RemoveFilteredState(selectedFilteredState);
             }
         }
