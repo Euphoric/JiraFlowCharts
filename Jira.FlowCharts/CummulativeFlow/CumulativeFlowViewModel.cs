@@ -32,7 +32,7 @@ namespace Jira.FlowCharts
         {
             var fromDate = DateTime.Now.AddMonths(-3);
 
-            var cfa = new CumulativeFlowAnalysis(await _source.GetStories(), _source.States.ToArray(), fromDate);
+            var cfa = new CumulativeFlowAnalysis(await _source.GetStories(), _source.FilteredStates.ToArray(), fromDate);
 
             SeriesCollection.Clear();
 

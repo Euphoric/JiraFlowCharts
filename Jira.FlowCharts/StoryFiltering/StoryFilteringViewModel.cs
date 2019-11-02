@@ -22,8 +22,6 @@ namespace Jira.FlowCharts.StoryFiltering
             DisplayName = "Story and state filtering";
 
             AvailableStates = new ObservableCollection<string>();
-            FilteredStates = new ObservableCollection<string>();
-            ResetStates = new ObservableCollection<string>();
 
             MoveStateToFiltered = ReactiveCommand.CreateFromTask(MoveStateToFilteredInner);
             MoveStateFromFiltered = ReactiveCommand.CreateFromTask(MoveStateFromFilteredInner);
@@ -33,9 +31,9 @@ namespace Jira.FlowCharts.StoryFiltering
         public ObservableCollection<string> AvailableStates { get; }
 
         public string SelectedFilteredState { get; set; }
-        public ObservableCollection<string> FilteredStates { get; }
+        public ObservableCollection<string> FilteredStates { get { return _tasksSource.FilteredStates; } }
 
-        public ObservableCollection<string> ResetStates { get; }
+        public ObservableCollection<string> ResetStates { get { return _tasksSource.ResetStates; } }
 
         public ReactiveCommand<Unit, Unit> MoveStateToFiltered { get; }
 
@@ -46,16 +44,12 @@ namespace Jira.FlowCharts.StoryFiltering
             await _tasksSource.ReloadStates();
 
             var allStates = await _tasksSource.GetAllStates();
-            var filteredStates = _tasksSource.States;
+            var filteredStates = _tasksSource.FilteredStates;
             var resetStates = _tasksSource.ResetStates;
 
             AvailableStates.Clear();
-            FilteredStates.Clear();
-            ResetStates.Clear();
 
             AvailableStates.AddRange(allStates.Except(filteredStates).Except(resetStates));
-            FilteredStates.AddRange(filteredStates);
-            ResetStates.AddRange(resetStates);
 
             await base.OnActivateAsync(cancellationToken);
         }
@@ -66,7 +60,6 @@ namespace Jira.FlowCharts.StoryFiltering
             if (selectedAvailableState != null)
             {
                 AvailableStates.Remove(selectedAvailableState);
-                FilteredStates.Add(selectedAvailableState);
                 _tasksSource.AddFilteredState(selectedAvailableState);
             }
         }
@@ -77,7 +70,6 @@ namespace Jira.FlowCharts.StoryFiltering
             if (selectedFilteredState != null)
             {
                 AvailableStates.Add(selectedFilteredState);
-                FilteredStates.Remove(selectedFilteredState);
                 _tasksSource.RemoveFilteredState(selectedFilteredState);
             }
         }

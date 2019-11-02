@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
-using System.Runtime.InteropServices;
-using System.Security;
 using System.Threading.Tasks;
+using DynamicData;
 using Jira.Querying;
-using Jira.Querying.Sqlite;
 
 namespace Jira.FlowCharts
 {
@@ -33,13 +32,16 @@ namespace Jira.FlowCharts
         private readonly ITasksSourceJiraCacheAdapter _jiraCache;
         private readonly IStatesRepository _statesRepository;
 
-        public List<string> States { get; private set; }
-        public List<string> ResetStates { get; private set; }
+        public ObservableCollection<string> FilteredStates { get; }
+        public ObservableCollection<string> ResetStates { get; }
 
         public TasksSource(ITasksSourceJiraCacheAdapter jiraCacheAdapter, IStatesRepository statesRepository)
         {
             _jiraCache = jiraCacheAdapter;
             _statesRepository = statesRepository;
+
+            FilteredStates = new ObservableCollection<string>();
+            ResetStates = new ObservableCollection<string>();
         }
 
         public async Task<string[]> GetAllStates()
@@ -49,8 +51,11 @@ namespace Jira.FlowCharts
 
         public Task ReloadStates()
         {
-            States = new List<string>(_statesRepository.GetFilteredStates());
-            ResetStates = new List<string>(_statesRepository.GetResetStates());
+            FilteredStates.Clear();
+            ResetStates.Clear();
+
+            FilteredStates.AddRange(_statesRepository.GetFilteredStates());
+            ResetStates.AddRange(_statesRepository.GetResetStates());
 
             return Task.CompletedTask;
         }
@@ -74,19 +79,19 @@ namespace Jira.FlowCharts
 
         internal void AddFilteredState(string state)
         {
-            States.Add(state);
+            FilteredStates.Add(state);
         }
 
         internal void RemoveFilteredState(string state)
         {
-            States.Remove(state);
+            FilteredStates.Remove(state);
         }
 
         public async Task<FinishedTask[]> GetFinishedStories()
         {
             IEnumerable<CachedIssue> stories = await GetStories();
 
-            SimplifyStateChangeOrder simplify = new SimplifyStateChangeOrder(States.ToArray(), ResetStates.ToArray());
+            SimplifyStateChangeOrder simplify = new SimplifyStateChangeOrder(FilteredStates.ToArray(), ResetStates.ToArray());
 
             DateTime startDate = DateTime.Now.AddMonths(-12);
 
