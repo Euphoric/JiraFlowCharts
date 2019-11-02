@@ -26,16 +26,20 @@ namespace Jira.FlowCharts.StoryFiltering
             ResetStates = new ObservableCollection<string>();
 
             MoveStateToFiltered = ReactiveCommand.CreateFromTask(MoveStateToFilteredInner);
+            MoveStateFromFiltered = ReactiveCommand.CreateFromTask(MoveStateFromFilteredInner);
         }
 
         public string SelectedAvailableState { get; set; }
         public ObservableCollection<string> AvailableStates { get; }
 
+        public string SelectedFilteredState { get; set; }
         public ObservableCollection<string> FilteredStates { get; }
 
         public ObservableCollection<string> ResetStates { get; }
 
         public ReactiveCommand<Unit, Unit> MoveStateToFiltered { get; }
+
+        public ReactiveCommand<Unit, Unit> MoveStateFromFiltered { get; }
 
         protected override async Task OnActivateAsync(CancellationToken cancellationToken)
         {
@@ -64,6 +68,17 @@ namespace Jira.FlowCharts.StoryFiltering
                 AvailableStates.Remove(selectedAvailableState);
                 FilteredStates.Add(selectedAvailableState);
                 _tasksSource.AddFilteredState(selectedAvailableState);
+            }
+        }
+
+        private async Task MoveStateFromFilteredInner()
+        {
+            string selectedFilteredState = SelectedFilteredState;
+            if (selectedFilteredState != null)
+            {
+                AvailableStates.Add(selectedFilteredState);
+                FilteredStates.Remove(selectedFilteredState);
+                _tasksSource.RemoveFilteredState(selectedFilteredState);
             }
         }
     }

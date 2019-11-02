@@ -164,7 +164,7 @@ namespace Jira.FlowCharts
         }
 
         [Fact]
-        public async Task Selected_state_can_change_when_moving()
+        public async Task Selected_available_state_can_change_when_moving()
         {
             var allStates = new[] { "A", "B", "C" };
             _jiraCacheAdapter.AllStates = allStates;
@@ -181,6 +181,73 @@ namespace Jira.FlowCharts
             Assert.Equal(new[] { "B", "C" }, _vm.AvailableStates);
             Assert.Equal(new[] { "A" }, _vm.FilteredStates);
             Assert.Equal(new[] { "A" }, _tasksSource.States);
+        }
+
+        [Fact]
+        public async Task Move_from_filtered_state_when_none_selected()
+        {
+            var allStates = new[] { "A", "B", "C" };
+            _statesRepository.FilteredStates = allStates;
+
+            await Reactivate();
+
+            await _vm.MoveStateFromFiltered.Execute().ToTask();
+
+            Assert.Empty(_vm.AvailableStates);
+            Assert.Equal(allStates, _vm.FilteredStates);
+        }
+
+        [Fact]
+        public async Task Move_from_filtered_state()
+        {
+            var allStates = new[] { "A", "B", "C" };
+            _statesRepository.FilteredStates = allStates;
+
+            await Reactivate();
+
+            _vm.SelectedFilteredState = "B";
+
+            await _vm.MoveStateFromFiltered.Execute().ToTask();
+
+            Assert.Equal(new[] { "B" }, _vm.AvailableStates);
+            Assert.Equal(new[] { "A", "C" }, _vm.FilteredStates);
+            Assert.Equal(new[] { "A", "C" }, _tasksSource.States);
+
+            _vm.SelectedFilteredState = "C";
+
+            await _vm.MoveStateFromFiltered.Execute().ToTask();
+
+            Assert.Equal(new[] { "B", "C" }, _vm.AvailableStates);
+            Assert.Equal(new[] { "A", }, _vm.FilteredStates);
+            Assert.Equal(new[] { "A", }, _tasksSource.States);
+
+            _vm.SelectedFilteredState = "A";
+
+            await _vm.MoveStateFromFiltered.Execute().ToTask();
+
+            Assert.Equal(new[] { "B", "C", "A" }, _vm.AvailableStates);
+            Assert.Equal(new string[] { }, _vm.FilteredStates);
+            Assert.Equal(new string[] { }, _tasksSource.States);
+        }
+
+        [Fact]
+        public async Task Selected_filtered_state_can_change_when_moving()
+        {
+            var allStates = new[] { "A", "B", "C" };
+            _statesRepository.FilteredStates = allStates;
+
+            // selection changes when item is removed from collection
+            _vm.FilteredStates.CollectionChanged += (_, __) => { _vm.SelectedFilteredState = null; };
+
+            await Reactivate();
+
+            _vm.SelectedFilteredState = "B";
+
+            await _vm.MoveStateFromFiltered.Execute().ToTask();
+
+            Assert.Equal(new[] { "B" }, _vm.AvailableStates);
+            Assert.Equal(new[] { "A", "C" }, _vm.FilteredStates);
+            Assert.Equal(new[] { "A", "C" }, _tasksSource.States);
         }
     }
 }
