@@ -33,8 +33,8 @@ namespace Jira.FlowCharts
         private readonly ITasksSourceJiraCacheAdapter _jiraCache;
         private readonly IStatesRepository _statesRepository;
 
-        public string[] States { get; private set; }
-        public string[] ResetStates { get; private set; }
+        public List<string> States { get; private set; }
+        public List<string> ResetStates { get; private set; }
 
         public TasksSource(ITasksSourceJiraCacheAdapter jiraCacheAdapter, IStatesRepository statesRepository)
         {
@@ -49,8 +49,8 @@ namespace Jira.FlowCharts
 
         public Task ReloadStates()
         {
-            States = _statesRepository.GetFilteredStates();
-            ResetStates = _statesRepository.GetResetStates();
+            States = new List<string>(_statesRepository.GetFilteredStates());
+            ResetStates = new List<string>(_statesRepository.GetResetStates());
 
             return Task.CompletedTask;
         }
@@ -72,11 +72,16 @@ namespace Jira.FlowCharts
             return stories;
         }
 
+        internal void AddFilteredState(string state)
+        {
+            States.Add(state);
+        }
+
         public async Task<FinishedTask[]> GetFinishedStories()
         {
             IEnumerable<CachedIssue> stories = await GetStories();
 
-            SimplifyStateChangeOrder simplify = new SimplifyStateChangeOrder(States, ResetStates);
+            SimplifyStateChangeOrder simplify = new SimplifyStateChangeOrder(States.ToArray(), ResetStates.ToArray());
 
             DateTime startDate = DateTime.Now.AddMonths(-12);
 

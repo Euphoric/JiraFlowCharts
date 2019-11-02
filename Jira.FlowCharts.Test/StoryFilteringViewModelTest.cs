@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reactive.Threading.Tasks;
 using System.Text;
 using System.Threading.Tasks;
 using Caliburn.Micro;
@@ -14,13 +15,14 @@ namespace Jira.FlowCharts
         private StoryFilteringViewModel _vm;
         private TestJiraCacheAdapter _jiraCacheAdapter;
         private TestStatesRepository _statesRepository;
+        TasksSource _tasksSource;
 
         public StoryFilteringViewModelTest()
         {
             _jiraCacheAdapter = new TestJiraCacheAdapter();
             _statesRepository = new TestStatesRepository();
-            var tasksSource = new TasksSource(_jiraCacheAdapter, _statesRepository);
-            _vm = new StoryFilteringViewModel(tasksSource);
+            _tasksSource = new TasksSource(_jiraCacheAdapter, _statesRepository);
+            _vm = new StoryFilteringViewModel(_tasksSource);
         }
 
         public async Task InitializeAsync()
@@ -115,6 +117,70 @@ namespace Jira.FlowCharts
             Assert.Equal(new[] { "A" }, _vm.AvailableStates);
             Assert.Equal(filteredStates, _vm.FilteredStates);
             Assert.Equal(resetStates, _vm.ResetStates);
+        }
+
+        [Fact]
+        public async Task Move_to_filtered_state_when_none_selected()
+        {
+            var allStates = new[] { "A", "B", "C" };
+            _jiraCacheAdapter.AllStates = allStates;
+
+            await Reactivate();
+
+            await _vm.MoveStateToFiltered.Execute().ToTask();
+
+            Assert.Equal(allStates, _vm.AvailableStates);
+            Assert.Empty(_vm.FilteredStates);
+        }
+
+        [Fact]
+        public async Task Move_to_filtered_state()
+        {
+            var allStates = new[] { "A", "B", "C" };
+            _jiraCacheAdapter.AllStates = allStates;
+
+            await Reactivate();
+
+            _vm.SelectedAvailableState = "A";
+            await _vm.MoveStateToFiltered.Execute().ToTask();
+
+            Assert.Equal(new[] { "B", "C" }, _vm.AvailableStates);
+            Assert.Equal(new[] { "A" }, _vm.FilteredStates);
+            Assert.Equal(new[] { "A" }, _tasksSource.States);
+
+            _vm.SelectedAvailableState = "C";
+            await _vm.MoveStateToFiltered.Execute().ToTask();
+
+            Assert.Equal(new[] { "B" }, _vm.AvailableStates);
+            Assert.Equal(new[] { "A", "C" }, _vm.FilteredStates);
+            Assert.Equal(new[] { "A", "C" }, _tasksSource.States);
+
+            _vm.SelectedAvailableState = "B";
+            await _vm.MoveStateToFiltered.Execute().ToTask();
+
+            Assert.Empty(_vm.AvailableStates);
+            Assert.Equal(new[] { "A", "C", "B" }, _vm.FilteredStates);
+            Assert.Equal(new[] { "A", "C", "B" }, _tasksSource.States);
+        }
+
+        [Fact]
+        public async Task Selected_state_can_change_when_moving()
+        {
+            var allStates = new[] { "A", "B", "C" };
+            _jiraCacheAdapter.AllStates = allStates;
+
+            await Reactivate();
+
+            _vm.SelectedAvailableState = "A";
+
+            // selection changes when item is removed from collection
+            _vm.AvailableStates.CollectionChanged += (_, __)=> { _vm.SelectedAvailableState = null; }; 
+
+            await _vm.MoveStateToFiltered.Execute().ToTask();
+
+            Assert.Equal(new[] { "B", "C" }, _vm.AvailableStates);
+            Assert.Equal(new[] { "A" }, _vm.FilteredStates);
+            Assert.Equal(new[] { "A" }, _tasksSource.States);
         }
     }
 }
