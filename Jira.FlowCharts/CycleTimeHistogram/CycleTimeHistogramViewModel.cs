@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Caliburn.Micro;
 using LiveCharts;
 using LiveCharts.Wpf;
+using MathNet.Numerics.Statistics;
 
 namespace Jira.FlowCharts
 {
@@ -42,40 +43,36 @@ namespace Jira.FlowCharts
 
         protected override async Task OnActivateAsync(CancellationToken cancellationToken)
         {
-            var histogramNonzero =
-                (await _taskSource.GetFinishedStories())
-                    .GroupBy(x => (int)x.Duration + 1)
-                    .Select(grp => new { Days = grp.Key, Counts = grp.Count() })
-                    .ToDictionary(x => x.Days, x => x.Counts);
+            var finishedStories = await _taskSource.GetFinishedStories();
 
-            var maxDay = histogramNonzero.Keys.Max();
+            var durations = finishedStories.Select(x => x.Duration).OrderBy(x=>x).ToArray();
 
-            var histogram =
-                Enumerable.Range(1, maxDay)
-                    .Select(x => new { Days = x, Count = HistogramValue(histogramNonzero, x) })
-                    .ToArray();
+            int max = (int)Math.Ceiling(durations[durations.Length * 99 / 100]);
+
+            Histogram hist = new Histogram(durations, max, 0, max);
+
+            ChartValues<double> chartValues = new ChartValues<double>();
+            List<string> labels = new List<string>();
+
+            for (int i = 0; i < hist.BucketCount; i++)
+            {
+                var bucket = hist[i];
+
+                chartValues.Add(bucket.Count);
+                labels.Add(bucket.LowerBound.ToString("N0"));
+            }
 
             SeriesCollection = new SeriesCollection
             {
                 new ColumnSeries
                 {
                     Title = "Story count",
-                    Values = new ChartValues<double>(histogram.Select(x=>(double)x.Count))
+                    Values = chartValues
                 }
             };
 
-            Labels = histogram.Select(x => x.Days.ToString()).ToArray();
+            Labels = labels.ToArray();
             Formatter = value => value.ToString("N0");
-        }
-
-        private static int HistogramValue<TKey>(Dictionary<TKey, int> histogramNonzero, TKey key)
-        {
-            if (histogramNonzero.TryGetValue(key, out int value))
-            {
-                return value;
-            }
-
-            return 0;
         }
     }
 
