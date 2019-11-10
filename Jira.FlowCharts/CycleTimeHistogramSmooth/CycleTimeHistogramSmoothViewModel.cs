@@ -3,14 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Media;
 using Caliburn.Micro;
 using LiveCharts;
 using LiveCharts.Wpf;
-using MathNet.Numerics.Statistics;
 
 namespace Jira.FlowCharts
 {
-    public class CycleTimeHistogramViewModel : Screen
+    public class CycleTimeHistogramSmoothViewModel : Screen
     {
         private readonly TasksSource _taskSource;
         private SeriesCollection _seriesCollection;
@@ -35,10 +35,10 @@ namespace Jira.FlowCharts
             private set => Set(ref _formatter, value);
         }
 
-        public CycleTimeHistogramViewModel(TasksSource taskSource)
+        public CycleTimeHistogramSmoothViewModel(TasksSource taskSource)
         {
             _taskSource = taskSource;
-            DisplayName = "Cycle time histogram";
+            DisplayName = "Cycle time smooth histogram";
         }
 
         protected override async Task OnActivateAsync(CancellationToken cancellationToken)
@@ -49,30 +49,40 @@ namespace Jira.FlowCharts
 
             int max = (int)Math.Ceiling(durations[durations.Length * 99 / 100]);
 
-            Histogram hist = new Histogram(durations, max, 0, max);
-
             ChartValues<double> chartValues = new ChartValues<double>();
             List<string> labels = new List<string>();
 
-            for (int i = 0; i < hist.BucketCount; i++)
-            {
-                var bucket = hist[i];
+            var gaussConst = 1 / Math.Sqrt(2 * Math.PI);
+            var kernelScale = 5;
 
-                chartValues.Add(bucket.Count);
-                labels.Add(bucket.LowerBound.ToString("N0"));
+            for (double x = 0; x < max; x += 0.2)
+            {
+                double height = 0;
+                for (int i = 0; i < durations.Length; i++)
+                {
+                    var dist = durations[i] - x;
+
+                    var h = gaussConst * Math.Exp(-1 / 2.0 * dist * dist * kernelScale);
+
+                    height += h;
+                }
+
+                chartValues.Add(height);
+                labels.Add(x.ToString("N0"));
             }
 
             SeriesCollection = new SeriesCollection
             {
-                new ColumnSeries
+                new LineSeries
                 {
                     Title = "Story count",
-                    Values = chartValues
+                    Values = chartValues,
+                    PointGeometry = Geometry.Empty
                 }
             };
 
             Labels = labels.ToArray();
-            Formatter = value => value.ToString("N0");
+            Formatter = value => value.ToString("N1");
         }
     }
 

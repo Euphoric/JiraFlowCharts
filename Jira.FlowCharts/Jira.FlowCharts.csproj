@@ -232,6 +232,10 @@
     </Compile>
     <Compile Include="CummulativeFlow\CumulativeFlowViewModel.cs" />
     <Compile Include="CurrentTime.cs" />
+    <Compile Include="CycleTimeHistogramSmooth\CycleTimeHistogramView.xaml.cs">
+      <DependentUpon>CycleTimeHistogramView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="CycleTimeHistogramSmooth\CycleTimeHistogramSmoothViewModel.cs" />
     <Compile Include="CycleTimeHistogram\CycleTimeHistogramView.xaml.cs">
       <DependentUpon>CycleTimeHistogramView.xaml</DependentUpon>
     </Compile>
@@ -272,6 +276,10 @@
     <Page Include="CummulativeFlow\CumulativeFlowView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="CycleTimeHistogramSmooth\CycleTimeHistogramView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="CycleTimeHistogram\CycleTimeHistogramView.xaml">
       <SubType>Designer</SubType>
