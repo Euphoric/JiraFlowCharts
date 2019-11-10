@@ -11,19 +11,43 @@ namespace Jira.FlowCharts
     public interface IStatesRepository
     {
         string[] GetFilteredStates();
+
+        void SetFilteredStates(string[] states);
+
         string[] GetResetStates();
+
+        void SetResetStates(string[] states);
     }
 
     public class MemoryStatesRepository : IStatesRepository
     {
+        public string[] FilteredStates { get; private set; }
+        public string[] ResetStates { get; private set; }
+
+        public MemoryStatesRepository()
+        {
+            FilteredStates = new[] { "Ready For Dev", "In Dev", "Ready for Peer Review", "Ready for QA", "In QA", "Ready for Done", "Done" };
+            ResetStates = new[] { "On Hold", "Not Started", "Withdrawn" };
+        }
+
         public string[] GetFilteredStates()
         {
-            return new[] { "Ready For Dev", "In Dev", "Ready for Peer Review", "Ready for QA", "In QA", "Ready for Done", "Done" };
+            return FilteredStates;
+        }
+
+        public void SetFilteredStates(string[] states)
+        {
+            FilteredStates = states;
         }
 
         public string[] GetResetStates()
         {
-            return new[] {"On Hold", "Not Started", "Withdrawn"};
+            return ResetStates;
+        }
+
+        public void SetResetStates(string[] states)
+        {
+            ResetStates = states;
         }
     }
 
@@ -87,24 +111,28 @@ namespace Jira.FlowCharts
         {
             AvailableStates.Remove(state);
             FilteredStates.Add(state);
+            _statesRepository.SetFilteredStates(FilteredStates.ToArray());
         }
 
         internal void RemoveFilteredState(string state)
         {
             AvailableStates.Add(state);
             FilteredStates.Remove(state);
+            _statesRepository.SetFilteredStates(FilteredStates.ToArray());
         }
 
         internal void AddResetState(string state)
         {
             AvailableStates.Remove(state);
             ResetStates.Add(state);
+            _statesRepository.SetResetStates(ResetStates.ToArray());
         }
 
         internal void RemoveResetState(string state)
         {
             AvailableStates.Add(state);
             ResetStates.Remove(state);
+            _statesRepository.SetResetStates(ResetStates.ToArray());
         }
 
         public async Task<FinishedTask[]> GetFinishedStories()

@@ -1,4 +1,7 @@
-﻿namespace Jira.FlowCharts
+﻿using System;
+using System.Linq;
+
+namespace Jira.FlowCharts
 {
     public class TestStatesRepository : IStatesRepository
     {
@@ -10,9 +13,19 @@
             return FilteredStates;
         }
 
+        public void SetFilteredStates(string[] states)
+        {
+            FilteredStates = states;
+        }
+
         public string[] GetResetStates()
         {
             return ResetStates;
+        }
+
+        public void SetResetStates(string[] states)
+        {
+            ResetStates = states;
         }
     }
 }
