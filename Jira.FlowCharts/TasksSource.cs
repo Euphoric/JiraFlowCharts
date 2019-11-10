@@ -95,6 +95,18 @@ namespace Jira.FlowCharts
             FilteredStates.Remove(state);
         }
 
+        internal void AddResetState(string state)
+        {
+            AvailableStates.Remove(state);
+            ResetStates.Add(state);
+        }
+
+        internal void RemoveResetState(string state)
+        {
+            AvailableStates.Add(state);
+            ResetStates.Remove(state);
+        }
+
         public async Task<FinishedTask[]> GetFinishedStories()
         {
             IEnumerable<CachedIssue> stories = await GetStories();

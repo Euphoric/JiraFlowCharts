@@ -23,6 +23,8 @@ namespace Jira.FlowCharts.StoryFiltering
 
             MoveStateToFiltered = ReactiveCommand.CreateFromTask(MoveStateToFilteredInner);
             MoveStateFromFiltered = ReactiveCommand.CreateFromTask(MoveStateFromFilteredInner);
+            MoveStateToReset = ReactiveCommand.CreateFromTask(MoveStateToResetInner);
+            MoveStateFromReset = ReactiveCommand.CreateFromTask(MoveStateFromResetInner);
         }
 
         public string SelectedAvailableState { get; set; }
@@ -31,11 +33,16 @@ namespace Jira.FlowCharts.StoryFiltering
         public string SelectedFilteredState { get; set; }
         public ObservableCollection<string> FilteredStates { get { return _tasksSource.FilteredStates; } }
 
+        public string SelectedResetState { get; set; }
         public ObservableCollection<string> ResetStates { get { return _tasksSource.ResetStates; } }
 
         public ReactiveCommand<Unit, Unit> MoveStateToFiltered { get; }
 
         public ReactiveCommand<Unit, Unit> MoveStateFromFiltered { get; }
+
+        public ReactiveCommand<Unit, Unit> MoveStateToReset { get; }
+
+        public ReactiveCommand<Unit, Unit> MoveStateFromReset { get; }
 
         protected override async Task OnActivateAsync(CancellationToken cancellationToken)
         {
@@ -46,19 +53,37 @@ namespace Jira.FlowCharts.StoryFiltering
 
         private async Task MoveStateToFilteredInner()
         {
-            string selectedAvailableState = SelectedAvailableState;
-            if (selectedAvailableState != null)
+            string stelectedState = SelectedAvailableState;
+            if (stelectedState != null)
             {
-                _tasksSource.AddFilteredState(selectedAvailableState);
+                _tasksSource.AddFilteredState(stelectedState);
             }
         }
 
         private async Task MoveStateFromFilteredInner()
         {
-            string selectedFilteredState = SelectedFilteredState;
-            if (selectedFilteredState != null)
+            string selectedState = SelectedFilteredState;
+            if (selectedState != null)
             {
-                _tasksSource.RemoveFilteredState(selectedFilteredState);
+                _tasksSource.RemoveFilteredState(selectedState);
+            }
+        }
+
+        private async Task MoveStateToResetInner()
+        {
+            string selectedState = SelectedAvailableState;
+            if (selectedState != null)
+            {
+                _tasksSource.AddResetState(selectedState);
+            }
+        }
+
+        private async Task MoveStateFromResetInner()
+        {
+            string selectedState = SelectedResetState;
+            if (selectedState != null)
+            {
+                _tasksSource.RemoveResetState(selectedState);
             }
         }
     }

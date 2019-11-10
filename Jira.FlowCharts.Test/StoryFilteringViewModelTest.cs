@@ -249,5 +249,137 @@ namespace Jira.FlowCharts
             Assert.Equal(new[] { "A", "C" }, _vm.FilteredStates);
             Assert.Equal(new[] { "A", "C" }, _tasksSource.FilteredStates);
         }
+
+
+        [Fact]
+        public async Task Move_to_reset_state_when_none_selected()
+        {
+            var allStates = new[] { "A", "B", "C" };
+            _jiraCacheAdapter.AllStates = allStates;
+
+            await Reactivate();
+
+            await _vm.MoveStateToReset.Execute().ToTask();
+
+            Assert.Equal(allStates, _vm.AvailableStates);
+            Assert.Empty(_vm.ResetStates);
+        }
+
+        [Fact]
+        public async Task Move_to_reset_state()
+        {
+            var allStates = new[] { "A", "B", "C" };
+            _jiraCacheAdapter.AllStates = allStates;
+
+            await Reactivate();
+
+            _vm.SelectedAvailableState = "A";
+            await _vm.MoveStateToReset.Execute().ToTask();
+
+            Assert.Equal(new[] { "B", "C" }, _vm.AvailableStates);
+            Assert.Equal(new[] { "A" }, _vm.ResetStates);
+            Assert.Equal(new[] { "A" }, _tasksSource.ResetStates);
+
+            _vm.SelectedAvailableState = "C";
+            await _vm.MoveStateToReset.Execute().ToTask();
+
+            Assert.Equal(new[] { "B" }, _vm.AvailableStates);
+            Assert.Equal(new[] { "A", "C" }, _vm.ResetStates);
+            Assert.Equal(new[] { "A", "C" }, _tasksSource.ResetStates);
+
+            _vm.SelectedAvailableState = "B";
+            await _vm.MoveStateToReset.Execute().ToTask();
+
+            Assert.Empty(_vm.AvailableStates);
+            Assert.Equal(new[] { "A", "C", "B" }, _vm.ResetStates);
+            Assert.Equal(new[] { "A", "C", "B" }, _tasksSource.ResetStates);
+        }
+
+        [Fact]
+        public async Task Selected_available_state_can_change_when_moving_to_reset()
+        {
+            var allStates = new[] { "A", "B", "C" };
+            _jiraCacheAdapter.AllStates = allStates;
+
+            await Reactivate();
+
+            _vm.SelectedAvailableState = "A";
+
+            // selection changes when item is removed from collection
+            _vm.AvailableStates.CollectionChanged += (_, __) => { _vm.SelectedAvailableState = null; };
+
+            await _vm.MoveStateToReset.Execute().ToTask();
+
+            Assert.Equal(new[] { "B", "C" }, _vm.AvailableStates);
+            Assert.Equal(new[] { "A" }, _vm.ResetStates);
+            Assert.Equal(new[] { "A" }, _tasksSource.ResetStates);
+        }
+
+        [Fact]
+        public async Task Move_from_reset_state_when_none_selected()
+        {
+            var allStates = new[] { "A", "B", "C" };
+            _statesRepository.ResetStates = allStates;
+
+            await Reactivate();
+
+            await _vm.MoveStateFromReset.Execute().ToTask();
+
+            Assert.Empty(_vm.AvailableStates);
+            Assert.Equal(allStates, _vm.ResetStates);
+        }
+
+        [Fact]
+        public async Task Move_from_reset_state()
+        {
+            var allStates = new[] { "A", "B", "C" };
+            _statesRepository.ResetStates = allStates;
+
+            await Reactivate();
+
+            _vm.SelectedResetState = "B";
+
+            await _vm.MoveStateFromReset.Execute().ToTask();
+
+            Assert.Equal(new[] { "B" }, _vm.AvailableStates);
+            Assert.Equal(new[] { "A", "C" }, _vm.ResetStates);
+            Assert.Equal(new[] { "A", "C" }, _tasksSource.ResetStates);
+
+            _vm.SelectedResetState = "C";
+
+            await _vm.MoveStateFromReset.Execute().ToTask();
+
+            Assert.Equal(new[] { "B", "C" }, _vm.AvailableStates);
+            Assert.Equal(new[] { "A", }, _vm.ResetStates);
+            Assert.Equal(new[] { "A", }, _tasksSource.ResetStates);
+
+            _vm.SelectedResetState = "A";
+
+            await _vm.MoveStateFromReset.Execute().ToTask();
+
+            Assert.Equal(new[] { "B", "C", "A" }, _vm.AvailableStates);
+            Assert.Equal(new string[] { }, _vm.ResetStates);
+            Assert.Equal(new string[] { }, _tasksSource.ResetStates);
+        }
+
+        [Fact]
+        public async Task Selected_Reset_state_can_change_when_moving()
+        {
+            var allStates = new[] { "A", "B", "C" };
+            _statesRepository.ResetStates = allStates;
+
+            // selection changes when item is removed from collection
+            _vm.FilteredStates.CollectionChanged += (_, __) => { _vm.SelectedResetState = null; };
+
+            await Reactivate();
+
+            _vm.SelectedResetState = "B";
+
+            await _vm.MoveStateFromReset.Execute().ToTask();
+
+            Assert.Equal(new[] { "B" }, _vm.AvailableStates);
+            Assert.Equal(new[] { "A", "C" }, _vm.ResetStates);
+            Assert.Equal(new[] { "A", "C" }, _tasksSource.ResetStates);
+        }
     }
 }
