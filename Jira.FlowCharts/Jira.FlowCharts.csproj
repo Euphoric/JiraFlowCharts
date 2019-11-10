@@ -242,6 +242,7 @@
     <Compile Include="CycleTimeScatterplot\CycleTimeScatterplotView.xaml.cs">
       <DependentUpon>CycleTimeScatterplotView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="IStatesRepository.cs" />
     <Compile Include="JiraUpdate\ICurrentTime.cs" />
     <Compile Include="JiraUpdate\IJiraUpdateView.cs" />
     <Compile Include="JiraUpdate\JiraUpdateView.xaml.cs">
@@ -249,6 +250,7 @@
     </Compile>
     <Compile Include="JiraUpdate\JiraUpdateViewModel.cs" />
     <Compile Include="MainViewModel.cs" />
+    <Compile Include="MemoryStatesRepository.cs" />
     <Compile Include="ReactiveScreen.cs" />
     <Compile Include="SimplifyStateChangeOrder.cs" />
     <Compile Include="Simulation\SimulationView.xaml.cs">
