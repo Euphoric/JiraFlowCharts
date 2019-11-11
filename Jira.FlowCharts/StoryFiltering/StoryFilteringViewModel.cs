@@ -59,38 +59,22 @@ namespace Jira.FlowCharts.StoryFiltering
 
         private async Task MoveStateToFilteredInner()
         {
-            string stelectedState = SelectedAvailableState;
-            if (stelectedState != null)
-            {
-                _tasksSource.AddFilteredState(stelectedState);
-            }
+            _tasksSource.AddFilteredState(SelectedAvailableState);
         }
 
         private async Task MoveStateFromFilteredInner()
         {
-            string selectedState = SelectedFilteredState;
-            if (selectedState != null)
-            {
-                _tasksSource.RemoveFilteredState(selectedState);
-            }
+            _tasksSource.RemoveFilteredState(SelectedFilteredState);
         }
 
         private async Task MoveStateToResetInner()
         {
-            string selectedState = SelectedAvailableState;
-            if (selectedState != null)
-            {
-                _tasksSource.AddResetState(selectedState);
-            }
+            _tasksSource.AddResetState(SelectedAvailableState);
         }
 
         private async Task MoveStateFromResetInner()
         {
-            string selectedState = SelectedResetState;
-            if (selectedState != null)
-            {
-                _tasksSource.RemoveResetState(selectedState);
-            }
+            _tasksSource.RemoveResetState(SelectedResetState);
         }
 
         private async Task MoveFilteredStateLowerInner()

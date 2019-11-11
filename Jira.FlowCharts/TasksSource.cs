@@ -66,6 +66,9 @@ namespace Jira.FlowCharts
 
         internal void AddFilteredState(string state)
         {
+            if (state == null)
+                return;
+
             AvailableStates.Remove(state);
             FilteredStates.Add(state);
             _statesRepository.SetFilteredStates(FilteredStates.ToArray());
@@ -73,6 +76,9 @@ namespace Jira.FlowCharts
 
         internal void RemoveFilteredState(string state)
         {
+            if (state == null)
+                return;
+
             AvailableStates.Add(state);
             FilteredStates.Remove(state);
             _statesRepository.SetFilteredStates(FilteredStates.ToArray());
@@ -80,6 +86,9 @@ namespace Jira.FlowCharts
 
         internal void AddResetState(string state)
         {
+            if (state == null)
+                return;
+
             AvailableStates.Remove(state);
             ResetStates.Add(state);
             _statesRepository.SetResetStates(ResetStates.ToArray());
@@ -87,6 +96,9 @@ namespace Jira.FlowCharts
 
         internal void RemoveResetState(string state)
         {
+            if (state == null)
+                return;
+
             AvailableStates.Add(state);
             ResetStates.Remove(state);
             _statesRepository.SetResetStates(ResetStates.ToArray());
