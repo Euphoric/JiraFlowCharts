@@ -109,9 +109,14 @@ namespace Jira.FlowCharts
             if (state == null)
                 return;
 
-            var insertAt = FilteredStates.IndexOf(state);
-            FilteredStates.Remove(state);
-            FilteredStates.Insert(Math.Max(0, insertAt - 1), state);
+            var stateAt = FilteredStates.IndexOf(state);
+            if (stateAt == 0)
+                return;
+
+            stateAt--;
+            var reinsertState = FilteredStates[stateAt];
+            FilteredStates.RemoveAt(stateAt);
+            FilteredStates.Insert(stateAt + 1, reinsertState);
 
             _statesRepository.SetFilteredStates(FilteredStates.ToArray());
         }
@@ -121,9 +126,14 @@ namespace Jira.FlowCharts
             if (state == null)
                 return;
 
-            var insertAt = FilteredStates.IndexOf(state);
-            FilteredStates.Remove(state);
-            FilteredStates.Insert(Math.Min(FilteredStates.Count, insertAt + 1), state);
+            var stateAt = FilteredStates.IndexOf(state);
+            if (stateAt == FilteredStates.Count-1)
+                return;
+
+            stateAt++;
+            var reinsertState = FilteredStates[stateAt];
+            FilteredStates.RemoveAt(stateAt);
+            FilteredStates.Insert(stateAt - 1, reinsertState);
 
             _statesRepository.SetFilteredStates(FilteredStates.ToArray());
         }

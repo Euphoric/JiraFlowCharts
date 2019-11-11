@@ -36,16 +36,15 @@ namespace Jira.FlowCharts
                 }
             };
 
-            // TODO
-            //_vm.FilteredStates.CollectionChanged += (s, e) =>
-            //{
-            //    if (
-            //    e.Action == NotifyCollectionChangedAction.Remove &&
-            //    e.OldItems.OfType<string>().SingleOrDefault() == _vm.SelectedFilteredState)
-            //    {
-            //        _vm.SelectedFilteredState = null;
-            //    }
-            //};
+            _vm.FilteredStates.CollectionChanged += (s, e) =>
+            {
+                if (
+                e.Action == NotifyCollectionChangedAction.Remove &&
+                e.OldItems.OfType<string>().SingleOrDefault() == _vm.SelectedFilteredState)
+                {
+                    _vm.SelectedFilteredState = null;
+                }
+            };
 
             _vm.ResetStates.CollectionChanged += (s, e) =>
             {
