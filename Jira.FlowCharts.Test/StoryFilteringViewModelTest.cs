@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Linq;
 using System.Reactive.Threading.Tasks;
 using System.Text;
@@ -23,6 +24,38 @@ namespace Jira.FlowCharts
             _statesRepository = new TestStatesRepository();
             _tasksSource = new TasksSource(_jiraCacheAdapter, _statesRepository);
             _vm = new StoryFilteringViewModel(_tasksSource);
+
+            // emulates WPF's behavior of changing selected item when it is removed from bound collection
+            _vm.AvailableStates.CollectionChanged += (s, e) =>
+            {
+                if (
+                e.Action == NotifyCollectionChangedAction.Remove && 
+                e.OldItems.OfType<string>().SingleOrDefault() == _vm.SelectedAvailableState)
+                {
+                    _vm.SelectedAvailableState = null;
+                }
+            };
+
+            // TODO
+            //_vm.FilteredStates.CollectionChanged += (s, e) =>
+            //{
+            //    if (
+            //    e.Action == NotifyCollectionChangedAction.Remove &&
+            //    e.OldItems.OfType<string>().SingleOrDefault() == _vm.SelectedFilteredState)
+            //    {
+            //        _vm.SelectedFilteredState = null;
+            //    }
+            //};
+
+            _vm.ResetStates.CollectionChanged += (s, e) =>
+            {
+                if (
+                e.Action == NotifyCollectionChangedAction.Remove &&
+                e.OldItems.OfType<string>().SingleOrDefault() == _vm.SelectedResetState)
+                {
+                    _vm.SelectedResetState = null;
+                }
+            };
         }
 
         public async Task InitializeAsync()
@@ -186,26 +219,6 @@ namespace Jira.FlowCharts
         }
 
         [Fact]
-        public async Task Selected_available_state_can_change_when_moving()
-        {
-            var allStates = new[] { "A", "B", "C" };
-            _jiraCacheAdapter.AllStates = allStates;
-
-            await Reactivate();
-
-            _vm.SelectedAvailableState = "A";
-
-            // selection changes when item is removed from collection
-            _vm.AvailableStates.CollectionChanged += (_, __)=> { _vm.SelectedAvailableState = null; }; 
-
-            await _vm.MoveStateToFiltered.Execute().ToTask();
-
-            Assert.Equal(new[] { "B", "C" }, _vm.AvailableStates);
-            Assert.Equal(new[] { "A" }, _vm.FilteredStates);
-            Assert.Equal(new[] { "A" }, _tasksSource.FilteredStates);
-        }
-
-        [Fact]
         public async Task Move_from_filtered_state_when_none_selected()
         {
             var allStates = new[] { "A", "B", "C" };
@@ -277,26 +290,6 @@ namespace Jira.FlowCharts
             Assert.Equal(new[] { "A", "C" }, _tasksSource.FilteredStates);
         }
 
-        [Fact]
-        public async Task Selected_filtered_state_can_change_when_moving()
-        {
-            var allStates = new[] { "A", "B", "C" };
-            _statesRepository.FilteredStates = allStates;
-
-            // selection changes when item is removed from collection
-            _vm.FilteredStates.CollectionChanged += (_, __) => { _vm.SelectedFilteredState = null; };
-
-            await Reactivate();
-
-            _vm.SelectedFilteredState = "B";
-
-            await _vm.MoveStateFromFiltered.Execute().ToTask();
-
-            Assert.Equal(new[] { "B" }, _vm.AvailableStates);
-            Assert.Equal(new[] { "A", "C" }, _vm.FilteredStates);
-            Assert.Equal(new[] { "A", "C" }, _tasksSource.FilteredStates);
-        }
-
 
         [Fact]
         public async Task Move_to_reset_state_when_none_selected()
@@ -358,26 +351,6 @@ namespace Jira.FlowCharts
             Assert.Equal(new[] { "A" }, _tasksSource.ResetStates);
 
             await Reactivate();
-
-            Assert.Equal(new[] { "B", "C" }, _vm.AvailableStates);
-            Assert.Equal(new[] { "A" }, _vm.ResetStates);
-            Assert.Equal(new[] { "A" }, _tasksSource.ResetStates);
-        }
-
-        [Fact]
-        public async Task Selected_available_state_can_change_when_moving_to_reset()
-        {
-            var allStates = new[] { "A", "B", "C" };
-            _jiraCacheAdapter.AllStates = allStates;
-
-            await Reactivate();
-
-            _vm.SelectedAvailableState = "A";
-
-            // selection changes when item is removed from collection
-            _vm.AvailableStates.CollectionChanged += (_, __) => { _vm.SelectedAvailableState = null; };
-
-            await _vm.MoveStateToReset.Execute().ToTask();
 
             Assert.Equal(new[] { "B", "C" }, _vm.AvailableStates);
             Assert.Equal(new[] { "A" }, _vm.ResetStates);
@@ -549,7 +522,7 @@ namespace Jira.FlowCharts
         }
 
         [Fact]
-        public async Task X_Move_filtered_higher_lower()
+        public async Task Move_filtered_higher_lower()
         {
             var allStates = new[] { "A", "B", "C" };
             _jiraCacheAdapter.AllStates = allStates;
