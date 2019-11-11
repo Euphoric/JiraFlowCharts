@@ -12,10 +12,10 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="165*"/>
+            <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="Auto" MinWidth="40"/>
-            <ColumnDefinition Width="203*"/>
-            <ColumnDefinition Width="360*"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="Auto" MinWidth="40"/>
         </Grid.ColumnDefinitions>
 
         <DockPanel Grid.Column="0" Grid.RowSpan="2">
@@ -50,6 +50,15 @@
             <TextBlock DockPanel.Dock="Top">Reset states</TextBlock>
             <ListBox ItemsSource="{Binding ResetStates}" SelectedItem="{Binding SelectedResetState}" />
         </DockPanel>
+
+        <Grid VerticalAlignment="Center" Grid.Row="0"  Grid.Column="3">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <Button Grid.Row="0" Margin="3" Command="{Binding MoveFilteredStateLower}" >⯅</Button>
+            <Button Grid.Row="1" Margin="3" Command="{Binding MoveFilteredStateHigher}">⯆</Button>
+        </Grid>
 
     </Grid>
 </UserControl>

@@ -92,6 +92,30 @@ namespace Jira.FlowCharts
             _statesRepository.SetResetStates(ResetStates.ToArray());
         }
 
+        internal void MoveFilteredStateLower(string state)
+        {
+            if (state == null)
+                return;
+
+            var insertAt = FilteredStates.IndexOf(state);
+            FilteredStates.Remove(state);
+            FilteredStates.Insert(Math.Max(0, insertAt - 1), state);
+
+            _statesRepository.SetFilteredStates(FilteredStates.ToArray());
+        }
+
+        internal void MoveFilteredStateHigher(string state)
+        {
+            if (state == null)
+                return;
+
+            var insertAt = FilteredStates.IndexOf(state);
+            FilteredStates.Remove(state);
+            FilteredStates.Insert(Math.Min(FilteredStates.Count, insertAt + 1), state);
+
+            _statesRepository.SetFilteredStates(FilteredStates.ToArray());
+        }
+
         public async Task<FinishedTask[]> GetFinishedStories()
         {
             IEnumerable<CachedIssue> stories = await GetStories();

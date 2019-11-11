@@ -475,5 +475,149 @@ namespace Jira.FlowCharts
             Assert.Equal(new[] { "A", "C" }, _vm.ResetStates);
             Assert.Equal(new[] { "A", "C" }, _tasksSource.ResetStates);
         }
+
+        [Fact]
+        public async Task Move_filtered_state_lower()
+        {
+            var allStates = new[] { "A", "B", "C" };
+            _jiraCacheAdapter.AllStates = allStates;
+            _statesRepository.FilteredStates = allStates;
+
+            await Reactivate();
+
+            _vm.SelectedFilteredState = "B";
+
+            await _vm.MoveFilteredStateLower.Execute().ToTask();
+
+            Assert.Equal(new[] { "B", "A", "C" }, _vm.FilteredStates);
+
+            _vm.SelectedFilteredState = "A";
+
+            await _vm.MoveFilteredStateLower.Execute().ToTask();
+
+            Assert.Equal(new[] { "A", "B", "C" }, _vm.FilteredStates);
+
+            _vm.SelectedFilteredState = "C";
+
+            await _vm.MoveFilteredStateLower.Execute().ToTask();
+
+            Assert.Equal(new[] { "A", "C", "B" }, _vm.FilteredStates);
+
+            await _vm.MoveFilteredStateLower.Execute().ToTask();
+
+            Assert.Equal(new[] { "C", "A", "B" }, _vm.FilteredStates);
+
+            await _vm.MoveFilteredStateLower.Execute().ToTask();
+
+            Assert.Equal(new[] { "C", "A", "B" }, _vm.FilteredStates);
+        }
+
+        [Fact]
+        public async Task Move_filtered_state_lower_none_selected()
+        {
+            var allStates = new[] { "A", "B", "C" };
+            _jiraCacheAdapter.AllStates = allStates;
+            _statesRepository.FilteredStates = allStates;
+
+            await Reactivate();
+
+            _vm.SelectedFilteredState = null;
+
+            await _vm.MoveFilteredStateLower.Execute().ToTask();
+
+            Assert.Equal(new[] { "A", "B", "C" }, _vm.FilteredStates);
+        }
+
+        [Fact]
+        public async Task Move_filtered_state_lower_persists()
+        {
+            var allStates = new[] { "A", "B", "C" };
+            _jiraCacheAdapter.AllStates = allStates;
+            _statesRepository.FilteredStates = allStates;
+
+            await Reactivate();
+
+            _vm.SelectedFilteredState = "B";
+
+            await _vm.MoveFilteredStateLower.Execute().ToTask();
+
+            Assert.Equal(new[] { "B", "A", "C" }, _vm.FilteredStates);
+
+            await Reactivate();
+
+            Assert.Equal(new[] { "B", "A", "C" }, _vm.FilteredStates);
+        }
+
+        [Fact]
+        public async Task X_Move_filtered_higher_lower()
+        {
+            var allStates = new[] { "A", "B", "C" };
+            _jiraCacheAdapter.AllStates = allStates;
+            _statesRepository.FilteredStates = allStates;
+
+            await Reactivate();
+
+            _vm.SelectedFilteredState = "B";
+
+            await _vm.MoveFilteredStateHigher.Execute().ToTask();
+
+            Assert.Equal(new[] { "A", "C", "B" }, _vm.FilteredStates);
+
+            _vm.SelectedFilteredState = "A";
+
+            await _vm.MoveFilteredStateHigher.Execute().ToTask();
+
+            Assert.Equal(new[] { "C", "A", "B" }, _vm.FilteredStates);
+
+            _vm.SelectedFilteredState = "C";
+
+            await _vm.MoveFilteredStateHigher.Execute().ToTask();
+
+            Assert.Equal(new[] { "A", "C", "B" }, _vm.FilteredStates);
+
+            await _vm.MoveFilteredStateHigher.Execute().ToTask();
+
+            Assert.Equal(new[] { "A", "B", "C" }, _vm.FilteredStates);
+
+            await _vm.MoveFilteredStateHigher.Execute().ToTask();
+
+            Assert.Equal(new[] { "A", "B", "C" }, _vm.FilteredStates);
+        }
+
+        [Fact]
+        public async Task Move_filtered_state_higher_none_selected()
+        {
+            var allStates = new[] { "A", "B", "C" };
+            _jiraCacheAdapter.AllStates = allStates;
+            _statesRepository.FilteredStates = allStates;
+
+            await Reactivate();
+
+            _vm.SelectedFilteredState = null;
+
+            await _vm.MoveFilteredStateHigher.Execute().ToTask();
+
+            Assert.Equal(new[] { "A", "B", "C" }, _vm.FilteredStates);
+        }
+
+        [Fact]
+        public async Task Move_filtered_state_higher_persists()
+        {
+            var allStates = new[] { "A", "B", "C" };
+            _jiraCacheAdapter.AllStates = allStates;
+            _statesRepository.FilteredStates = allStates;
+
+            await Reactivate();
+
+            _vm.SelectedFilteredState = "B";
+
+            await _vm.MoveFilteredStateHigher.Execute().ToTask();
+
+            Assert.Equal(new[] { "A", "C", "B" }, _vm.FilteredStates);
+
+            await Reactivate();
+
+            Assert.Equal(new[] { "A", "C", "B" }, _vm.FilteredStates);
+        }
     }
 }
