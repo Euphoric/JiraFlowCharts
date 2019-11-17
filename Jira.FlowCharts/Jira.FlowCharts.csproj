@@ -249,6 +249,7 @@
       <DependentUpon>JiraUpdateView.xaml</DependentUpon>
     </Compile>
     <Compile Include="JiraUpdate\JiraUpdateViewModel.cs" />
+    <Compile Include="JsonStatesRepository.cs" />
     <Compile Include="MainViewModel.cs" />
     <Compile Include="MemoryStatesRepository.cs" />
     <Compile Include="ReactiveScreen.cs" />
