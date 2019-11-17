@@ -14,7 +14,7 @@ namespace Jira.FlowCharts
         {
             DisplayName = "Jira flow metrics";
 
-            _tasksSource = new TasksSource(new TasksSourceJiraCacheAdapter(), new JsonStatesRepository(@"../../../Data/analysisSettings.json"));
+            _tasksSource = new TasksSource(new TasksSourceJiraCacheAdapter(@"../../../Data/issuesCache.db"), new JsonStatesRepository(@"../../../Data/analysisSettings.json"));
             
             Items.Add(new JiraUpdateViewModel(_tasksSource, new CurrentTime()));
             Items.Add(new StoryFilteringViewModel(_tasksSource));

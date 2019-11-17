@@ -16,9 +16,16 @@ namespace Jira.FlowCharts
 
     public class TasksSourceJiraCacheAdapter : ITasksSourceJiraCacheAdapter
     {
+        private readonly string _databaseFile;
+
+        public TasksSourceJiraCacheAdapter(string databaseFile)
+        {
+            _databaseFile = databaseFile;
+        }
+
         private JiraLocalCache.IRepository CreateRepository()
         {
-            return new SqliteJiraLocalCacheRepository(@"../../../Data/issuesCache.db");
+            return new SqliteJiraLocalCacheRepository(_databaseFile);
         }
 
         public async Task<List<CachedIssue>> GetIssues()
