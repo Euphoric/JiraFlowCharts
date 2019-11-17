@@ -138,20 +138,30 @@ namespace Jira.FlowCharts
             _statesRepository.SetFilteredStates(FilteredStates.ToArray());
         }
 
-        public async Task<FinishedTask[]> GetFinishedStories()
+        public async Task<FinishedTask[]> GetAllFinishedStories()
         {
             IEnumerable<CachedIssue> stories = await GetStories();
 
             SimplifyStateChangeOrder simplify = new SimplifyStateChangeOrder(FilteredStates.ToArray(), ResetStates.ToArray());
 
-            DateTime startDate = DateTime.Now.AddMonths(-12);
-
             FinishedTask[] finishedStories = stories
                 .Where(x => x.Status == "Done")
                 .Select(x => CalculateDuration(x, simplify))
-                .Where(x => x.End > startDate).ToArray();
+                .ToArray();
 
             return finishedStories;
+        }
+
+        public async Task<FinishedTask[]> GetLatestFinishedStories()
+        {
+            FinishedTask[] finishedStories = await GetAllFinishedStories();
+
+            DateTime startDate = DateTime.Now.AddMonths(-12);
+
+            FinishedTask[] finishedStoriesLast = finishedStories
+                .Where(x => x.End > startDate).ToArray();
+
+            return finishedStoriesLast;
         }
 
         private static FinishedTask CalculateDuration(CachedIssue issue, SimplifyStateChangeOrder simplify)

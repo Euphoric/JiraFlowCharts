@@ -106,7 +106,7 @@ namespace Jira.FlowCharts
             Stories = new ChartValues<IssuePoint>();
             Bugs = new ChartValues<IssuePoint>();
 
-            var finishedTasks = await _taskSource.GetFinishedStories();
+            var finishedTasks = await _taskSource.GetLatestFinishedStories();
             foreach (var issue in finishedTasks)
             {
                 var sinceStart = issue.End - _baseDate;
