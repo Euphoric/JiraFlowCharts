@@ -15,13 +15,13 @@ namespace Jira.FlowCharts
     {
         private StoryFilteringViewModel _vm;
         private TestJiraCacheAdapter _jiraCacheAdapter;
-        private TestStatesRepository _statesRepository;
+        private MemoryStatesRepository _statesRepository;
         TasksSource _tasksSource;
 
         public StoryFilteringViewModelTest()
         {
             _jiraCacheAdapter = new TestJiraCacheAdapter();
-            _statesRepository = new TestStatesRepository();
+            _statesRepository = new MemoryStatesRepository(new string[0], new string[0]);
             _tasksSource = new TasksSource(_jiraCacheAdapter, _statesRepository);
             _vm = new StoryFilteringViewModel(_tasksSource);
 
@@ -102,7 +102,7 @@ namespace Jira.FlowCharts
             _jiraCacheAdapter.AllStates = allStates;
 
             var filteredStates = new[] {"B", "C"};
-            _statesRepository.FilteredStates = filteredStates;
+            _statesRepository.SetFilteredStates(filteredStates);
 
             await Reactivate();
 
@@ -120,7 +120,7 @@ namespace Jira.FlowCharts
             _jiraCacheAdapter.AllStates = allStates;
 
             var resetStates = new[] { "D" };
-            _statesRepository.ResetStates = resetStates;
+            _statesRepository.SetResetStates(resetStates);
 
             await Reactivate();
 
@@ -138,10 +138,10 @@ namespace Jira.FlowCharts
             _jiraCacheAdapter.AllStates = allStates;
 
             var filteredStates = new[] { "B", "C" };
-            _statesRepository.FilteredStates = filteredStates;
+            _statesRepository.SetFilteredStates(filteredStates);
 
             var resetStates = new[] { "D" };
-            _statesRepository.ResetStates = resetStates;
+            _statesRepository.SetResetStates(resetStates);
 
             await Reactivate();
             await Reactivate();
@@ -221,7 +221,7 @@ namespace Jira.FlowCharts
         public async Task Move_from_filtered_state_when_none_selected()
         {
             var allStates = new[] { "A", "B", "C" };
-            _statesRepository.FilteredStates = allStates;
+            _statesRepository.SetFilteredStates(allStates);
 
             await Reactivate();
 
@@ -236,7 +236,7 @@ namespace Jira.FlowCharts
         {
             var allStates = new[] { "A", "B", "C" };
             _jiraCacheAdapter.AllStates = allStates;
-            _statesRepository.FilteredStates = allStates;
+            _statesRepository.SetFilteredStates(allStates);
 
             await Reactivate();
 
@@ -270,7 +270,7 @@ namespace Jira.FlowCharts
         {
             var allStates = new[] { "A", "B", "C" };
             _jiraCacheAdapter.AllStates = allStates;
-            _statesRepository.FilteredStates = allStates;
+            _statesRepository.SetFilteredStates(allStates);
 
             await Reactivate();
 
@@ -360,7 +360,7 @@ namespace Jira.FlowCharts
         public async Task Move_from_reset_state_when_none_selected()
         {
             var allStates = new[] { "A", "B", "C" };
-            _statesRepository.ResetStates = allStates;
+            _statesRepository.SetResetStates(allStates);
 
             await Reactivate();
 
@@ -375,7 +375,7 @@ namespace Jira.FlowCharts
         {
             var allStates = new[] { "A", "B", "C" };
             _jiraCacheAdapter.AllStates = allStates;
-            _statesRepository.ResetStates = allStates;
+            _statesRepository.SetResetStates(allStates);
 
             await Reactivate();
 
@@ -409,7 +409,7 @@ namespace Jira.FlowCharts
         {
             var allStates = new[] { "A", "B", "C" };
             _jiraCacheAdapter.AllStates = allStates;
-            _statesRepository.ResetStates = allStates;
+            _statesRepository.SetResetStates(allStates);
 
             await Reactivate();
 
@@ -432,7 +432,7 @@ namespace Jira.FlowCharts
         public async Task Selected_Reset_state_can_change_when_moving()
         {
             var allStates = new[] { "A", "B", "C" };
-            _statesRepository.ResetStates = allStates;
+            _statesRepository.SetResetStates(allStates);
 
             // selection changes when item is removed from collection
             _vm.FilteredStates.CollectionChanged += (_, __) => { _vm.SelectedResetState = null; };
@@ -453,7 +453,7 @@ namespace Jira.FlowCharts
         {
             var allStates = new[] { "A", "B", "C" };
             _jiraCacheAdapter.AllStates = allStates;
-            _statesRepository.FilteredStates = allStates;
+            _statesRepository.SetFilteredStates(allStates);
 
             await Reactivate();
 
@@ -489,7 +489,7 @@ namespace Jira.FlowCharts
         {
             var allStates = new[] { "A", "B", "C" };
             _jiraCacheAdapter.AllStates = allStates;
-            _statesRepository.FilteredStates = allStates;
+            _statesRepository.SetFilteredStates(allStates);
 
             await Reactivate();
 
@@ -505,7 +505,7 @@ namespace Jira.FlowCharts
         {
             var allStates = new[] { "A", "B", "C" };
             _jiraCacheAdapter.AllStates = allStates;
-            _statesRepository.FilteredStates = allStates;
+            _statesRepository.SetFilteredStates(allStates);
 
             await Reactivate();
 
@@ -525,7 +525,7 @@ namespace Jira.FlowCharts
         {
             var allStates = new[] { "A", "B", "C" };
             _jiraCacheAdapter.AllStates = allStates;
-            _statesRepository.FilteredStates = allStates;
+            _statesRepository.SetFilteredStates(allStates);
 
             await Reactivate();
 
@@ -561,7 +561,7 @@ namespace Jira.FlowCharts
         {
             var allStates = new[] { "A", "B", "C" };
             _jiraCacheAdapter.AllStates = allStates;
-            _statesRepository.FilteredStates = allStates;
+            _statesRepository.SetFilteredStates(allStates);
 
             await Reactivate();
 
@@ -577,7 +577,7 @@ namespace Jira.FlowCharts
         {
             var allStates = new[] { "A", "B", "C" };
             _jiraCacheAdapter.AllStates = allStates;
-            _statesRepository.FilteredStates = allStates;
+            _statesRepository.SetFilteredStates(allStates);
 
             await Reactivate();
 

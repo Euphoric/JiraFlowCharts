@@ -2,8 +2,8 @@
 {
     public class MemoryStatesRepository : IStatesRepository
     {
-        public string[] FilteredStates { get; private set; }
-        public string[] ResetStates { get; private set; }
+        private string[] FilteredStates { get; set; }
+        private string[] ResetStates { get; set; }
 
         public MemoryStatesRepository(string[] filteredStates, string[] resetStates)
         {
