@@ -3,8 +3,6 @@ using System.Threading.Tasks;
 using Caliburn.Micro;
 using Jira.FlowCharts.JiraUpdate;
 using Jira.FlowCharts.StoryFiltering;
-using Jira.Querying;
-using Jira.Querying.Sqlite;
 
 namespace Jira.FlowCharts
 {
@@ -16,10 +14,7 @@ namespace Jira.FlowCharts
         {
             DisplayName = "Jira flow metrics";
 
-            string[] filteredStates = new[] { "Ready For Dev", "In Dev", "Ready for Peer Review", "Ready for QA", "In QA", "Ready for Done", "Done" };
-            string[] resetStates = new[] { "On Hold", "Not Started", "Withdrawn" };
-
-            _tasksSource = new TasksSource(new TasksSourceJiraCacheAdapter(), new MemoryStatesRepository(filteredStates, resetStates));
+            _tasksSource = new TasksSource(new TasksSourceJiraCacheAdapter(), new JsonStatesRepository(@"../../../Data/analysisSettings.json"));
             
             Items.Add(new JiraUpdateViewModel(_tasksSource, new CurrentTime()));
             Items.Add(new StoryFilteringViewModel(_tasksSource));
