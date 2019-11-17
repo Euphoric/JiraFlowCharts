@@ -16,7 +16,10 @@ namespace Jira.FlowCharts
         {
             DisplayName = "Jira flow metrics";
 
-            _tasksSource = new TasksSource(new TasksSourceJiraCacheAdapter(), new MemoryStatesRepository());
+            string[] filteredStates = new[] { "Ready For Dev", "In Dev", "Ready for Peer Review", "Ready for QA", "In QA", "Ready for Done", "Done" };
+            string[] resetStates = new[] { "On Hold", "Not Started", "Withdrawn" };
+
+            _tasksSource = new TasksSource(new TasksSourceJiraCacheAdapter(), new MemoryStatesRepository(filteredStates, resetStates));
             
             Items.Add(new JiraUpdateViewModel(_tasksSource, new CurrentTime()));
             Items.Add(new StoryFilteringViewModel(_tasksSource));
