@@ -95,7 +95,74 @@ namespace Jira.FlowCharts
                 {
                     new CachedIssueStatusChange(new DateTime(2012, 2, 1), "A"),
                     new CachedIssueStatusChange(new DateTime(2012, 2, 3), "C"),
+                },
+                Started = new DateTime(2012, 2, 1),
+                Ended = new DateTime(2012, 2, 3),
+                Duration = TimeSpan.FromDays(2)
+            };
+
+            _compareLogic.AssertEqual<object>(expectedIssue, analyzedIssue);
+        }
+
+        [Fact]
+        public async Task Non_started_issue_is_analyzed()
+        {
+            _tasksSource.AddFilteredState("B");
+
+            var issue = new CachedIssue()
+            {
+                StatusChanges = new Collection<CachedIssueStatusChange>()
+                {
+                    new CachedIssueStatusChange(new DateTime(2012, 1, 1), "A"),
                 }
+            };
+            _jiraCacheAdapter.Issues.Add(issue);
+            var issues = await _tasksSource.GetAllIssues();
+
+            var analyzedIssue = Assert.Single(issues);
+
+            var expectedIssue = new AnalyzedIssue()
+            {
+                StatusChanges = issue.StatusChanges,
+                SimplifiedStatusChanges = new Collection<CachedIssueStatusChange>()
+                { },
+                Started = null,
+                Ended = null,
+                Duration = null
+            };
+
+            _compareLogic.AssertEqual<object>(expectedIssue, analyzedIssue);
+        }
+
+        [Fact]
+        public async Task Issue_that_doesnt_have_last_state_is_not_finished()
+        {
+            _tasksSource.AddFilteredState("A");
+            _tasksSource.AddFilteredState("C");
+
+            var issue = new CachedIssue()
+            {
+                StatusChanges = new Collection<CachedIssueStatusChange>()
+                {
+                    new CachedIssueStatusChange(new DateTime(2012, 2, 1), "A"),
+                    new CachedIssueStatusChange(new DateTime(2012, 2, 2), "B"),
+                }
+            };
+            _jiraCacheAdapter.Issues.Add(issue);
+            var issues = await _tasksSource.GetAllIssues();
+
+            var analyzedIssue = Assert.Single(issues);
+
+            var expectedIssue = new AnalyzedIssue()
+            {
+                StatusChanges = issue.StatusChanges,
+                SimplifiedStatusChanges = new Collection<CachedIssueStatusChange>()
+                {
+                    new CachedIssueStatusChange(new DateTime(2012, 2, 1), "A")
+                },
+                Started = new DateTime(2012, 2, 1),
+                Ended = null,
+                Duration = null
             };
 
             _compareLogic.AssertEqual<object>(expectedIssue, analyzedIssue);

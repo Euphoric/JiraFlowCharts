@@ -63,10 +63,20 @@ namespace Jira.FlowCharts
             List<AnalyzedIssue> analyzedIssues = _mapper.Map<List<AnalyzedIssue>>(issues);
 
             SimplifyStateChangeOrder simplify = new SimplifyStateChangeOrder(FilteredStates.ToArray(), ResetStates.ToArray());
+            var finishedState = FilteredStates.LastOrDefault();
 
             foreach (var item in analyzedIssues)
             {
                 item.SimplifiedStatusChanges = new Collection<CachedIssueStatusChange>(simplify.FilterStatusChanges(item.StatusChanges).ToList());
+
+                item.Started = item.SimplifiedStatusChanges.FirstOrDefault()?.ChangeTime;
+
+                CachedIssueStatusChange lastState = item.SimplifiedStatusChanges.LastOrDefault();
+                if (lastState != null && lastState.State == finishedState)
+                {
+                    item.Ended = lastState.ChangeTime;
+                }
+                item.Duration = item.Ended - item.Started;
             }
 
             return analyzedIssues;

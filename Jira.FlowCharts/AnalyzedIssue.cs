@@ -20,5 +20,9 @@ namespace Jira.FlowCharts
         public Collection<CachedIssueStatusChange> StatusChanges { get; set; }
 
         public Collection<CachedIssueStatusChange> SimplifiedStatusChanges { get; set; }
+
+        public DateTime? Started { get; set; }
+        public DateTime? Ended { get; set; }
+        public TimeSpan? Duration { get; set; }
     }
 }
