@@ -45,7 +45,7 @@ namespace Jira.FlowCharts
         {
             var finishedStories = await _taskSource.GetLatestFinishedStories();
 
-            var durations = finishedStories.Select(x => x.Duration).OrderBy(x=>x).ToArray();
+            var durations = finishedStories.Select(x => x.DurationDays).OrderBy(x=>x).ToArray();
 
             int max = (int)Math.Ceiling(durations[durations.Length * 99 / 100]);
 

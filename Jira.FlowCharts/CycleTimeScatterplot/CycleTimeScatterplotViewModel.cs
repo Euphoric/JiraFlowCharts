@@ -109,13 +109,13 @@ namespace Jira.FlowCharts
             var finishedTasks = await _taskSource.GetLatestFinishedStories();
             foreach (var issue in finishedTasks)
             {
-                var sinceStart = issue.End - _baseDate;
+                var sinceStart = issue.Ended - _baseDate;
                 var label = ""
                             + issue.Key + Environment.NewLine
                             + issue.Title + Environment.NewLine
-                            + issue.End.ToString(CultureInfo.InvariantCulture);
+                            + issue.Ended.ToString(CultureInfo.InvariantCulture);
 
-                var issuePoint = new IssuePoint(label, sinceStart.TotalDays, issue.Duration);
+                var issuePoint = new IssuePoint(label, sinceStart.TotalDays, issue.DurationDays);
 
                 if (issue.Type == "Story")
                 {
@@ -127,7 +127,7 @@ namespace Jira.FlowCharts
                 }
             }
 
-            var durations = finishedTasks.Select(x => x.Duration).OrderBy(x => x).ToArray();
+            var durations = finishedTasks.Select(x => x.DurationDays).OrderBy(x => x).ToArray();
 
             Percentile50 = durations[(int)(durations.Length * 0.50)];
             Percentile70 = durations[(int)(durations.Length * 0.70)];

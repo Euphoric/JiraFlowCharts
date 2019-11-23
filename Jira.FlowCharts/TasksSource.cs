@@ -197,7 +197,7 @@ namespace Jira.FlowCharts
             DateTime startDate = DateTime.Now.AddMonths(-12);
 
             FinishedTask[] finishedStoriesLast = finishedStories
-                .Where(x => x.End > startDate).ToArray();
+                .Where(x => x.Ended > startDate).ToArray();
 
             return finishedStoriesLast;
         }
@@ -216,9 +216,9 @@ namespace Jira.FlowCharts
                 Key = issue.Key,
                 Title = issue.Title,
                 Type = issue.Type,
-                Start = startTime,
-                End = doneTime,
-                Duration = duration.TotalDays,
+                Started = startTime,
+                Ended = doneTime,
+                Duration = duration,
                 StoryPoints = issue.StoryPoints,
                 TimeSpent = issue.TimeSpent
             };

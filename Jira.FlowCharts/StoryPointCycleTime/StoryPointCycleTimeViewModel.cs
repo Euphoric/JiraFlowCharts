@@ -46,14 +46,14 @@ namespace Jira.FlowCharts
                 .Select(grp => new
                 {
                     StoryPoints = grp.Key,
-                    Min = grp.Min(x => x.Duration),
-                    Percentile05 = Percentile(grp.Select(x => x.Duration), 0.05),
-                    Percentile25 = Percentile(grp.Select(x => x.Duration), 0.25),
-                    Percentile75 = Percentile(grp.Select(x => x.Duration), 0.75),
-                    Percentile95 = Percentile(grp.Select(x => x.Duration), 0.95),
-                    Max = grp.Max(x => x.Duration),
-                    Average = grp.Average(x => x.Duration),
-                    Median = Percentile(grp.Select(x => x.Duration), 0.5),
+                    Min = grp.Min(x => x.DurationDays),
+                    Percentile05 = Percentile(grp.Select(x => x.DurationDays), 0.05),
+                    Percentile25 = Percentile(grp.Select(x => x.DurationDays), 0.25),
+                    Percentile75 = Percentile(grp.Select(x => x.DurationDays), 0.75),
+                    Percentile95 = Percentile(grp.Select(x => x.DurationDays), 0.95),
+                    Max = grp.Max(x => x.DurationDays),
+                    Average = grp.Average(x => x.DurationDays),
+                    Median = Percentile(grp.Select(x => x.DurationDays), 0.5),
                     Count = grp.Count()
                 })
                 .OrderBy(x => x.StoryPoints)
