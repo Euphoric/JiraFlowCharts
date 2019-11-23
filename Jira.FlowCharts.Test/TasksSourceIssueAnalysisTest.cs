@@ -167,5 +167,29 @@ namespace Jira.FlowCharts
 
             _compareLogic.AssertEqual<object>(expectedIssue, analyzedIssue);
         }
+
+        [Fact]
+        public async Task Analyzed_as_valid_issue()
+        {
+            var issue = new CachedIssue()
+            {
+                Type = "Story",
+                StatusChanges = new Collection<CachedIssueStatusChange>()
+            };
+            _jiraCacheAdapter.Issues.Add(issue);
+            var issues = await _tasksSource.GetAllIssues();
+
+            var analyzedIssue = Assert.Single(issues);
+
+            var expectedIssue = new AnalyzedIssue()
+            {
+                Type = "Story",
+                StatusChanges = issue.StatusChanges,
+                SimplifiedStatusChanges = new Collection<CachedIssueStatusChange>(),
+                IsValid = true
+            };
+
+            _compareLogic.AssertEqual<object>(expectedIssue, analyzedIssue);
+        }
     }
 }

@@ -151,9 +151,19 @@ namespace Jira.FlowCharts
                     item.Ended = lastState.ChangeTime;
                 }
                 item.Duration = item.Ended - item.Started;
+                item.IsValid = IsValidIssue(item);
             }
 
             return analyzedIssues;
+        }
+        private static bool IsValidIssue(AnalyzedIssue issue)
+        {
+            // TODO : Automated tests and ability to change for user
+
+            return 
+                (issue.Type == "Story" || issue.Type == "Bug") && 
+                (issue.Resolution != "Cancelled" && issue.Resolution != "Duplicate") && 
+                (issue.Status != "Withdrawn" && issue.Status != "On Hold");
         }
 
         public async Task<IEnumerable<AnalyzedIssue>> GetStories()
@@ -161,14 +171,9 @@ namespace Jira.FlowCharts
             var issues = await GetAllIssues();
 
             IEnumerable<AnalyzedIssue> stories = issues
-                .Where(x => IsValidIssue(x));
+                .Where(x => x.IsValid);
 
             return stories;
-        }
-
-        private static bool IsValidIssue(AnalyzedIssue x)
-        {
-            return (x.Type == "Story" || x.Type == "Bug") && (x.Resolution != "Cancelled" && x.Resolution != "Duplicate") && (x.Status != "Withdrawn" && x.Status != "On Hold");
         }
 
         public async Task<FinishedTask[]> GetAllFinishedStories()
