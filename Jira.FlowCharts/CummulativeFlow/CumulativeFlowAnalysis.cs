@@ -40,7 +40,7 @@ namespace Jira.FlowCharts
             return stateRanges;
         }
 
-        public CumulativeFlowAnalysis(IEnumerable<CachedIssue> stories, string[] states, DateTime? from = null)
+        public CumulativeFlowAnalysis(IEnumerable<AnalyzedIssue> stories, string[] states, DateTime? from = null)
         {
             States = states.Reverse().ToArray();
             var stateIxs = States.Select((x, i) => new { i, x }).ToDictionary(x => x.x, x => x.i);

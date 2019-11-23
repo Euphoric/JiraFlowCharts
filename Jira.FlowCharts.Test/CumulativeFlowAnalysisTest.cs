@@ -11,11 +11,11 @@ namespace Jira.FlowCharts.Test
     {
         private class FlatIssueBuilder
         {
-            Dictionary<int, CachedIssue> issues = new Dictionary<int, CachedIssue>();
+            Dictionary<int, AnalyzedIssue> issues = new Dictionary<int, AnalyzedIssue>();
 
             DateTime currentDateTime = new DateTime(2010, 07, 03);
 
-            internal IEnumerable<CachedIssue> BuildIssues()
+            internal IEnumerable<AnalyzedIssue> BuildIssues()
             {
                 return issues.Values;
             }
@@ -25,7 +25,7 @@ namespace Jira.FlowCharts.Test
                 if (issues.ContainsKey(id))
                     return;
 
-                issues.Add(id, new CachedIssue() { Key = (string)("IS-" + id), StatusChanges = new Collection<CachedIssueStatusChange>() });
+                issues.Add(id, new AnalyzedIssue() { Key = (string)("IS-" + id), StatusChanges = new Collection<CachedIssueStatusChange>() });
             }
 
             internal void UpdateIssue(int id, string state)

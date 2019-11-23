@@ -156,26 +156,24 @@ namespace Jira.FlowCharts
             return analyzedIssues;
         }
 
-        private async Task<IEnumerable<CachedIssue>> GetAllIssues2()
+        public async Task<IEnumerable<AnalyzedIssue>> GetStories()
         {
-            return await _jiraCache.GetIssues();
-        }
+            var issues = await GetAllIssues();
 
-        public async Task<IEnumerable<CachedIssue>> GetStories()
-        {
-            var issues = await GetAllIssues2();
-
-            IEnumerable<CachedIssue> stories = issues
-                .Where(x => x.Type == "Story" || x.Type == "Bug")
-                .Where(x => x.Resolution != "Cancelled" && x.Resolution != "Duplicate")
-                .Where(x => x.Status != "Withdrawn" && x.Status != "On Hold");
+            IEnumerable<AnalyzedIssue> stories = issues
+                .Where(x => IsValidIssue(x));
 
             return stories;
         }
 
+        private static bool IsValidIssue(AnalyzedIssue x)
+        {
+            return (x.Type == "Story" || x.Type == "Bug") && (x.Resolution != "Cancelled" && x.Resolution != "Duplicate") && (x.Status != "Withdrawn" && x.Status != "On Hold");
+        }
+
         public async Task<FinishedTask[]> GetAllFinishedStories()
         {
-            IEnumerable<CachedIssue> stories = await GetStories();
+            IEnumerable<AnalyzedIssue> stories = await GetStories();
 
             SimplifyStateChangeOrder simplify = new SimplifyStateChangeOrder(FilteredStates.ToArray(), ResetStates.ToArray());
 
@@ -199,7 +197,7 @@ namespace Jira.FlowCharts
             return finishedStoriesLast;
         }
 
-        private static FinishedTask CalculateDuration(CachedIssue issue, SimplifyStateChangeOrder simplify)
+        private static FinishedTask CalculateDuration(AnalyzedIssue issue, SimplifyStateChangeOrder simplify)
         {
             var simplifiedIssues = simplify.FilterStatusChanges(issue.StatusChanges);
 
