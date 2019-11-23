@@ -191,5 +191,107 @@ namespace Jira.FlowCharts
 
             _compareLogic.AssertEqual<object>(expectedIssue, analyzedIssue);
         }
+
+        [Fact]
+        public async Task Finished_issue_is_analyzed()
+        {
+            _tasksSource.AddFilteredState("A");
+            _tasksSource.AddFilteredState("C");
+
+            var issue = new CachedIssue()
+            {
+                Type = "Story",
+                StatusChanges = new Collection<CachedIssueStatusChange>()
+                {
+                    new CachedIssueStatusChange(new DateTime(2012, 2, 1), "A"),
+                    new CachedIssueStatusChange(new DateTime(2012, 2, 2), "B"),
+                    new CachedIssueStatusChange(new DateTime(2012, 2, 3), "C"),
+                }
+            };
+            _jiraCacheAdapter.Issues.Add(issue);
+            var issues = await _tasksSource.GetAllFinishedStories();
+
+            var analyzedIssue = Assert.Single(issues);
+
+            var expectedIssue = new FinishedIssue()
+            {
+                Type = "Story",
+                IsValid = true,
+                StatusChanges = new Collection<CachedIssueStatusChange>()
+                {
+                    new CachedIssueStatusChange(new DateTime(2012, 2, 1), "A"),
+                    new CachedIssueStatusChange(new DateTime(2012, 2, 3), "C"),
+                },
+                Started = new DateTime(2012, 2, 1),
+                Ended = new DateTime(2012, 2, 3),
+                Duration = TimeSpan.FromDays(2)
+            };
+
+            _compareLogic.AssertEqual(expectedIssue, analyzedIssue);
+        }
+
+        [Fact]
+        public async Task Finished_story_must_be_valid()
+        {
+            _tasksSource.AddFilteredState("A");
+            _tasksSource.AddFilteredState("C");
+
+            var issue = new CachedIssue()
+            {
+                Type = "NotStory",
+                StatusChanges = new Collection<CachedIssueStatusChange>()
+                {
+                    new CachedIssueStatusChange(new DateTime(2012, 2, 1), "A"),
+                    new CachedIssueStatusChange(new DateTime(2012, 2, 2), "B"),
+                    new CachedIssueStatusChange(new DateTime(2012, 2, 3), "C"),
+                }
+            };
+            _jiraCacheAdapter.Issues.Add(issue);
+            var issues = await _tasksSource.GetAllFinishedStories();
+
+            Assert.Empty(issues);
+        }
+
+
+        [Fact]
+        public async Task Finished_story_must_have_start()
+        {
+            _tasksSource.AddFilteredState("A");
+            _tasksSource.AddFilteredState("C");
+
+            var issue = new CachedIssue()
+            {
+                Type = "Story",
+                StatusChanges = new Collection<CachedIssueStatusChange>()
+                {
+                    new CachedIssueStatusChange(new DateTime(2012, 2, 2), "B"),
+                }
+            };
+            _jiraCacheAdapter.Issues.Add(issue);
+            var issues = await _tasksSource.GetAllFinishedStories();
+
+            Assert.Empty(issues);
+        }
+
+        [Fact]
+        public async Task Finished_story_must_have_end()
+        {
+            _tasksSource.AddFilteredState("A");
+            _tasksSource.AddFilteredState("C");
+
+            var issue = new CachedIssue()
+            {
+                Type = "Story",
+                StatusChanges = new Collection<CachedIssueStatusChange>()
+                {
+                    new CachedIssueStatusChange(new DateTime(2012, 2, 1), "A"),
+                    new CachedIssueStatusChange(new DateTime(2012, 2, 2), "B"),
+                }
+            };
+            _jiraCacheAdapter.Issues.Add(issue);
+            var issues = await _tasksSource.GetAllFinishedStories();
+
+            Assert.Empty(issues);
+        }
     }
 }

@@ -180,11 +180,9 @@ namespace Jira.FlowCharts
         {
             IEnumerable<AnalyzedIssue> stories = await GetStories();
 
-            SimplifyStateChangeOrder simplify = new SimplifyStateChangeOrder(FilteredStates.ToArray(), ResetStates.ToArray());
-
             FinishedIssue[] finishedStories = stories
-                .Where(x => x.Status == "Done")
-                .Select(x => CalculateDuration(x, simplify))
+                .Where(x => x.Duration != null)
+                .Select(x => CalculateDuration(x))
                 .ToArray();
 
             return finishedStories;
@@ -202,25 +200,20 @@ namespace Jira.FlowCharts
             return finishedStoriesLast;
         }
 
-        private static FinishedIssue CalculateDuration(AnalyzedIssue issue, SimplifyStateChangeOrder simplify)
+        private static FinishedIssue CalculateDuration(AnalyzedIssue issue)
         {
-            var simplifiedIssues = simplify.FilterStatusChanges(issue.StatusChanges);
-
-            var startTime = simplifiedIssues.First().ChangeTime;
-            var doneTime = simplifiedIssues.Last().ChangeTime;
-
-            TimeSpan duration = doneTime - startTime;
-
             var flowIssue = new FinishedIssue()
             {
                 Key = issue.Key,
                 Title = issue.Title,
                 Type = issue.Type,
-                Started = startTime,
-                Ended = doneTime,
-                Duration = duration,
+                Started = issue.Started.Value,
+                Ended = issue.Ended.Value,
+                Duration = issue.Duration.Value,
                 StoryPoints = issue.StoryPoints,
-                TimeSpent = issue.TimeSpent
+                TimeSpent = issue.TimeSpent,
+                StatusChanges = issue.SimplifiedStatusChanges,
+                IsValid = issue.IsValid
             };
 
             return flowIssue;
