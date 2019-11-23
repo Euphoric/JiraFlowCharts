@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -61,6 +62,43 @@ namespace Jira.FlowCharts
             var issues = await _tasksSource.GetAllIssues();
 
             _compareLogic.AssertEqual<object>(issues, _jiraCacheAdapter.Issues);
+        }
+
+        [Fact]
+        public async Task Analyzed_issue_contains_simplified_states()
+        {
+            _tasksSource.AddFilteredState("A");
+            _tasksSource.AddFilteredState("C");
+            _tasksSource.AddResetState("D");
+
+            var issue = new CachedIssue()
+            {
+                StatusChanges = new Collection<CachedIssueStatusChange>()
+                {
+                    new CachedIssueStatusChange(new DateTime(2012, 1, 1), "A"),
+                    new CachedIssueStatusChange(new DateTime(2012, 1, 2), "D"),
+
+                    new CachedIssueStatusChange(new DateTime(2012, 2, 1), "A"),
+                    new CachedIssueStatusChange(new DateTime(2012, 2, 2), "B"),
+                    new CachedIssueStatusChange(new DateTime(2012, 2, 3), "C"),
+                }
+            };
+            _jiraCacheAdapter.Issues.Add(issue);
+            var issues = await _tasksSource.GetAllIssues();
+
+            var analyzedIssue = Assert.Single(issues);
+
+            var expectedIssue = new AnalyzedIssue()
+            {
+                StatusChanges = issue.StatusChanges,
+                SimplifiedStatusChanges = new Collection<CachedIssueStatusChange>()
+                {
+                    new CachedIssueStatusChange(new DateTime(2012, 2, 1), "A"),
+                    new CachedIssueStatusChange(new DateTime(2012, 2, 3), "C"),
+                }
+            };
+
+            _compareLogic.AssertEqual<object>(expectedIssue, analyzedIssue);
         }
     }
 }

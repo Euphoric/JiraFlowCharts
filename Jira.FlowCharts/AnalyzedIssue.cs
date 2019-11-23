@@ -18,5 +18,7 @@ namespace Jira.FlowCharts
         public int? TimeSpent { get; set; }
         public int? StoryPoints { get; set; }
         public Collection<CachedIssueStatusChange> StatusChanges { get; set; }
+
+        public Collection<CachedIssueStatusChange> SimplifiedStatusChanges { get; set; }
     }
 }

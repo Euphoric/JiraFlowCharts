@@ -59,7 +59,17 @@ namespace Jira.FlowCharts
         public async Task<IEnumerable<AnalyzedIssue>> GetAllIssues()
         {
             List<CachedIssue> issues = await _jiraCache.GetIssues();
-            return _mapper.Map<List<AnalyzedIssue>>(issues);
+
+            List<AnalyzedIssue> analyzedIssues = _mapper.Map<List<AnalyzedIssue>>(issues);
+
+            SimplifyStateChangeOrder simplify = new SimplifyStateChangeOrder(FilteredStates.ToArray(), ResetStates.ToArray());
+
+            foreach (var item in analyzedIssues)
+            {
+                item.SimplifiedStatusChanges = new Collection<CachedIssueStatusChange>(simplify.FilterStatusChanges(item.StatusChanges).ToList());
+            }
+
+            return analyzedIssues;
         }
 
         private async Task<IEnumerable<CachedIssue>> GetAllIssues2()
@@ -79,7 +89,7 @@ namespace Jira.FlowCharts
             return stories;
         }
 
-        internal void AddFilteredState(string state)
+        public void AddFilteredState(string state)
         {
             if (state == null)
                 return;
@@ -89,7 +99,7 @@ namespace Jira.FlowCharts
             _statesRepository.SetFilteredStates(FilteredStates.ToArray());
         }
 
-        internal void RemoveFilteredState(string state)
+        public void RemoveFilteredState(string state)
         {
             if (state == null)
                 return;
@@ -99,7 +109,7 @@ namespace Jira.FlowCharts
             _statesRepository.SetFilteredStates(FilteredStates.ToArray());
         }
 
-        internal void AddResetState(string state)
+        public void AddResetState(string state)
         {
             if (state == null)
                 return;
@@ -109,7 +119,7 @@ namespace Jira.FlowCharts
             _statesRepository.SetResetStates(ResetStates.ToArray());
         }
 
-        internal void RemoveResetState(string state)
+        public void RemoveResetState(string state)
         {
             if (state == null)
                 return;
@@ -119,7 +129,7 @@ namespace Jira.FlowCharts
             _statesRepository.SetResetStates(ResetStates.ToArray());
         }
 
-        internal void MoveFilteredStateLower(string state)
+        public void MoveFilteredStateLower(string state)
         {
             if (state == null)
                 return;
@@ -136,7 +146,7 @@ namespace Jira.FlowCharts
             _statesRepository.SetFilteredStates(FilteredStates.ToArray());
         }
 
-        internal void MoveFilteredStateHigher(string state)
+        public void MoveFilteredStateHigher(string state)
         {
             if (state == null)
                 return;
