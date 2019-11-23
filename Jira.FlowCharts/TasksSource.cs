@@ -56,49 +56,6 @@ namespace Jira.FlowCharts
             ResetStates.AddRange(resetStates);
         }
 
-        public async Task<IEnumerable<AnalyzedIssue>> GetAllIssues()
-        {
-            List<CachedIssue> issues = await _jiraCache.GetIssues();
-
-            List<AnalyzedIssue> analyzedIssues = _mapper.Map<List<AnalyzedIssue>>(issues);
-
-            SimplifyStateChangeOrder simplify = new SimplifyStateChangeOrder(FilteredStates.ToArray(), ResetStates.ToArray());
-            var finishedState = FilteredStates.LastOrDefault();
-
-            foreach (var item in analyzedIssues)
-            {
-                item.SimplifiedStatusChanges = new Collection<CachedIssueStatusChange>(simplify.FilterStatusChanges(item.StatusChanges).ToList());
-
-                item.Started = item.SimplifiedStatusChanges.FirstOrDefault()?.ChangeTime;
-
-                CachedIssueStatusChange lastState = item.SimplifiedStatusChanges.LastOrDefault();
-                if (lastState != null && lastState.State == finishedState)
-                {
-                    item.Ended = lastState.ChangeTime;
-                }
-                item.Duration = item.Ended - item.Started;
-            }
-
-            return analyzedIssues;
-        }
-
-        private async Task<IEnumerable<CachedIssue>> GetAllIssues2()
-        {
-            return await _jiraCache.GetIssues();
-        }
-
-        public async Task<IEnumerable<CachedIssue>> GetStories()
-        {
-            var issues = await GetAllIssues2();
-
-            IEnumerable<CachedIssue> stories = issues
-                .Where(x => x.Type == "Story" || x.Type == "Bug")
-                .Where(x => x.Resolution != "Cancelled" && x.Resolution != "Duplicate")
-                .Where(x => x.Status != "Withdrawn" && x.Status != "On Hold");
-
-            return stories;
-        }
-
         public void AddFilteredState(string state)
         {
             if (state == null)
@@ -171,6 +128,49 @@ namespace Jira.FlowCharts
             FilteredStates.Insert(stateAt - 1, reinsertState);
 
             _statesRepository.SetFilteredStates(FilteredStates.ToArray());
+        }
+
+        public async Task<IEnumerable<AnalyzedIssue>> GetAllIssues()
+        {
+            List<CachedIssue> issues = await _jiraCache.GetIssues();
+
+            List<AnalyzedIssue> analyzedIssues = _mapper.Map<List<AnalyzedIssue>>(issues);
+
+            SimplifyStateChangeOrder simplify = new SimplifyStateChangeOrder(FilteredStates.ToArray(), ResetStates.ToArray());
+            var finishedState = FilteredStates.LastOrDefault();
+
+            foreach (var item in analyzedIssues)
+            {
+                item.SimplifiedStatusChanges = new Collection<CachedIssueStatusChange>(simplify.FilterStatusChanges(item.StatusChanges).ToList());
+
+                item.Started = item.SimplifiedStatusChanges.FirstOrDefault()?.ChangeTime;
+
+                CachedIssueStatusChange lastState = item.SimplifiedStatusChanges.LastOrDefault();
+                if (lastState != null && lastState.State == finishedState)
+                {
+                    item.Ended = lastState.ChangeTime;
+                }
+                item.Duration = item.Ended - item.Started;
+            }
+
+            return analyzedIssues;
+        }
+
+        private async Task<IEnumerable<CachedIssue>> GetAllIssues2()
+        {
+            return await _jiraCache.GetIssues();
+        }
+
+        public async Task<IEnumerable<CachedIssue>> GetStories()
+        {
+            var issues = await GetAllIssues2();
+
+            IEnumerable<CachedIssue> stories = issues
+                .Where(x => x.Type == "Story" || x.Type == "Bug")
+                .Where(x => x.Resolution != "Cancelled" && x.Resolution != "Duplicate")
+                .Where(x => x.Status != "Withdrawn" && x.Status != "On Hold");
+
+            return stories;
         }
 
         public async Task<FinishedTask[]> GetAllFinishedStories()
