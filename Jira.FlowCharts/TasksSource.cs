@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
 using DynamicData;
 using Jira.Querying;
 
@@ -12,6 +13,7 @@ namespace Jira.FlowCharts
     {
         private readonly ITasksSourceJiraCacheAdapter _jiraCache;
         private readonly IStatesRepository _statesRepository;
+        private IMapper _mapper;
 
         public ObservableCollection<string> AvailableStates { get; }
         public ObservableCollection<string> FilteredStates { get; }
@@ -25,6 +27,13 @@ namespace Jira.FlowCharts
             AvailableStates = new ObservableCollection<string>();
             FilteredStates = new ObservableCollection<string>();
             ResetStates = new ObservableCollection<string>();
+
+            var config = new MapperConfiguration(cfg =>
+            {
+                cfg.CreateMap<CachedIssue, AnalyzedIssue>();
+            });
+
+            _mapper = config.CreateMapper();
         }
 
         public async Task<string[]> GetAllStates()
@@ -47,14 +56,20 @@ namespace Jira.FlowCharts
             ResetStates.AddRange(resetStates);
         }
 
-        public async Task<IEnumerable<CachedIssue>> GetAllIssues()
+        public async Task<IEnumerable<AnalyzedIssue>> GetAllIssues()
+        {
+            List<CachedIssue> issues = await _jiraCache.GetIssues();
+            return _mapper.Map<List<AnalyzedIssue>>(issues);
+        }
+
+        private async Task<IEnumerable<CachedIssue>> GetAllIssues2()
         {
             return await _jiraCache.GetIssues();
         }
 
         public async Task<IEnumerable<CachedIssue>> GetStories()
         {
-            var issues = await GetAllIssues();
+            var issues = await GetAllIssues2();
 
             IEnumerable<CachedIssue> stories = issues
                 .Where(x => x.Type == "Story" || x.Type == "Bug")

@@ -225,6 +225,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="AnalyzedIssue.cs" />
     <Compile Include="Bootstrapper.cs" />
     <Compile Include="CummulativeFlow\CumulativeFlowAnalysis.cs" />
     <Compile Include="CummulativeFlow\CumulativeFlowView.xaml.cs">
