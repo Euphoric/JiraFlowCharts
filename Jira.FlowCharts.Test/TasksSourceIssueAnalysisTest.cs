@@ -200,7 +200,10 @@ namespace Jira.FlowCharts
 
             var issue = new CachedIssue()
             {
+                Key = "AC-1",
+                Title = "Title",
                 Type = "Story",
+                StoryPoints = 12,
                 StatusChanges = new Collection<CachedIssueStatusChange>()
                 {
                     new CachedIssueStatusChange(new DateTime(2012, 2, 1), "A"),
@@ -215,7 +218,10 @@ namespace Jira.FlowCharts
 
             var expectedIssue = new FinishedIssue()
             {
-                Type = "Story",
+                Key = issue.Key,
+                Title = issue.Title,
+                Type = issue.Type,
+                StoryPoints = issue.StoryPoints,
                 IsValid = true,
                 StatusChanges = new Collection<CachedIssueStatusChange>()
                 {

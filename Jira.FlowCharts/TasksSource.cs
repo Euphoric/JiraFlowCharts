@@ -211,7 +211,6 @@ namespace Jira.FlowCharts
                 Ended = issue.Ended.Value,
                 Duration = issue.Duration.Value,
                 StoryPoints = issue.StoryPoints,
-                TimeSpent = issue.TimeSpent,
                 StatusChanges = issue.SimplifiedStatusChanges,
                 IsValid = issue.IsValid
             };
