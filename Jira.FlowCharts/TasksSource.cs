@@ -176,13 +176,13 @@ namespace Jira.FlowCharts
             return stories;
         }
 
-        public async Task<FinishedTask[]> GetAllFinishedStories()
+        public async Task<FinishedIssue[]> GetAllFinishedStories()
         {
             IEnumerable<AnalyzedIssue> stories = await GetStories();
 
             SimplifyStateChangeOrder simplify = new SimplifyStateChangeOrder(FilteredStates.ToArray(), ResetStates.ToArray());
 
-            FinishedTask[] finishedStories = stories
+            FinishedIssue[] finishedStories = stories
                 .Where(x => x.Status == "Done")
                 .Select(x => CalculateDuration(x, simplify))
                 .ToArray();
@@ -190,19 +190,19 @@ namespace Jira.FlowCharts
             return finishedStories;
         }
 
-        public async Task<FinishedTask[]> GetLatestFinishedStories()
+        public async Task<FinishedIssue[]> GetLatestFinishedStories()
         {
-            FinishedTask[] finishedStories = await GetAllFinishedStories();
+            FinishedIssue[] finishedStories = await GetAllFinishedStories();
 
             DateTime startDate = DateTime.Now.AddMonths(-12);
 
-            FinishedTask[] finishedStoriesLast = finishedStories
+            FinishedIssue[] finishedStoriesLast = finishedStories
                 .Where(x => x.Ended > startDate).ToArray();
 
             return finishedStoriesLast;
         }
 
-        private static FinishedTask CalculateDuration(AnalyzedIssue issue, SimplifyStateChangeOrder simplify)
+        private static FinishedIssue CalculateDuration(AnalyzedIssue issue, SimplifyStateChangeOrder simplify)
         {
             var simplifiedIssues = simplify.FilterStatusChanges(issue.StatusChanges);
 
@@ -211,7 +211,7 @@ namespace Jira.FlowCharts
 
             TimeSpan duration = doneTime - startTime;
 
-            var flowIssue = new FinishedTask()
+            var flowIssue = new FinishedIssue()
             {
                 Key = issue.Key,
                 Title = issue.Title,

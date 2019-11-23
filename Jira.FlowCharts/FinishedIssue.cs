@@ -4,7 +4,7 @@ using System.Collections.ObjectModel;
 
 namespace Jira.FlowCharts
 {
-    public class FinishedTask
+    public class FinishedIssue
     {
         public string Key { get; set; }
         public string Title { get; set; }
