@@ -36,8 +36,8 @@ namespace Jira.FlowCharts.IssuesGrid
             IssuesGrid.Columns.Add(new DataGridTextColumn { Header = "Resolution", Binding = new Binding("Resolution") });
             IssuesGrid.Columns.Add(new DataGridCheckBoxColumn() { Header = "IsValid", Binding = new Binding("IsValid") });
             IssuesGrid.Columns.Add(new DataGridTextColumn { Header = "Story Points", Binding = new Binding("StoryPoints") });
-            IssuesGrid.Columns.Add(new DataGridTextColumn { Header = "Original estimated time", Binding = new Binding("OriginalEstimate"), Width = 70});
-            IssuesGrid.Columns.Add(new DataGridTextColumn { Header = "Time spent", Binding = new Binding("TimeSpent"), Width = 70 });
+            IssuesGrid.Columns.Add(new DataGridTextColumn { Header = "Time estimated", Binding = new Binding("OriginalEstimate") { StringFormat = "N1" }, Width = 50});
+            IssuesGrid.Columns.Add(new DataGridTextColumn { Header = "Time spent", Binding = new Binding("TimeSpent"){StringFormat = "N1"}, Width = 50 });
         }
     }
 }
