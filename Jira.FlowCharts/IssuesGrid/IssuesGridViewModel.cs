@@ -44,6 +44,7 @@ namespace Jira.FlowCharts.IssuesGrid
 
             row.OriginalEstimate = issue.OriginalEstimate.HasValue ? TimeSpan.FromMinutes(issue.OriginalEstimate.Value).TotalDays : (double?)null;
             row.TimeSpent = issue.TimeSpent.HasValue ? TimeSpan.FromMinutes(issue.TimeSpent.Value).TotalDays : (double?)null;
+            row.IsValid = TasksSource.IsValidIssue(issue);
 
             return row;
         }

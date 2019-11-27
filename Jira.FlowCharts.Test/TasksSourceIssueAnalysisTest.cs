@@ -185,8 +185,7 @@ namespace Jira.FlowCharts
             {
                 Type = "Story",
                 StatusChanges = issue.StatusChanges,
-                SimplifiedStatusChanges = new Collection<CachedIssueStatusChange>(),
-                IsValid = true
+                SimplifiedStatusChanges = new Collection<CachedIssueStatusChange>()
             };
 
             _compareLogic.AssertEqual<object>(expectedIssue, analyzedIssue);
@@ -222,7 +221,6 @@ namespace Jira.FlowCharts
                 Title = issue.Title,
                 Type = issue.Type,
                 StoryPoints = issue.StoryPoints,
-                IsValid = true,
                 StatusChanges = new Collection<CachedIssueStatusChange>()
                 {
                     new CachedIssueStatusChange(new DateTime(2012, 2, 1), "A"),

@@ -156,13 +156,12 @@ namespace Jira.FlowCharts
                     item.Ended = lastState.ChangeTime;
                 }
                 item.Duration = item.Ended - item.Started;
-                item.IsValid = IsValidIssue(item);
             }
 
             return analyzedIssues;
         }
 
-        private static bool IsValidIssue(AnalyzedIssue issue)
+        public static bool IsValidIssue(AnalyzedIssue issue)
         {
             // TODO : Automated tests and ability to change for user
 
@@ -177,7 +176,7 @@ namespace Jira.FlowCharts
             var issues = await GetAllIssues();
 
             IEnumerable<AnalyzedIssue> stories = issues
-                .Where(x => x.IsValid);
+                .Where(IsValidIssue);
 
             return stories;
         }
@@ -217,8 +216,7 @@ namespace Jira.FlowCharts
                 Ended = issue.Ended.Value,
                 Duration = issue.Duration.Value,
                 StoryPoints = issue.StoryPoints,
-                StatusChanges = issue.SimplifiedStatusChanges,
-                IsValid = issue.IsValid
+                StatusChanges = issue.SimplifiedStatusChanges
             };
 
             return flowIssue;

@@ -24,6 +24,5 @@ namespace Jira.FlowCharts
 
         public TimeSpan Duration { get; set; }
         public double DurationDays => Duration.TotalDays;
-        public bool IsValid { get; set; }
     }
 }

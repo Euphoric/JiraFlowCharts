@@ -23,6 +23,5 @@ namespace Jira.FlowCharts
         public DateTime? Started { get; set; }
         public DateTime? Ended { get; set; }
         public TimeSpan? Duration { get; set; }
-        public bool IsValid { get; set; }
     }
 }
