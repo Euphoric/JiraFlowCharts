@@ -11,32 +11,33 @@ namespace Jira.FlowCharts.Test
     {
         private class FlatIssueBuilder
         {
-            Dictionary<int, AnalyzedIssue> issues = new Dictionary<int, AnalyzedIssue>();
+            readonly Dictionary<int, AnalyzedIssue> _issues = new Dictionary<int, AnalyzedIssue>();
 
-            DateTime currentDateTime = new DateTime(2010, 07, 03);
+            DateTime _currentDateTime = new DateTime(2010, 07, 03);
 
             internal IEnumerable<AnalyzedIssue> BuildIssues()
             {
-                return issues.Values;
+                return _issues.Values;
             }
 
             internal void CreateIssue(int id)
             {
-                if (issues.ContainsKey(id))
+                if (_issues.ContainsKey(id))
                     return;
 
-                issues.Add(id, new AnalyzedIssue() { Key = (string)("IS-" + id), StatusChanges = new Collection<CachedIssueStatusChange>() });
+                var analyzedIssue = new AnalyzedIssue { Key = "IS-" + id, SimplifiedStatusChanges = new Collection<CachedIssueStatusChange>() };
+                _issues.Add(id, analyzedIssue);
             }
 
             internal void UpdateIssue(int id, string state)
             {
                 CreateIssue(id);
-                issues[id].StatusChanges.Add(new CachedIssueStatusChange(currentDateTime, state));
+                _issues[id].SimplifiedStatusChanges.Add(new CachedIssueStatusChange(_currentDateTime, state));
             }
 
             internal void ForwardTime(TimeSpan time)
             {
-                currentDateTime = currentDateTime.Add(time);
+                _currentDateTime = _currentDateTime.Add(time);
             }
         }
 
@@ -193,52 +194,37 @@ namespace Jira.FlowCharts.Test
         }
 
         [Fact]
-        public void Ignores_all_but_first_transition_into_state()
+        public void Uses_simplified_status_changes()
         {
-            var builder = new FlatIssueBuilder();
-            builder.UpdateIssue(1, DevState);
-            builder.ForwardTime(TimeSpan.FromDays(1));
-            builder.UpdateIssue(1, DevState);
-            builder.ForwardTime(TimeSpan.FromDays(1));
-            builder.UpdateIssue(1, QaState);
-            builder.ForwardTime(TimeSpan.FromDays(1));
-            builder.UpdateIssue(1, QaState);
-            builder.ForwardTime(TimeSpan.FromDays(1));
-            CumulativeFlowAnalysis cfa = new CumulativeFlowAnalysis(builder.BuildIssues(), new[] { DevState, QaState, DoneState });
+            var issues = new List<AnalyzedIssue>
+            {
+                new AnalyzedIssue
+                {
+                    Key = "IS-1",
+                    StatusChanges = new Collection<CachedIssueStatusChange>()
+                    {
+                        new CachedIssueStatusChange(new DateTime(2019, 1, 1), DevState),
+                        new CachedIssueStatusChange(new DateTime(2019, 1, 2), QaState),
+                        new CachedIssueStatusChange(new DateTime(2019, 1, 3), DevState),
+                        new CachedIssueStatusChange(new DateTime(2019, 1, 4), QaState),
+                    },
+                    SimplifiedStatusChanges = new Collection<CachedIssueStatusChange>()
+                    {
+                        new CachedIssueStatusChange(new DateTime(2019, 1, 1), DevState),
+                        new CachedIssueStatusChange(new DateTime(2019, 1, 2), QaState)
+                    }
+                }
+            };
+            CumulativeFlowAnalysis cfa = new CumulativeFlowAnalysis(issues, new[] { DevState, QaState, DoneState });
 
             Assert.Equal(2, cfa.Changes.Length);
 
             var firstChange = cfa.Changes[0];
-            Assert.Equal(new DateTime(2010, 07, 03), firstChange.Date);
+            Assert.Equal(new DateTime(2019, 1, 1), firstChange.Date);
             Assert.Equal(new int[] { 0, 0, 1 }, firstChange.StateCounts);
 
             var secondChange = cfa.Changes[1];
-            Assert.Equal(new DateTime(2010, 07, 05), secondChange.Date);
-            Assert.Equal(new int[] { 0, 1, 0 }, secondChange.StateCounts);
-        }
-
-        [Fact]
-        public void Going_back_to_previous_state_is_ignored()
-        {
-            var builder = new FlatIssueBuilder();
-            builder.UpdateIssue(1, DevState);
-            builder.ForwardTime(TimeSpan.FromDays(1));
-            builder.UpdateIssue(1, QaState);
-            builder.ForwardTime(TimeSpan.FromDays(1));
-            builder.UpdateIssue(1, DevState);
-            builder.ForwardTime(TimeSpan.FromDays(1));
-            builder.UpdateIssue(1, QaState);
-            builder.ForwardTime(TimeSpan.FromDays(1));
-            CumulativeFlowAnalysis cfa = new CumulativeFlowAnalysis(builder.BuildIssues(), new[] { DevState, QaState, DoneState });
-
-            Assert.Equal(2, cfa.Changes.Length);
-
-            var firstChange = cfa.Changes[0];
-            Assert.Equal(new DateTime(2010, 07, 03), firstChange.Date);
-            Assert.Equal(new int[] { 0, 0, 1 }, firstChange.StateCounts);
-
-            var secondChange = cfa.Changes[1];
-            Assert.Equal(new DateTime(2010, 07, 04), secondChange.Date);
+            Assert.Equal(new DateTime(2019, 1, 2), secondChange.Date);
             Assert.Equal(new int[] { 0, 1, 0 }, secondChange.StateCounts);
         }
 
