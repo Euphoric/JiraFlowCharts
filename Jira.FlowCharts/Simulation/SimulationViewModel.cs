@@ -58,17 +58,11 @@ namespace Jira.FlowCharts
         {
             var finishedStories = await _taskSource.GetLatestFinishedStories();
 
-            var startTime = finishedStories.Max(x => x.Ended).AddMonths(-6);
+            var from = finishedStories.Min(x => x.Ended);
+            var to = finishedStories.Max(x => x.Ended);
 
-            var stories =
-                finishedStories.Where(x => x.Started > startTime)
-                .ToArray();
-
-            var from = stories.Min(x => x.Started);
-            var to = stories.Max(x => x.Ended);
-
-            StoryCreationRate = stories.Count() / (to - from).TotalDays;
-            var cycleTimes = stories.Select(x => x.DurationDays).ToArray();
+            StoryCreationRate = finishedStories.Count() / (to - from).TotalDays;
+            var cycleTimes = finishedStories.Select(x => x.DurationDays).ToArray();
 
             Simulation.FlowSimulationStatisticOutput simStats = await Task.Run(() => Simulation.FlowSimulationStatistics.RunSimulationStatistic(StoryCreationRate, cycleTimes, 20000, SimulatedStoriesCount));
 
