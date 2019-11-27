@@ -243,6 +243,10 @@
     <Compile Include="CycleTimeScatterplot\CycleTimeScatterplotView.xaml.cs">
       <DependentUpon>CycleTimeScatterplotView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="IssuesGrid\IssuesGridView.xaml.cs">
+      <DependentUpon>IssuesGridView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="IssuesGrid\IssuesGridViewModel.cs" />
     <Compile Include="IStatesRepository.cs" />
     <Compile Include="JiraUpdate\ICurrentTime.cs" />
     <Compile Include="JiraUpdate\IJiraUpdateView.cs" />
@@ -290,6 +294,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="CycleTimeScatterplot\CycleTimeScatterplotView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="IssuesGrid\IssuesGridView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
