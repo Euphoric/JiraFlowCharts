@@ -23,6 +23,21 @@ namespace Jira.FlowCharts.IssuesGrid
         public IssuesGridView()
         {
             InitializeComponent();
+
+            Loaded += OnLoaded;
+        }
+
+        private void OnLoaded(object sender, RoutedEventArgs e)
+        {
+            IssuesGrid.Columns.Add(new DataGridTextColumn { Header = "Key", Binding = new Binding("Key") });
+            IssuesGrid.Columns.Add(new DataGridTextColumn { Header = "Title", Binding = new Binding("Title"), Width = 120 });
+            IssuesGrid.Columns.Add(new DataGridTextColumn { Header = "Type", Binding = new Binding("Type") });
+            IssuesGrid.Columns.Add(new DataGridTextColumn { Header = "Status", Binding = new Binding("Status") });
+            IssuesGrid.Columns.Add(new DataGridTextColumn { Header = "Resolution", Binding = new Binding("Resolution") });
+            IssuesGrid.Columns.Add(new DataGridCheckBoxColumn() { Header = "IsValid", Binding = new Binding("IsValid") });
+            IssuesGrid.Columns.Add(new DataGridTextColumn { Header = "Story Points", Binding = new Binding("StoryPoints") });
+            IssuesGrid.Columns.Add(new DataGridTextColumn { Header = "Original estimated time", Binding = new Binding("OriginalEstimate"), Width = 70});
+            IssuesGrid.Columns.Add(new DataGridTextColumn { Header = "Time spent", Binding = new Binding("TimeSpent"), Width = 70 });
         }
     }
 }
