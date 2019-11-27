@@ -196,6 +196,7 @@ namespace Jira.FlowCharts
         {
             _tasksSource.AddFilteredState("A");
             _tasksSource.AddFilteredState("C");
+            _tasksSource.IssuesFrom = new DateTime(2012,1 , 1);
 
             var issue = new CachedIssue()
             {
@@ -211,7 +212,7 @@ namespace Jira.FlowCharts
                 }
             };
             _jiraCacheAdapter.Issues.Add(issue);
-            var issues = await _tasksSource.GetAllFinishedStories();
+            var issues = await _tasksSource.GetLatestFinishedStories();
 
             var analyzedIssue = Assert.Single(issues);
 
@@ -251,7 +252,7 @@ namespace Jira.FlowCharts
                 }
             };
             _jiraCacheAdapter.Issues.Add(issue);
-            var issues = await _tasksSource.GetAllFinishedStories();
+            var issues = await _tasksSource.GetLatestFinishedStories();
 
             Assert.Empty(issues);
         }
@@ -272,7 +273,7 @@ namespace Jira.FlowCharts
                 }
             };
             _jiraCacheAdapter.Issues.Add(issue);
-            var issues = await _tasksSource.GetAllFinishedStories();
+            var issues = await _tasksSource.GetLatestFinishedStories();
 
             Assert.Empty(issues);
         }
@@ -293,7 +294,33 @@ namespace Jira.FlowCharts
                 }
             };
             _jiraCacheAdapter.Issues.Add(issue);
-            var issues = await _tasksSource.GetAllFinishedStories();
+            var issues = await _tasksSource.GetLatestFinishedStories();
+
+            Assert.Empty(issues);
+        }
+
+        [Fact]
+        public async Task Filters_out_old_issues()
+        {
+            _tasksSource.AddFilteredState("A");
+            _tasksSource.AddFilteredState("C");
+            _tasksSource.IssuesFrom = new DateTime(2012, 2, 3).AddSeconds(1);
+
+            var issue = new CachedIssue()
+            {
+                Key = "AC-1",
+                Title = "Title",
+                Type = "Story",
+                StoryPoints = 12,
+                StatusChanges = new Collection<CachedIssueStatusChange>()
+                {
+                    new CachedIssueStatusChange(new DateTime(2012, 2, 1), "A"),
+                    new CachedIssueStatusChange(new DateTime(2012, 2, 2), "B"),
+                    new CachedIssueStatusChange(new DateTime(2012, 2, 3), "C"),
+                }
+            };
+            _jiraCacheAdapter.Issues.Add(issue);
+            var issues = await _tasksSource.GetLatestFinishedStories();
 
             Assert.Empty(issues);
         }

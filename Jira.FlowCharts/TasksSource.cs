@@ -181,26 +181,33 @@ namespace Jira.FlowCharts
             return stories;
         }
 
-        public async Task<FinishedIssue[]> GetAllFinishedStories()
+        public DateTime? IssuesFrom { get; set; }
+
+        private async Task<IEnumerable<AnalyzedIssue>> GetLatestStories()
         {
-            IEnumerable<AnalyzedIssue> stories = await GetStories();
+            IEnumerable<AnalyzedIssue> stories = (await GetStories()).ToArray();
 
-            FinishedIssue[] finishedStories = stories
-                .Where(x => x.Duration != null)
-                .Select(MapToFinishedIssue)
-                .ToArray();
+            var latestStories = stories
+                    .Where(x => IssuesFrom == null || x.Ended >= IssuesFrom)
+                    .ToArray();
 
-            return finishedStories;
+            return latestStories;
         }
 
-        public async Task<FinishedIssue[]> GetLatestFinishedStories()
+        public async Task<IEnumerable<FinishedIssue>> GetLatestFinishedStories()
         {
-            FinishedIssue[] finishedStories = await GetAllFinishedStories();
+            var latestStories = await GetLatestStories();
 
-            DateTime startDate = DateTime.Now.AddMonths(-12);
+            return OfFinishedStories(latestStories);
+        }
 
-            FinishedIssue[] finishedStoriesLast = finishedStories
-                .Where(x => x.Ended > startDate).ToArray();
+        private static IEnumerable<FinishedIssue> OfFinishedStories(IEnumerable<AnalyzedIssue> latestStories)
+        {
+            FinishedIssue[] finishedStoriesLast =
+                latestStories
+                    .Where(x => x.Duration != null)
+                    .Select(MapToFinishedIssue)
+                    .ToArray();
 
             return finishedStoriesLast;
         }
