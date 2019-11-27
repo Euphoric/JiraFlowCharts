@@ -18,28 +18,6 @@ namespace Jira.FlowCharts
             public int[] StateCounts { get; set; }
         }
 
-        private class StateRange
-        {
-            DateTime From { get; }
-            DateTime To { get; }
-
-            public StateRange(DateTime from, DateTime to)
-            {
-                if (from > to)
-                    throw new ArgumentException("[from] must be less or equal to [to]");
-
-                From = from;
-                To = to;
-            }
-        }
-
-        private IEnumerable<StateRange> ChangeRanges(Collection<CachedIssueStatusChange> statusChanges)
-        {
-            List<StateRange> stateRanges = new List<StateRange>();
-
-            return stateRanges;
-        }
-
         public CumulativeFlowAnalysis(IEnumerable<AnalyzedIssue> stories, string[] states, DateTime? from = null)
         {
             States = states.Reverse().ToArray();
