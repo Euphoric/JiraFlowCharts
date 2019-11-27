@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using Caliburn.Micro;
@@ -21,7 +22,8 @@ namespace Jira.FlowCharts
             TasksSourceJiraCacheAdapter jiraCacheAdapter = new TasksSourceJiraCacheAdapter(Path.Combine(dataPath, @"issuesCache.db"));
             JsonStatesRepository statesRepository = new JsonStatesRepository(Path.Combine(dataPath, @"analysisSettings.json"));
             _tasksSource = new TasksSource(jiraCacheAdapter, statesRepository);
-            
+            _tasksSource.IssuesFrom = DateTime.Now.AddYears(-1);
+
             Items.Add(new JiraUpdateViewModel(_tasksSource, new CurrentTime()));
             Items.Add(new StoryFilteringViewModel(_tasksSource));
             Items.Add(new IssuesGridViewModel(_tasksSource));
