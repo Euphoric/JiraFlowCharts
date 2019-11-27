@@ -13,7 +13,7 @@ namespace Jira.FlowCharts
     {
         private readonly ITasksSourceJiraCacheAdapter _jiraCache;
         private readonly IStatesRepository _statesRepository;
-        private IMapper _mapper;
+        private readonly IMapper _mapper;
 
         public ObservableCollection<string> AvailableStates { get; }
         public ObservableCollection<string> FilteredStates { get; }
@@ -34,6 +34,11 @@ namespace Jira.FlowCharts
             });
 
             _mapper = config.CreateMapper();
+        }
+
+        public async Task UpdateIssues(JiraLoginParameters jiraLoginParameters, string projectName, ICacheUpdateProgress cacheUpdateProgress)
+        {
+            await _jiraCache.UpdateIssues(jiraLoginParameters, projectName, cacheUpdateProgress);
         }
 
         public async Task<string[]> GetAllStates()
@@ -156,6 +161,7 @@ namespace Jira.FlowCharts
 
             return analyzedIssues;
         }
+
         private static bool IsValidIssue(AnalyzedIssue issue)
         {
             // TODO : Automated tests and ability to change for user
@@ -182,7 +188,7 @@ namespace Jira.FlowCharts
 
             FinishedIssue[] finishedStories = stories
                 .Where(x => x.Duration != null)
-                .Select(x => CalculateDuration(x))
+                .Select(MapToFinishedIssue)
                 .ToArray();
 
             return finishedStories;
@@ -200,7 +206,7 @@ namespace Jira.FlowCharts
             return finishedStoriesLast;
         }
 
-        private static FinishedIssue CalculateDuration(AnalyzedIssue issue)
+        private static FinishedIssue MapToFinishedIssue(AnalyzedIssue issue)
         {
             var flowIssue = new FinishedIssue()
             {
@@ -216,11 +222,6 @@ namespace Jira.FlowCharts
             };
 
             return flowIssue;
-        }
-
-        public async Task UpdateIssues(JiraLoginParameters jiraLoginParameters, string projectName, ICacheUpdateProgress cacheUpdateProgress)
-        {
-            await _jiraCache.UpdateIssues(jiraLoginParameters, projectName, cacheUpdateProgress);
         }
     }
 }
