@@ -29,6 +29,8 @@ namespace Jira.FlowCharts.IssuesGrid
 
         private void OnLoaded(object sender, RoutedEventArgs e)
         {
+            IssuesGrid.Columns.Clear();
+
             IssuesGrid.Columns.Add(new DataGridTextColumn { Header = "Key", Binding = new Binding("Key") });
             IssuesGrid.Columns.Add(new DataGridTextColumn { Header = "Title", Binding = new Binding("Title"), Width = 120 });
             IssuesGrid.Columns.Add(new DataGridTextColumn { Header = "Type", Binding = new Binding("Type") });
@@ -38,6 +40,10 @@ namespace Jira.FlowCharts.IssuesGrid
             IssuesGrid.Columns.Add(new DataGridTextColumn { Header = "Story Points", Binding = new Binding("StoryPoints") });
             IssuesGrid.Columns.Add(new DataGridTextColumn { Header = "Time estimated", Binding = new Binding("OriginalEstimate") { StringFormat = "N1" }, Width = 50});
             IssuesGrid.Columns.Add(new DataGridTextColumn { Header = "Time spent", Binding = new Binding("TimeSpent"){StringFormat = "N1"}, Width = 50 });
+
+            IssuesGrid.Columns.Add(new DataGridTextColumn { Header = "Started", Binding = new Binding("Started"){StringFormat = "u"} });
+            IssuesGrid.Columns.Add(new DataGridTextColumn { Header = "Ended", Binding = new Binding("Ended") { StringFormat = "u" } });
+            IssuesGrid.Columns.Add(new DataGridTextColumn { Header = "Duration", Binding = new Binding("DurationDays"){StringFormat = "N1"} });
         }
     }
 }
