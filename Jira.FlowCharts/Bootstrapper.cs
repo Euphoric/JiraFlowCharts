@@ -2,12 +2,13 @@
 using System.Collections.Generic;
 using System.Windows;
 using Caliburn.Micro;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Jira.FlowCharts
 {
     public class Bootstrapper : BootstrapperBase
     {
-        private SimpleContainer container;
+        private ServiceProvider _container;
 
         public Bootstrapper()
         {
@@ -16,11 +17,12 @@ namespace Jira.FlowCharts
 
         protected override void Configure()
         {
-            container = new SimpleContainer();
+            ServiceCollection sc = new ServiceCollection();
 
-            container.Singleton<IWindowManager, WindowManager>();
+            sc.AddSingleton<IWindowManager, WindowManager>();
+            sc.AddTransient<MainViewModel>();
 
-            container.PerRequest<MainViewModel>();
+            _container = sc.BuildServiceProvider();
         }
 
         protected override void OnStartup(object sender, StartupEventArgs e)
@@ -30,17 +32,17 @@ namespace Jira.FlowCharts
 
         protected override object GetInstance(Type service, string key)
         {
-            return container.GetInstance(service, key);
+            return _container.GetRequiredService(service);
         }
 
         protected override IEnumerable<object> GetAllInstances(Type service)
         {
-            return container.GetAllInstances(service);
+            return _container.GetServices(service);
         }
 
         protected override void BuildUp(object instance)
         {
-            container.BuildUp(instance);
+            throw new NotSupportedException("Service provider doesn't have a buildup functionality.");
         }
     }
 }
