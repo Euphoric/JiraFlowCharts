@@ -32,7 +32,9 @@ namespace Jira.FlowCharts
             sc.AddLogging(cfg => 
                 cfg
                     .SetMinimumLevel(LogLevel.Trace)
-                    .AddSerilog(CreateSerilogLogger(), true));
+                    .AddSerilog(CreateSerilogLogger(), true)
+                    .AddExceptionDemystifyer()
+                );
 
             _container = sc.BuildServiceProvider();
 
