@@ -11,13 +11,13 @@ namespace Jira.FlowCharts
 {
     public class MainViewModel : Conductor<IScreen>.Collection.OneActive
     {
-        private TasksSource _tasksSource;
+        private readonly TasksSource _tasksSource;
 
         public MainViewModel()
         {
             DisplayName = "Jira flow metrics";
 
-            string dataPath = @"../../../Data";
+            var dataPath = GetPathToData();
 
             TasksSourceJiraCacheAdapter jiraCacheAdapter = new TasksSourceJiraCacheAdapter(Path.Combine(dataPath, @"issuesCache.db"));
             JsonStatesRepository statesRepository = new JsonStatesRepository(Path.Combine(dataPath, @"analysisSettings.json"));
@@ -33,6 +33,16 @@ namespace Jira.FlowCharts
             Items.Add(new CycleTimeHistogramSmoothViewModel(_tasksSource));
             Items.Add(new StoryPointCycleTimeViewModel(_tasksSource));
             Items.Add(new SimulationViewModel(_tasksSource));
+        }
+
+        private static string GetPathToData()
+        {
+#if DEBUG
+            return @"../../../Data";
+#else
+            var appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+            return Path.Combine(appData, "JiraFlowMetrics");
+#endif
         }
 
         protected override async Task OnInitializeAsync(CancellationToken cancellationToken)
