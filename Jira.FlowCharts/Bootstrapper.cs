@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Windows;
+using System.Windows.Threading;
 using Caliburn.Micro;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -14,6 +15,7 @@ namespace Jira.FlowCharts
     public class Bootstrapper : BootstrapperBase
     {
         private ServiceProvider _container;
+        private ILogger<Bootstrapper> _logger;
 
         public Bootstrapper()
         {
@@ -33,6 +35,8 @@ namespace Jira.FlowCharts
                     .AddSerilog(CreateSerilogLogger(), true));
 
             _container = sc.BuildServiceProvider();
+
+            _logger = _container.GetRequiredService<ILoggerFactory>().CreateLogger<Bootstrapper>();
         }
 
         private static Logger CreateSerilogLogger()
@@ -50,12 +54,19 @@ namespace Jira.FlowCharts
                 .CreateLogger();
         }
 
-        protected override void OnStartup(object sender, StartupEventArgs e)
+        protected override async void OnStartup(object sender, StartupEventArgs e)
         {
-            var logger = _container.GetRequiredService<ILoggerFactory>().CreateLogger<Bootstrapper>();
-            logger.LogInformation("Startup");
+            _logger.LogInformation("Startup");
 
-            DisplayRootViewFor<MainViewModel>();
+            try
+            {
+                await DisplayRootViewFor<MainViewModel>();
+            }
+            catch (Exception exception)
+            {
+                _logger.LogCritical(exception, "Error during startup. Exiting.");
+                Application.Shutdown(1);
+            }
         }
 
         protected override object GetInstance(Type service, string key)
@@ -71,6 +82,13 @@ namespace Jira.FlowCharts
         protected override void BuildUp(object instance)
         {
             throw new NotSupportedException("Service provider doesn't have a buildup functionality.");
+        }
+
+        protected override void OnUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
+        {
+            _logger.LogError(e.Exception, "Unhandled exception.");
+
+            base.OnUnhandledException(sender, e);
         }
     }
 }
