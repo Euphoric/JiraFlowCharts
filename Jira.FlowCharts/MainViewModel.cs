@@ -19,6 +19,11 @@ namespace Jira.FlowCharts
 
             var dataPath = GetPathToData();
 
+            if (!Directory.Exists(dataPath))
+            {
+                Directory.CreateDirectory(dataPath);
+            }
+
             TasksSourceJiraCacheAdapter jiraCacheAdapter = new TasksSourceJiraCacheAdapter(Path.Combine(dataPath, @"issuesCache.db"));
             JsonStatesRepository statesRepository = new JsonStatesRepository(Path.Combine(dataPath, @"analysisSettings.json"));
             _tasksSource = new TasksSource(jiraCacheAdapter, statesRepository);
