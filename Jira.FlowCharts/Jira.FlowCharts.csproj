@@ -51,10 +51,10 @@
       <HintPath>..\packages\C5.2.5.3\lib\net45\C5.dll</HintPath>
     </Reference>
     <Reference Include="Caliburn.Micro.Core, Version=4.0.0.0, Culture=neutral, PublicKeyToken=8e5891231f2ed21f, processorArchitecture=MSIL">
-      <HintPath>..\packages\Caliburn.Micro.Core.4.0.102-alpha\lib\net45\Caliburn.Micro.Core.dll</HintPath>
+      <HintPath>..\packages\Caliburn.Micro.Core.4.0.62-alpha\lib\net45\Caliburn.Micro.Core.dll</HintPath>
     </Reference>
     <Reference Include="Caliburn.Micro.Platform, Version=4.0.0.0, Culture=neutral, PublicKeyToken=8e5891231f2ed21f, processorArchitecture=MSIL">
-      <HintPath>..\packages\Caliburn.Micro.4.0.102-alpha\lib\net45\Caliburn.Micro.Platform.dll</HintPath>
+      <HintPath>..\packages\Caliburn.Micro.4.0.62-alpha\lib\net45\Caliburn.Micro.Platform.dll</HintPath>
     </Reference>
     <Reference Include="codeessentials.Extensions.Logging.Demystifier, Version=1.0.58.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\codeessentials.Extensions.Logging.Demystifier.1.0.58\lib\net461\codeessentials.Extensions.Logging.Demystifier.dll</HintPath>

@@ -48,10 +48,10 @@
       <HintPath>..\packages\AutoFixture.Xunit2.4.11.0\lib\net452\AutoFixture.Xunit2.dll</HintPath>
     </Reference>
     <Reference Include="Caliburn.Micro.Core, Version=4.0.0.0, Culture=neutral, PublicKeyToken=8e5891231f2ed21f, processorArchitecture=MSIL">
-      <HintPath>..\packages\Caliburn.Micro.Core.4.0.102-alpha\lib\net45\Caliburn.Micro.Core.dll</HintPath>
+      <HintPath>..\packages\Caliburn.Micro.Core.4.0.62-alpha\lib\net45\Caliburn.Micro.Core.dll</HintPath>
     </Reference>
     <Reference Include="Caliburn.Micro.Platform, Version=4.0.0.0, Culture=neutral, PublicKeyToken=8e5891231f2ed21f, processorArchitecture=MSIL">
-      <HintPath>..\packages\Caliburn.Micro.4.0.102-alpha\lib\net45\Caliburn.Micro.Platform.dll</HintPath>
+      <HintPath>..\packages\Caliburn.Micro.4.0.62-alpha\lib\net45\Caliburn.Micro.Platform.dll</HintPath>
     </Reference>
     <Reference Include="DynamicData, Version=6.13.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\DynamicData.6.13.18\lib\net461\DynamicData.dll</HintPath>
