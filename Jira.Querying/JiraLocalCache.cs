@@ -125,9 +125,9 @@ namespace Jira.Querying
             int itemPaging = 0;
             while (true)
             {
-                const int QueryLimit = 50;
+                const int queryLimit = 50;
 
-                IJiraIssue[] updatedIssues = await client.GetIssues(projectKey, lastUpdateDate, QueryLimit, itemPaging);
+                IJiraIssue[] updatedIssues = await client.GetIssues(projectKey, lastUpdateDate, queryLimit, itemPaging);
 
                 foreach (var issue in updatedIssues)
                 {
@@ -137,9 +137,9 @@ namespace Jira.Querying
                     progress.UpdatedIssue(flatIssue.Key, flatIssue.Updated.Value);
                 }
 
-                itemPaging += QueryLimit;
+                itemPaging += queryLimit;
 
-                if (updatedIssues.Length != QueryLimit)
+                if (updatedIssues.Length != queryLimit)
                 {
                     break;
                 }

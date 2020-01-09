@@ -20,7 +20,7 @@ namespace Jira.Querying
             public DateTime? Updated { get; set; }
         }
 
-        readonly List<FakeJiraIssue> Issues = new List<FakeJiraIssue>();
+        readonly List<FakeJiraIssue> _issues = new List<FakeJiraIssue>();
         private DateTime _currentDateTime;
 
         /// <summary>
@@ -59,7 +59,7 @@ namespace Jira.Querying
                 }
             }
 
-            FakeJiraIssue[] returnedJiraIssues = Issues
+            FakeJiraIssue[] returnedJiraIssues = _issues
                 .Where(x => WithoutSeconds(x.Updated) >= WithoutSeconds(lastUpdated))
                 .OrderBy(x => x.Updated)
                 .Skip(skipCount)
@@ -102,10 +102,10 @@ namespace Jira.Querying
 
         public void UpdateIssue(string key, TimeSpan? step = null)
         {
-            var existingIssue = Issues.FirstOrDefault(x => x.Key == key);
+            var existingIssue = _issues.FirstOrDefault(x => x.Key == key);
             if (existingIssue == null)
             {
-                Issues.Add(new FakeJiraIssue(key) { Created = _currentDateTime, Updated = _currentDateTime });
+                _issues.Add(new FakeJiraIssue(key) { Created = _currentDateTime, Updated = _currentDateTime });
             }
             else
             {

@@ -8,29 +8,29 @@ namespace Jira.FlowCharts
 {
     public class ObservableRecording<T> : IDisposable
     {
-        private readonly List<T> observedItems = new List<T>();
-        private readonly string propertyName;
+        private readonly List<T> _observedItems = new List<T>();
+        private readonly string _propertyName;
         private readonly INotifyPropertyChanged _inpc;
 
-        public IEnumerable<T> ObservedItems { get => observedItems; }
+        public IEnumerable<T> ObservedItems { get => _observedItems; }
 
         public ObservableRecording(INotifyPropertyChanged inpc, string propertyName)
         {
             _inpc = inpc;
             _inpc.PropertyChanged += PropertyChanged;
-            this.propertyName = propertyName;
+            _propertyName = propertyName;
         }
 
         private void PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            if (e.PropertyName != propertyName)
+            if (e.PropertyName != _propertyName)
             {
                 return;
             }
 
-            var prop = sender.GetType().GetProperty(propertyName);
+            var prop = sender.GetType().GetProperty(_propertyName);
             var value = prop.GetValue(sender);
-            observedItems.Add((T)value);
+            _observedItems.Add((T)value);
         }
 
         public void Dispose()

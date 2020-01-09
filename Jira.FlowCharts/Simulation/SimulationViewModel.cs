@@ -12,10 +12,10 @@ namespace Jira.FlowCharts
     public class SimulationViewModel : ReactiveScreen
     {
         private readonly TasksSource _taskSource;
-        private double storyCreationRate;
-        private int simulatedStoriesCount;
+        private double _storyCreationRate;
+        private int _simulatedStoriesCount;
 
-        public double StoryCreationRate { get => storyCreationRate; private set => this.RaiseAndSetIfChanged(ref storyCreationRate, value); }
+        public double StoryCreationRate { get => _storyCreationRate; private set => this.RaiseAndSetIfChanged(ref _storyCreationRate, value); }
 
         private readonly ObservableAsPropertyHelper<Simulation.FlowSimulationStatisticOutput> _simulationOutput;
         public Simulation.FlowSimulationStatisticOutput SimulationOutput => _simulationOutput.Value;
@@ -30,8 +30,8 @@ namespace Jira.FlowCharts
 
         public int SimulatedStoriesCount
         {
-            get => simulatedStoriesCount;
-            set => this.RaiseAndSetIfChanged(ref simulatedStoriesCount, value);
+            get => _simulatedStoriesCount;
+            set => this.RaiseAndSetIfChanged(ref _simulatedStoriesCount, value);
         }
 
         public SimulationViewModel(TasksSource taskSource)
