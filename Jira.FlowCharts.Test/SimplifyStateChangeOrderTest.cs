@@ -217,5 +217,28 @@ namespace Jira.FlowCharts.Test
 
             Assert.Empty(simplified);
         }
+
+        [Fact]
+        public void Input_states_dates_can_be_out_of_order()
+        {
+            List<CachedIssueStatusChange> changes = new List<CachedIssueStatusChange>()
+            {
+                new CachedIssueStatusChange(new DateTime(2010, 07, 07), DoneState),
+                new CachedIssueStatusChange(new DateTime(2010, 07, 05), QaState),
+                new CachedIssueStatusChange(new DateTime(2010, 07, 03), DevState),
+            };
+
+            SimplifyStateChangeOrder simplify = new SimplifyStateChangeOrder(new[] { DevState, QaState, DoneState });
+            var simplified = simplify.FilterStatusChanges(changes).ToList();
+
+            List<CachedIssueStatusChange> expectedChanges = new List<CachedIssueStatusChange>()
+            {
+                new CachedIssueStatusChange(new DateTime(2010, 07, 03), DevState),
+                new CachedIssueStatusChange(new DateTime(2010, 07, 05), QaState),
+                new CachedIssueStatusChange(new DateTime(2010, 07, 07), DoneState),
+            };
+
+            simplified.ShouldCompare(expectedChanges);
+        }
     }
 }

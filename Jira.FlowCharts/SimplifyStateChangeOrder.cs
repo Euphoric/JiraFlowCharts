@@ -20,7 +20,8 @@ namespace Jira.FlowCharts
 
         public IEnumerable<CachedIssueStatusChange> FilterStatusChanges(IEnumerable<CachedIssueStatusChange> statusChanges)
         {
-            return SimplifyStateOrder(SkipAfterResetState(statusChanges));
+            var statusChangesOrderedByDate = statusChanges.OrderBy(x => x.ChangeTime);
+            return SimplifyStateOrder(SkipAfterResetState(statusChangesOrderedByDate));
         }
 
         private IEnumerable<CachedIssueStatusChange> SkipAfterResetState(IEnumerable<CachedIssueStatusChange> statusChanges)
@@ -33,7 +34,7 @@ namespace Jira.FlowCharts
             }
             else
             {
-                return statusChanges;
+                return list;
             }
         }
 
