@@ -39,7 +39,12 @@ namespace Jira.FlowCharts
 
         private static double Percentile(FinishedIssue[] storiesInWindow, int percentile)
         {
-            return storiesInWindow[(int) (storiesInWindow.Length * percentile / 100)].DurationDays;
+            var locationFloat = ((storiesInWindow.Length - 1) * percentile / 100.0);
+            var a = storiesInWindow[(int) locationFloat].DurationDays;
+            var b = storiesInWindow[Math.Min(storiesInWindow.Length - 1, (int) locationFloat + 1)].DurationDays;
+            double lerp = locationFloat - Math.Floor(locationFloat);
+
+            return a * (1 - lerp) + b * lerp;
         }
 
         protected override async Task OnActivateAsync(CancellationToken cancellationToken)
