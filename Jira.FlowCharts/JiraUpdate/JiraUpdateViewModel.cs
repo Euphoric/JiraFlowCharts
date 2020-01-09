@@ -56,6 +56,13 @@ namespace Jira.FlowCharts.JiraUpdate
             private set => Set(ref _updateError, value);
         }
 
+        private string _lastUpdatedKey;
+        public string LastUpdatedKey
+        {
+            get => _lastUpdatedKey;
+            private set => Set(ref _lastUpdatedKey, value);
+        }
+
         double _updateProgress;
         public double UpdateProgress
         {
@@ -96,6 +103,7 @@ namespace Jira.FlowCharts.JiraUpdate
                 await UpdateDisplay();
 
                 UpdateProgress = 100;
+                LastUpdatedKey = "Done";
             }
             catch (Exception e)
             {
@@ -105,6 +113,8 @@ namespace Jira.FlowCharts.JiraUpdate
 
         void ICacheUpdateProgress.UpdatedIssue(string key, DateTime updated)
         {
+            LastUpdatedKey = key;
+
             if (!_updateProgressReportStartTime.HasValue)
             {
                 UpdateProgress = 1;

@@ -221,5 +221,22 @@ namespace Jira.FlowCharts
                 AssertProgressUpdateIsCorrect(progressUpdates.ObservedItems, 1, 100);
             }
         }
+
+        [Fact]
+        public async Task Reports_key_of_last_updated_issues_key_as_update_runs()
+        {
+            using (var progressUpdates = _vm.RecordProperty<string>(nameof(_vm.LastUpdatedKey)))
+            {
+                _jiraCacheAdapter.IssuesToUpdateWith.Add(new CachedIssue() { Key = "KEY-11", Updated = new DateTime(2019, 1, 1) });
+                _jiraCacheAdapter.IssuesToUpdateWith.Add(new CachedIssue() { Key = "KEY-2", Updated = new DateTime(2019, 1, 2) });
+
+                _currentTime.UtcNow = new DateTime(2019, 1, 3);
+
+                await _vm.UpdateCommand.Execute().ToTask();
+                Assert.Null(_vm.UpdateError);
+
+                Assert.Equal(new string[] {"KEY-11", "KEY-2", "Done"}, progressUpdates.ObservedItems);
+            }
+        }
     }
 }
