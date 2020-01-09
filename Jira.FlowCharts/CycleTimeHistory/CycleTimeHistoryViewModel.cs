@@ -37,6 +37,11 @@ namespace Jira.FlowCharts
             DisplayName = "Cycle time history";
         }
 
+        private static double Percentile(FinishedIssue[] storiesInWindow, int percentile)
+        {
+            return storiesInWindow[(int) (storiesInWindow.Length * percentile / 100)].DurationDays;
+        }
+
         protected override async Task OnActivateAsync(CancellationToken cancellationToken)
         {
             var latestFinishedStories = (await _tasksSource.GetLatestFinishedStories());
@@ -70,10 +75,10 @@ namespace Jira.FlowCharts
                 labels.Add(currentDate.ToShortDateString());
 
                 issuesCounts.Add(storiesInWindow.Length);
-                percentiles50.Add(storiesInWindow[(int) (storiesInWindow.Length * 50 / 100)].DurationDays);
-                percentiles70.Add(storiesInWindow[(int) (storiesInWindow.Length * 70 / 100)].DurationDays);
-                percentiles85.Add(storiesInWindow[(int) (storiesInWindow.Length * 85 / 100)].DurationDays);
-                percentiles95.Add(storiesInWindow[(int) (storiesInWindow.Length * 95 / 100)].DurationDays);
+                percentiles50.Add(Percentile(storiesInWindow, 50));
+                percentiles70.Add(Percentile(storiesInWindow, 70));
+                percentiles85.Add(Percentile(storiesInWindow, 85));
+                percentiles95.Add(Percentile(storiesInWindow, 95));
             }
 
 
