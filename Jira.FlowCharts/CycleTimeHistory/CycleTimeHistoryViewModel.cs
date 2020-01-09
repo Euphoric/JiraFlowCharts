@@ -34,7 +34,7 @@ namespace Jira.FlowCharts
         public CycleTimeHistoryViewModel(TasksSource tasksSource)
         {
             _tasksSource = tasksSource;
-            DisplayName = "Cycle time history";
+            DisplayName = "Cycle time and throughput history";
         }
 
         private static double Percentile(FinishedIssue[] storiesInWindow, int percentile)
