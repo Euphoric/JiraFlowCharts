@@ -43,7 +43,7 @@ namespace Jira.FlowCharts
 
             var orderedStories = latestFinishedStories.OrderBy(x => x.Ended).ToArray();
 
-            TimeSpan historyWindow = TimeSpan.FromDays(-90);
+            TimeSpan historyWindow = TimeSpan.FromDays(-3*30);
 
             var endDate = orderedStories.Last().Ended.Date;
             var startDate = endDate.AddYears(-1);
@@ -52,6 +52,7 @@ namespace Jira.FlowCharts
             List<double> percentiles70 = new List<double>();
             List<double> percentiles85 = new List<double>();
             List<double> percentiles95 = new List<double>();
+            List<double> issuesCounts = new List<double>();
             List<string> labels = new List<string>();
 
             for (DateTime currentDate = startDate; currentDate <= endDate; currentDate += TimeSpan.FromDays(1))
@@ -68,6 +69,7 @@ namespace Jira.FlowCharts
 
                 labels.Add(currentDate.ToShortDateString());
 
+                issuesCounts.Add(storiesInWindow.Length);
                 percentiles50.Add(storiesInWindow[(int) (storiesInWindow.Length * 50 / 100)].DurationDays);
                 percentiles70.Add(storiesInWindow[(int) (storiesInWindow.Length * 70 / 100)].DurationDays);
                 percentiles85.Add(storiesInWindow[(int) (storiesInWindow.Length * 85 / 100)].DurationDays);
@@ -104,6 +106,14 @@ namespace Jira.FlowCharts
                     Fill = Brushes.Transparent,
                     PointGeometry = null,
                     Title = "Percentile 95%"
+                },
+                new LineSeries
+                {
+                    Values = new ChartValues<double>(issuesCounts),
+                    Fill = Brushes.Transparent,
+                    PointGeometry = null,
+                    Title = "Issues count",
+                    ScalesYAt = 1
                 },
             };
 
