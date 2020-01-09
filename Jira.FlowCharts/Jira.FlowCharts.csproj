@@ -296,6 +296,10 @@
       <DependentUpon>StoryFilteringView.xaml</DependentUpon>
     </Compile>
     <Compile Include="StoryFiltering\StoryFilteringViewModel.cs" />
+    <Compile Include="CycleTimeHistory\CycleTimeHistoryView.xaml.cs">
+      <DependentUpon>CycleTimeHistoryView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="CycleTimeHistory\CycleTimeHistoryViewModel.cs" />
     <Compile Include="StoryPointCycleTime\StoryPointCycleTimeView.xaml.cs">
       <DependentUpon>StoryPointCycleTimeView.xaml</DependentUpon>
     </Compile>
@@ -348,6 +352,10 @@
     <Page Include="StoryFiltering\StoryFilteringView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="CycleTimeHistory\CycleTimeHistoryView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="StoryPointCycleTime\StoryPointCycleTimeView.xaml">
       <SubType>Designer</SubType>
