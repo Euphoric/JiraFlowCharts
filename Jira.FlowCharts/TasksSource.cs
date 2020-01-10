@@ -201,6 +201,13 @@ namespace Jira.FlowCharts
             return OfFinishedStories(latestStories);
         }
 
+        public async Task<IEnumerable<FinishedIssue>> GetFinishedStories()
+        {
+            var stories = await GetStories();
+
+            return OfFinishedStories(stories);
+        }
+
         private static IEnumerable<FinishedIssue> OfFinishedStories(IEnumerable<AnalyzedIssue> latestStories)
         {
             FinishedIssue[] finishedStoriesLast =
