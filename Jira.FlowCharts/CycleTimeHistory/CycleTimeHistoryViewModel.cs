@@ -121,6 +121,7 @@ namespace Jira.FlowCharts
                 {
                     Values = new ChartValues<double>(issuesCounts),
                     Fill = Brushes.Transparent,
+                    StrokeDashArray = new DoubleCollection(new double[]{ 4, 2 }),
                     PointGeometry = null,
                     Title = "Issues count",
                     ScalesYAt = 1
