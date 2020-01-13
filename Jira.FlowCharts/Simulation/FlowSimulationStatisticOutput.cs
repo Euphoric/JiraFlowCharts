@@ -7,7 +7,7 @@ namespace Jira.FlowCharts.Simulation
 {
     public class FlowSimulationStatisticOutput
     {
-        public int[] HistogramValues { get; private set; }
+        public double[] HistogramValues { get; private set; }
         public double[] HistogramLabels { get; private set; }
         public double Percentile50 { get; private set; }
         public double Percentile75 { get; private set; }
@@ -26,13 +26,14 @@ namespace Jira.FlowCharts.Simulation
             var buckets = (max - min);
             Histogram hist = new Histogram(simulationTimes, buckets, min, max);
             
-            output.HistogramValues = new int[hist.BucketCount];
+            output.HistogramValues = new double[hist.BucketCount];
             output.HistogramLabels = new double[hist.BucketCount];
 
+            double simulationsCount = simulationTimes.Count;
             for (int i = 0; i < hist.BucketCount; i++)
             {
                 var bucket = hist[i];
-                output.HistogramValues[i] = (int)bucket.Count;
+                output.HistogramValues[i] = (bucket.Count / simulationsCount) * 100; // % of times the simulation ended at this time
                 output.HistogramLabels[i] = bucket.LowerBound;
             }
 

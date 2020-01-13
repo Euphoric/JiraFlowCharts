@@ -65,7 +65,6 @@ namespace Jira.FlowCharts
             var cycleTimes = finishedStories.Select(x => x.DurationDays).ToArray();
 
             Simulation.FlowSimulationStatisticOutput simStats = await Task.Run(() => Simulation.FlowSimulationStatistics.RunSimulationStatistic(StoryCreationRate, cycleTimes, 20000, SimulatedStoriesCount));
-
             return simStats;
         }
 
@@ -79,7 +78,7 @@ namespace Jira.FlowCharts
                 new ColumnSeries
                 {
                     Title = "Final time count",
-                    Values = new ChartValues<double>(simStats.HistogramValues.Select(x=>(double)x))
+                    Values = new ChartValues<double>(simStats.HistogramValues)
                 }
             };
         }
