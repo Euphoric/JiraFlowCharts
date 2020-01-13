@@ -37,16 +37,6 @@ namespace Jira.FlowCharts
             DisplayName = "Cycle time and throughput history";
         }
 
-        private static double Percentile(FinishedIssue[] storiesInWindow, int percentile)
-        {
-            var locationFloat = ((storiesInWindow.Length - 1) * percentile / 100.0);
-            var a = storiesInWindow[(int) locationFloat].DurationDays;
-            var b = storiesInWindow[Math.Min(storiesInWindow.Length - 1, (int) locationFloat + 1)].DurationDays;
-            double lerp = locationFloat - Math.Floor(locationFloat);
-
-            return a * (1 - lerp) + b * lerp;
-        }
-
         protected override async Task OnActivateAsync(CancellationToken cancellationToken)
         {
             var latestFinishedStories = (await _tasksSource.GetFinishedStories());
@@ -68,22 +58,24 @@ namespace Jira.FlowCharts
             for (DateTime currentDate = startDate; currentDate <= endDate; currentDate += TimeSpan.FromDays(1))
             {
                 var fromDate = currentDate.Add(historyWindow);
-                var storiesInWindow =
+                var durationsInWindow =
                     orderedStories
                         .Where(x => x.Ended > fromDate && x.Ended <= currentDate)
-                        .OrderBy(x=>x.DurationDays)
+                        .Select(x=>x.DurationDays)
                         .ToArray();
 
-                if (storiesInWindow.Length == 0)
+                if (durationsInWindow.Length == 0)
                     continue;
 
                 labels.Add(currentDate.ToShortDateString());
 
-                issuesCounts.Add(storiesInWindow.Length);
-                percentiles50.Add(Percentile(storiesInWindow, 50));
-                percentiles70.Add(Percentile(storiesInWindow, 70));
-                percentiles85.Add(Percentile(storiesInWindow, 85));
-                percentiles95.Add(Percentile(storiesInWindow, 95));
+                var dp = new DurationPercentiles(durationsInWindow);
+
+                issuesCounts.Add(durationsInWindow.Length);
+                percentiles50.Add(dp.DurationAtPercentile(0.50));
+                percentiles70.Add(dp.DurationAtPercentile(0.70));
+                percentiles85.Add(dp.DurationAtPercentile(0.85));
+                percentiles95.Add(dp.DurationAtPercentile(0.95));
             }
 
 
