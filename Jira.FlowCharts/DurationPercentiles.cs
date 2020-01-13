@@ -24,9 +24,14 @@ namespace Jira.FlowCharts
 
         public double DurationAtPercentile(double percentile)
         {
-            int elementIndex = (int) Math.Round(percentile * (Durations.Count - 1));
+            var positionWithinDurations = percentile * (Durations.Count - 1);
+            int firstElementIndex = (int)Math.Floor(positionWithinDurations);
+            var secondElementIndex = Math.Min(Durations.Count - 1, firstElementIndex + 1);
 
-            return Durations.ElementAt(elementIndex);
+            double interpolationValue = positionWithinDurations - Math.Floor(positionWithinDurations);
+            return 
+                Durations.ElementAt(firstElementIndex) * (1 - interpolationValue) + 
+                Durations.ElementAt(secondElementIndex) * interpolationValue;
         }
 
         public double PercentileAtDuration(double duration)

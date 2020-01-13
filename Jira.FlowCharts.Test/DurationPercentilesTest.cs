@@ -10,6 +10,20 @@ namespace Jira.FlowCharts
     
     public class DurationPercentilesTest
     {
+        private class DoubleEpsilonComparer : IEqualityComparer<double>
+        {
+            public bool Equals(double x, double y)
+            {
+                double smallestDifference = 1e-8;
+                return Math.Abs(x - y) < smallestDifference;
+            }
+
+            public int GetHashCode(double obj)
+            {
+                return 0;
+            }
+        }
+
         [Fact]
         public void Empty_input_is_error()
         {
@@ -53,13 +67,13 @@ namespace Jira.FlowCharts
         }
 
         [Theory]
-        [InlineData(0.1, 1)]
-        [InlineData(0.2, 3)]
-        [InlineData(0.3, 3)]
-        public void Returns_exact_durations_for_inexact_percentiles(double percentile, double expectedDuration)
+        [InlineData((0 + 0.25) / 2, 1.5)]
+        [InlineData(0.5*0.3 + 0.75*0.7, 4*0.3 + 10*0.7)]
+        [InlineData(0.75 * 0.8 + 1 * 0.2, 10 * 0.8 + 100 * 0.2)]
+        public void Returns_interpolated_durations_for_inexact_percentiles(double percentile, double expectedDuration)
         {
-            var dp = new DurationPercentiles(new double[] { 1, 3, 5, 6, 8 });
-            Assert.Equal(expectedDuration, dp.DurationAtPercentile(percentile));
+            var dp = new DurationPercentiles(new double[] { 1, 2, 4, 10, 100 });
+            Assert.Equal(expectedDuration, dp.DurationAtPercentile(percentile), new DoubleEpsilonComparer());
         }
 
         [Theory]
