@@ -141,18 +141,15 @@ namespace Jira.FlowCharts
                 }
             }
 
-            var durations = finishedTasks.Select(x => x.DurationDays).OrderBy(x => x).ToArray();
+            var dp = new DurationPercentiles(finishedTasks.Select(x => x.DurationDays));
 
-            Percentile50 = durations[(int)(durations.Length * 0.50)];
-            Percentile70 = durations[(int)(durations.Length * 0.70)];
-            Percentile85 = durations[(int)(durations.Length * 0.85)];
-            Percentile95 = durations[(int)(durations.Length * 0.95)];
+            Percentile50 = dp.DurationAtPercentile(0.50);
+            Percentile70 = dp.DurationAtPercentile(0.70);
+            Percentile85 = dp.DurationAtPercentile(0.85);
+            Percentile95 = dp.DurationAtPercentile(0.95);
 
-            var firstDays7Index = durations.Select((x, i) => ValueTuple.Create(i, x)).First(t => t.Item2 > 7).Item1;
-            Days7 = ((double)firstDays7Index / durations.Count()) * 100;
-
-            var firstDays14Index = durations.Select((x, i) => ValueTuple.Create(i, x)).First(t => t.Item2 > 14).Item1;
-            Days14 = ((double) firstDays14Index / durations.Count()) * 100;
+            Days7 = dp.PercentileAtDuration(7) * 100;
+            Days14 = dp.PercentileAtDuration(14) * 100;
 
             LabelPoint = x => IssuePointLabel((IssuePoint)x.Instance);
             Formatter = x => (_baseDate + TimeSpan.FromDays(x)).ToString("d/M/yy", CultureInfo.InvariantCulture);

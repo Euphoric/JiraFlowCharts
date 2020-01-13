@@ -19,10 +19,10 @@ namespace Jira.FlowCharts.Simulation
         {
             FlowSimulationStatisticOutput output = new FlowSimulationStatisticOutput();
 
-            var orderedSimulationTimes = simulationTimes.OrderBy(x => x).ToArray();
+            var dp = new DurationPercentiles(simulationTimes);
 
-            var min = (int)Math.Floor(orderedSimulationTimes[0]);
-            var max = (int)Math.Ceiling(orderedSimulationTimes[orderedSimulationTimes.Length * 9995 / 10000]); // limit the histogram to 99.95% of times, to hide extremes and shorten the tail
+            var min = (int)Math.Floor(dp.Durations.First());
+            var max = (int)Math.Ceiling(dp.DurationAtPercentile(0.9995)); // limit the histogram to 99.95% of times, to hide extremes and shorten the tail
             var buckets = (max - min);
             Histogram hist = new Histogram(simulationTimes, buckets, min, max);
             
@@ -36,11 +36,11 @@ namespace Jira.FlowCharts.Simulation
                 output.HistogramLabels[i] = bucket.LowerBound;
             }
 
-            output.Percentile50 = orderedSimulationTimes[orderedSimulationTimes.Length * 50 / 100];
-            output.Percentile75 = orderedSimulationTimes[orderedSimulationTimes.Length * 75 / 100];
-            output.Percentile85 = orderedSimulationTimes[orderedSimulationTimes.Length * 85 / 100];
-            output.Percentile95 = orderedSimulationTimes[orderedSimulationTimes.Length * 95 / 100];
-            output.Percentile99 = orderedSimulationTimes[orderedSimulationTimes.Length * 99 / 1000];
+            output.Percentile50 = dp.DurationAtPercentile(0.50);
+            output.Percentile75 = dp.DurationAtPercentile(0.75);
+            output.Percentile85 = dp.DurationAtPercentile(0.85);
+            output.Percentile95 = dp.DurationAtPercentile(0.95);
+            output.Percentile99 = dp.DurationAtPercentile(0.99);
 
             return output;
         }
