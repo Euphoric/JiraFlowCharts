@@ -264,6 +264,7 @@
     <Compile Include="CycleTimeScatterplot\CycleTimeScatterplotView.xaml.cs">
       <DependentUpon>CycleTimeScatterplotView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="DurationPercentiles.cs" />
     <Compile Include="IssuesGrid\IssuesGridView.xaml.cs">
       <DependentUpon>IssuesGridView.xaml</DependentUpon>
     </Compile>

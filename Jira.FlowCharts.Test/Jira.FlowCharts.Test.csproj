@@ -125,6 +125,7 @@
   <ItemGroup>
     <Compile Include="CompareExtensions.cs" />
     <Compile Include="CumulativeFlowAnalysisTest.cs" />
+    <Compile Include="DurationPercentilesTest.cs" />
     <Compile Include="JiraUpdateViewModelTest.cs" />
     <Compile Include="ObservableRecording.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
