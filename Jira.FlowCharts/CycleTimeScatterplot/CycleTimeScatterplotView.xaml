@@ -54,6 +54,8 @@
                      70%: <Run Text="{Binding Percentile70, Mode=OneWay, StringFormat=N1}" /> days,
                      85%: <Run Text="{Binding Percentile85, Mode=OneWay, StringFormat=N1}" /> days,
                      95%: <Run Text="{Binding Percentile95, Mode=OneWay, StringFormat=N1}" /> days.
+                     7 Days: <Run Text="{Binding Days7, Mode=OneWay, StringFormat=N1}" />%.
+                     14 Days: <Run Text="{Binding Days14, Mode=OneWay, StringFormat=N1}" />%.
             </TextBlock>
         </StackPanel>
     </Grid>

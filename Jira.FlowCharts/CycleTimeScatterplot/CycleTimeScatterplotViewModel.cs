@@ -45,6 +45,8 @@ namespace Jira.FlowCharts
         private double _percentile70;
         private double _percentile85;
         private double _percentile95;
+        private double _days14;
+        private double _days7;
 
         public ChartValues<IssuePoint> Stories
         {
@@ -94,6 +96,18 @@ namespace Jira.FlowCharts
             private set => Set(ref _percentile95, value);
         }
 
+        public double Days7
+        {
+            get => _days7;
+            private set => Set(ref _days7, value);
+        }
+
+        public double Days14
+        {
+            get => _days14;
+            private set => Set(ref _days14, value);
+        }
+
         public CycleTimeScatterplotViewModel(TasksSource taskSource)
         {
             _taskSource = taskSource;
@@ -133,6 +147,12 @@ namespace Jira.FlowCharts
             Percentile70 = durations[(int)(durations.Length * 0.70)];
             Percentile85 = durations[(int)(durations.Length * 0.85)];
             Percentile95 = durations[(int)(durations.Length * 0.95)];
+
+            var firstDays7Index = durations.Select((x, i) => ValueTuple.Create(i, x)).First(t => t.Item2 > 7).Item1;
+            Days7 = ((double)firstDays7Index / durations.Count()) * 100;
+
+            var firstDays14Index = durations.Select((x, i) => ValueTuple.Create(i, x)).First(t => t.Item2 > 14).Item1;
+            Days14 = ((double) firstDays14Index / durations.Count()) * 100;
 
             LabelPoint = x => IssuePointLabel((IssuePoint)x.Instance);
             Formatter = x => (_baseDate + TimeSpan.FromDays(x)).ToString("d/M/yy", CultureInfo.InvariantCulture);
