@@ -10,7 +10,7 @@ namespace Jira.FlowCharts.Simulation
         public double[] HistogramValues { get; private set; }
         public double[] HistogramLabels { get; private set; }
         public double Percentile50 { get; private set; }
-        public double Percentile75 { get; private set; }
+        public double Percentile70 { get; private set; }
         public double Percentile85 { get; private set; }
         public double Percentile95 { get; private set; }
         public double Percentile99 { get; private set; }
@@ -38,7 +38,7 @@ namespace Jira.FlowCharts.Simulation
             }
 
             output.Percentile50 = dp.DurationAtPercentile(0.50);
-            output.Percentile75 = dp.DurationAtPercentile(0.75);
+            output.Percentile70 = dp.DurationAtPercentile(0.70);
             output.Percentile85 = dp.DurationAtPercentile(0.85);
             output.Percentile95 = dp.DurationAtPercentile(0.95);
             output.Percentile99 = dp.DurationAtPercentile(0.99);

@@ -35,7 +35,7 @@ namespace Jira.FlowCharts.Simulation
             }
 
             Console.WriteLine($"Percentile 50% : {output.Percentile50:F2}");
-            Console.WriteLine($"Percentile 75% : {output.Percentile75:F2}");
+            Console.WriteLine($"Percentile 70% : {output.Percentile70:F2}");
             Console.WriteLine($"Percentile 85% : {output.Percentile85:F2}");
             Console.WriteLine($"Percentile 95% : {output.Percentile95:F2}");
             Console.WriteLine($"Percentile 99% : {output.Percentile99:F2}");

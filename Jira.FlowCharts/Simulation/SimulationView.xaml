@@ -31,7 +31,7 @@
         <StackPanel Grid.Row="2" Orientation="Horizontal">
             <TextBlock>
                             50%: <Run Text="{Binding SimulationOutput.Percentile50, Mode=OneWay, StringFormat=N1}" /> days,
-                            75%: <Run Text="{Binding SimulationOutput.Percentile75, Mode=OneWay, StringFormat=N1}" /> days,
+                            70%: <Run Text="{Binding SimulationOutput.Percentile70, Mode=OneWay, StringFormat=N1}" /> days,
                             85%: <Run Text="{Binding SimulationOutput.Percentile85, Mode=OneWay, StringFormat=N1}" /> days,
                             95%: <Run Text="{Binding SimulationOutput.Percentile95, Mode=OneWay, StringFormat=N1}" /> days.
             </TextBlock>
