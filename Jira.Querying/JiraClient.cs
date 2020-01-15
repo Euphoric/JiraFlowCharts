@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
@@ -63,18 +64,40 @@ namespace Jira.Querying
             return RetrieveTaskData(((InnerJiraIssue)issue).Issue);
         }
 
+        /// <summary>
+        /// feature flag for loading labels from issues as status changes
+        /// </summary>
+        private static bool LoadLabels = false;
+
         private async Task<CachedIssue> RetrieveTaskData(Issue issue)
         {
             Console.WriteLine($"Retrieving issue {issue.Key.Value}");
 
-            var changeLog = await issue.GetChangeLogsAsync();
-            var statusChanges =
+            var changeLog = (await issue.GetChangeLogsAsync()).ToList();
+            var issueChanges =
                 changeLog
-                    .SelectMany(log => log.Items.Select(item => new { log, item }))
-                    .Where(x => x.item.FieldName == "status")
+                    .SelectMany(log => log.Items.Select(item => new {log, item}))
+                    .Where(x => x.item.FieldName == "status" )
                     .Select(x => new CachedIssueStatusChange(x.log.CreatedDate, x.item.ToValue))
-                    .OrderBy(x => x.ChangeTime)
                     .ToArray();
+
+            if (LoadLabels)
+            {
+                var labelChanges =
+                    changeLog
+                        .SelectMany(log => log.Items.Select(item => new {log, item}))
+                        .Where(x => x.item.FieldName == "labels")
+                        .SelectMany(x => ParseLabelChange(x.item.FromValue, x.item.ToValue).Select(lb => new {x.log, lb}))
+                        .Select(x => new CachedIssueStatusChange(x.log.CreatedDate, x.lb))
+                        .ToArray();
+
+                issueChanges =
+                    issueChanges
+                        .Concat(labelChanges)
+                        .ToArray();
+            }
+
+            issueChanges = issueChanges.OrderBy(x => x.ChangeTime).ToArray();
 
             string storyPointsStr = issue.CustomFields.SingleOrDefault(x => x.Name == "Story Points")?.Values
                 ?.SingleOrDefault();
@@ -97,9 +120,20 @@ namespace Jira.Querying
                 Resolved = issue.ResolutionDate,
                 OriginalEstimate = issue.TimeTrackingData?.OriginalEstimateInSeconds,
                 TimeSpent = issue.TimeTrackingData?.TimeSpentInSeconds,
-                StatusChanges = new Collection<CachedIssueStatusChange>(statusChanges),
+                StatusChanges = new Collection<CachedIssueStatusChange>(issueChanges),
                 StoryPoints = storyPoints,
             };
+        }
+
+        private IEnumerable<string> ParseLabelChange(string fromValue, string toValue)
+        {
+            var fromLabels = fromValue?.Split(' ') ?? new string[0];
+            var toLabels = toValue?.Split(' ') ?? new string[0];
+
+            var removedLabels = fromLabels.Except(toLabels).Select(x => "Remove_" + x).ToArray();
+            var addedLabels = toLabels.Except(fromLabels).Select(x => "Add_" + x).ToArray();
+
+            return removedLabels.Concat(addedLabels);
         }
     }
 }

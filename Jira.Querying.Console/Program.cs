@@ -28,7 +28,10 @@ namespace JiraParse
             var section = configuration.GetSection("jira");
             
             // create a connection to JIRA using the Rest client
-            var client = new JiraClient(section.GetValue<string>("url"), section.GetValue<string>("userName"), section.GetValue<string>("password"));
+            var jiraUrl = section.GetValue<string>("url");
+            var username = section.GetValue<string>("userName");
+            var password = section.GetValue<string>("password");
+            var client = new JiraClient(jiraUrl, username, password);
 
             DateTime lastUpdate = DateTime.Now.AddYears(-1);
 
