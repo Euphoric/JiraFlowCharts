@@ -12,6 +12,7 @@ namespace Jira.FlowCharts
     public class MainViewModel : Conductor<IScreen>.Collection.OneActive
     {
         private readonly TasksSource _tasksSource;
+        private readonly StateFiltering _stateFiltering;
 
         public MainViewModel()
         {
@@ -27,14 +28,14 @@ namespace Jira.FlowCharts
             TasksSourceJiraCacheAdapter jiraCacheAdapter = new TasksSourceJiraCacheAdapter(Path.Combine(dataPath, @"issuesCache.db"));
             JsonStatesRepository statesRepository = new JsonStatesRepository(Path.Combine(dataPath, @"analysisSettings.json"));
 
-            var stateFiltering = new StateFiltering(jiraCacheAdapter, statesRepository);
-            _tasksSource = new TasksSource(jiraCacheAdapter, stateFiltering);
+            _stateFiltering = new StateFiltering(jiraCacheAdapter, statesRepository);
+            _tasksSource = new TasksSource(jiraCacheAdapter, _stateFiltering);
             var issuesFrom = DateTime.Now.AddYears(-1);
 
             Items.Add(new JiraUpdateViewModel(_tasksSource, new CurrentTime()));
-            Items.Add(new StoryFilteringViewModel(stateFiltering));
+            Items.Add(new StoryFilteringViewModel(_stateFiltering));
             Items.Add(new IssuesGridViewModel(_tasksSource));
-            Items.Add(new CumulativeFlowViewModel(_tasksSource, stateFiltering));
+            Items.Add(new CumulativeFlowViewModel(_tasksSource, _stateFiltering));
             Items.Add(new CycleTimeScatterplotViewModel(_tasksSource, issuesFrom));
             Items.Add(new CycleTimeHistogramViewModel(_tasksSource, issuesFrom));
             Items.Add(new CycleTimeHistoryViewModel(_tasksSource));
@@ -56,7 +57,7 @@ namespace Jira.FlowCharts
 
         protected override async Task OnInitializeAsync(CancellationToken cancellationToken)
         {
-            await _tasksSource.StateFiltering.ReloadStates();
+            await _stateFiltering.ReloadStates();
         }
     }
 }
