@@ -59,9 +59,6 @@ namespace Jira.FlowCharts
         [Fact]
         public Task Activating_updates_current_status()
         {
-            Assert.Equal(0, _vm.CachedIssuesCount);
-            Assert.Null(_vm.LastUpdatedIssue);
-
             Assert.Empty(_vm.Projects);
 
             return Task.CompletedTask;
@@ -99,9 +96,6 @@ namespace Jira.FlowCharts
 
             await _vm.UpdateCommand.Execute().ToTask();
             Assert.Null(_vm.UpdateError);
-
-            Assert.Equal(issueCount, _vm.CachedIssuesCount);
-            Assert.Equal(new DateTime(2019, 1, 1).AddDays(issueCount), _vm.LastUpdatedIssue);
 
             var project = Assert.Single(_vm.Projects);
             Assert.NotNull(project);

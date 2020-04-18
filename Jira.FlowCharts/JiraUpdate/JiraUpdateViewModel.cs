@@ -13,8 +13,6 @@ namespace Jira.FlowCharts.JiraUpdate
     {
         private readonly TasksSource _tasksSource;
         private readonly ICurrentTime _currentTime;
-        private int _cachedIssuesCount;
-        private DateTime? _lastUpdatedIssue;
         private string _updateError;
         DateTime? _updateProgressReportStartTime;
 
@@ -36,18 +34,6 @@ namespace Jira.FlowCharts.JiraUpdate
         public string JiraUsername { get; set; }
 
         public string ProjectKey { get; set; }
-
-        public int CachedIssuesCount
-        {
-            get => _cachedIssuesCount;
-            private set => Set(ref _cachedIssuesCount, value);
-        }
-
-        public DateTime? LastUpdatedIssue
-        {
-            get => _lastUpdatedIssue;
-            private set => Set(ref _lastUpdatedIssue, value);
-        }
 
         public ReactiveCommand<Unit, Unit> UpdateCommand { get; }
 
@@ -82,8 +68,6 @@ namespace Jira.FlowCharts.JiraUpdate
         private async Task UpdateDisplay()
         {
             var allIssues = (await _tasksSource.GetAllIssues()).ToList();
-            CachedIssuesCount = allIssues.Count;
-            LastUpdatedIssue = allIssues.Max(x => x.Updated);
 
             _projects.Clear();
 
