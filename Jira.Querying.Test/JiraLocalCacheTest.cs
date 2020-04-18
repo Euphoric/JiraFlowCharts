@@ -478,5 +478,43 @@ namespace Jira.Querying
             var issueKeys = retrievedIssues.Select(x => x.Key).ToArray();
             Assert.Equal(new[] {"A-1", "B-1"}, issueKeys.OrderBy(x=>x));
         }
+
+        [Fact]
+        public async Task Issues_are_empty_for_nonexisting_project()
+        {
+            await Cache.Initialize();
+
+            var issueKeys = (await Cache.GetIssues("A")).Select(x => x.Key).ToArray();
+            Assert.Empty(issueKeys);
+        }
+
+        [Fact]
+        public async Task Issues_are_returned_for_project()
+        {
+            await Cache.Initialize();
+
+            _client.UpdateIssue("A-1");
+            await CacheUpdate(projectKey:"A");
+
+            var issueKeys = (await Cache.GetIssues("A")).Select(x => x.Key).ToArray();
+            Assert.Equal(new[] {"A-1"}, issueKeys);
+        }
+
+        [Fact]
+        public async Task Issues_are_returned_only_for_specified_project()
+        {
+            await Cache.Initialize();
+
+            _client.UpdateIssue("A-1");
+            _client.UpdateIssue("B-1");
+
+            await CacheUpdate(projectKey:"A");
+
+            var issueAKeys = (await Cache.GetIssues("A")).Select(x => x.Key).ToArray();
+            Assert.Equal(new[] {"A-1"}, issueAKeys);
+
+            var issueBKeys = (await Cache.GetIssues("B")).Select(x => x.Key).ToArray();
+            Assert.Empty(issueBKeys);
+        }
     }
 }

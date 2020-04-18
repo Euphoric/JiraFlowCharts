@@ -26,7 +26,7 @@ namespace Jira.Querying
         {
             Task Initialize();
 
-            Task<IEnumerable<CachedIssue>> GetIssues();
+            Task<IEnumerable<CachedIssue>> GetIssues(string projectKey = null);
 
             Task AddOrReplaceCachedIssue(CachedIssue flatIssue);
 
@@ -46,9 +46,14 @@ namespace Jira.Querying
                 return Task.CompletedTask;
             }
 
-            public Task<IEnumerable<CachedIssue>> GetIssues()
+            public Task<IEnumerable<CachedIssue>> GetIssues(string projectKey = null)
             {
-                return Task.FromResult<IEnumerable<CachedIssue>>(_issues);
+                IEnumerable<CachedIssue> issues = _issues;
+                if (projectKey != null)
+                {
+                    issues = issues.Where(x => x.Key.StartsWith(projectKey));
+                }
+                return Task.FromResult(issues);
             }
             
             public Task AddOrReplaceCachedIssue(CachedIssue flatIssue)
@@ -95,9 +100,15 @@ namespace Jira.Querying
             _repository = repository;
         }
 
+        [Obsolete("Use version with project key.")]
         public async Task<IEnumerable<CachedIssue>> GetIssues()
         {
             return await _repository.GetIssues();
+        }
+
+        public async Task<IEnumerable<CachedIssue>> GetIssues(string projectKey)
+        {
+            return await _repository.GetIssues(projectKey);
         }
 
         public async Task Initialize()
