@@ -22,7 +22,7 @@ namespace Jira.FlowCharts
         {
             _jiraCacheAdapter = new TestJiraCacheAdapter();
             _statesRepository = new MemoryStatesRepository(new string[0], new string[0]);
-            _tasksSource = new TasksSource(_jiraCacheAdapter, _statesRepository);
+            _tasksSource = new TasksSource(_jiraCacheAdapter, new StateFiltering(_jiraCacheAdapter, _statesRepository));
             _vm = new StoryFilteringViewModel(_tasksSource);
 
             // emulates WPF's behavior of changing selected item when it is removed from bound collection

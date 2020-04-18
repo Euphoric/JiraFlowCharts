@@ -26,7 +26,9 @@ namespace Jira.FlowCharts
 
             TasksSourceJiraCacheAdapter jiraCacheAdapter = new TasksSourceJiraCacheAdapter(Path.Combine(dataPath, @"issuesCache.db"));
             JsonStatesRepository statesRepository = new JsonStatesRepository(Path.Combine(dataPath, @"analysisSettings.json"));
-            _tasksSource = new TasksSource(jiraCacheAdapter, statesRepository);
+
+            var stateFiltering = new StateFiltering(jiraCacheAdapter, statesRepository);
+            _tasksSource = new TasksSource(jiraCacheAdapter, stateFiltering);
             var issuesFrom = DateTime.Now.AddYears(-1);
 
             Items.Add(new JiraUpdateViewModel(_tasksSource, new CurrentTime()));

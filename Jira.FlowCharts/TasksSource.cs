@@ -14,11 +14,11 @@ namespace Jira.FlowCharts
 
         public StateFiltering StateFiltering { get; }
 
-        public TasksSource(ITasksSourceJiraCacheAdapter jiraCacheAdapter, IStatesRepository statesRepository)
+        public TasksSource(ITasksSourceJiraCacheAdapter jiraCacheAdapter, StateFiltering stateFiltering)
         {
             _jiraCache = jiraCacheAdapter;
 
-            StateFiltering = new StateFiltering(jiraCacheAdapter, statesRepository);
+            StateFiltering = stateFiltering;
 
             var config = new MapperConfiguration(cfg =>
             {

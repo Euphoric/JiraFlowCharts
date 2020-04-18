@@ -41,7 +41,7 @@ namespace Jira.FlowCharts
         {
             _jiraCacheAdapter = new TestJiraCacheAdapter();
             _statesRepository = new MemoryStatesRepository(new string[0], new string[0]);
-            _tasksSource = new TasksSource(_jiraCacheAdapter, _statesRepository);
+            _tasksSource = new TasksSource(_jiraCacheAdapter, new StateFiltering(_jiraCacheAdapter, _statesRepository));
 
             _compareLogic = new CompareLogic(new ComparisonConfig() { IgnoreObjectTypes = true, MaxDifferences = 3 });
         }
