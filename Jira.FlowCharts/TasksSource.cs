@@ -13,13 +13,9 @@ namespace Jira.FlowCharts
         private readonly ITasksSourceJiraCacheAdapter _jiraCache;
         private readonly IMapper _mapper;
 
-        private StateFiltering StateFiltering { get; }
-
-        public TasksSource(ITasksSourceJiraCacheAdapter jiraCacheAdapter, StateFiltering stateFiltering)
+        public TasksSource(ITasksSourceJiraCacheAdapter jiraCacheAdapter)
         {
             _jiraCache = jiraCacheAdapter;
-
-            StateFiltering = stateFiltering;
 
             var config = new MapperConfiguration(cfg =>
             {

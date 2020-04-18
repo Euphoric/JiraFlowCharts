@@ -28,7 +28,7 @@ namespace Jira.FlowCharts
             JsonStatesRepository statesRepository = new JsonStatesRepository(Path.Combine(dataPath, @"analysisSettings.json"));
 
             _stateFiltering = new StateFiltering(jiraCacheAdapter, statesRepository);
-            var tasksSource = new TasksSource(jiraCacheAdapter, _stateFiltering);
+            var tasksSource = new TasksSource(jiraCacheAdapter);
             var issuesFrom = DateTime.Now.AddYears(-1);
 
             var stateFilteringProvider = new StateFilteringProvider(_stateFiltering);

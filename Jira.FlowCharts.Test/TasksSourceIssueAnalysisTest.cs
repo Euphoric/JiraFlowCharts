@@ -39,7 +39,7 @@ namespace Jira.FlowCharts
         public TasksSourceIssueAnalysisTest()
         {
             _jiraCacheAdapter = new TestJiraCacheAdapter();
-            _tasksSource = new TasksSource(_jiraCacheAdapter, null);
+            _tasksSource = new TasksSource(_jiraCacheAdapter);
 
             _compareLogic = new CompareLogic(new ComparisonConfig() { IgnoreObjectTypes = true, MaxDifferences = 3 });
         }

@@ -38,8 +38,7 @@ namespace Jira.FlowCharts
         {
             _jiraCacheAdapter = new TestJiraCacheAdapter();
 
-            IStatesRepository statesRepository = new MemoryStatesRepository(new string[0], new string[0]);
-            var tasksSource = new TasksSource(_jiraCacheAdapter, new StateFiltering(_jiraCacheAdapter, statesRepository));
+            var tasksSource = new TasksSource(_jiraCacheAdapter);
             _currentTime = new TestCurrentTime();
             _vm = new JiraUpdateViewModel(tasksSource, _currentTime);
 
