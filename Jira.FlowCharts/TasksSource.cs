@@ -79,9 +79,15 @@ namespace Jira.FlowCharts
                 (issue.Status != "Withdrawn" && issue.Status != "On Hold");
         }
 
-        public async Task<IEnumerable<AnalyzedIssue>> GetStories()
+        [Obsolete("Use parametrized version.")]
+        public Task<IEnumerable<AnalyzedIssue>> GetStories()
         {
-            var issues = await GetAllIssues();
+            return GetStories(StateFilteringParameter.GetParameters(StateFiltering));
+        }
+
+        public async Task<IEnumerable<AnalyzedIssue>> GetStories(StateFilteringParameter stateFiltering)
+        {
+            var issues = await GetAllIssues(stateFiltering);
 
             IEnumerable<AnalyzedIssue> stories = issues
                 .Where(IsValidIssue);
@@ -89,9 +95,9 @@ namespace Jira.FlowCharts
             return stories;
         }
 
-        private async Task<IEnumerable<AnalyzedIssue>> GetLatestStories(IssuesFromParameters parameters)
+        private async Task<IEnumerable<AnalyzedIssue>> GetLatestStories(IssuesFromParameters parameters, StateFilteringParameter stateFiltering)
         {
-            IEnumerable<AnalyzedIssue> stories = (await GetStories()).ToArray();
+            IEnumerable<AnalyzedIssue> stories = (await GetStories(stateFiltering)).ToArray();
 
             var latestStories = stories
                     .Where(x => parameters.IssuesFrom == null || x.Ended >= parameters.IssuesFrom)
@@ -100,16 +106,28 @@ namespace Jira.FlowCharts
             return latestStories;
         }
 
-        public async Task<IEnumerable<FinishedIssue>> GetLatestFinishedStories(IssuesFromParameters parameters)
+        [Obsolete("Use parametrized version")]
+        public Task<IEnumerable<FinishedIssue>> GetLatestFinishedStories(IssuesFromParameters parameters)
         {
-            var latestStories = await GetLatestStories(parameters);
+            return GetLatestFinishedStories(parameters, StateFilteringParameter.GetParameters(StateFiltering));
+        }
+
+        public async Task<IEnumerable<FinishedIssue>> GetLatestFinishedStories(IssuesFromParameters parameters, StateFilteringParameter stateFiltering)
+        {
+            var latestStories = await GetLatestStories(parameters, stateFiltering);
 
             return OfFinishedStories(latestStories);
         }
 
-        public async Task<IEnumerable<FinishedIssue>> GetFinishedStories()
+        [Obsolete("Use parametrized version")]
+        public Task<IEnumerable<FinishedIssue>> GetFinishedStories()
         {
-            var stories = await GetStories();
+            return GetFinishedStories(StateFilteringParameter.GetParameters(StateFiltering));
+        }
+
+        public async Task<IEnumerable<FinishedIssue>> GetFinishedStories(StateFilteringParameter stateFiltering)
+        {
+            var stories = await GetStories(stateFiltering);
 
             return OfFinishedStories(stories);
         }
