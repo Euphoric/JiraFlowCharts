@@ -1,9 +1,7 @@
-﻿using Jira.Querying;
-using LiveCharts;
+﻿using LiveCharts;
 using LiveCharts.Defaults;
 using LiveCharts.Wpf;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -15,10 +13,12 @@ namespace Jira.FlowCharts
     public class CumulativeFlowViewModel : Screen
     {
         private readonly TasksSource _source;
+        private readonly StateFiltering _stateFiltering;
 
-        public CumulativeFlowViewModel(TasksSource source)
+        public CumulativeFlowViewModel(TasksSource source, StateFiltering stateFiltering)
         {
             _source = source;
+            _stateFiltering = stateFiltering;
             DisplayName = "Cumulative flow";
 
             SeriesCollection = new SeriesCollection();
@@ -32,7 +32,7 @@ namespace Jira.FlowCharts
         {
             var fromDate = DateTime.Now.AddMonths(-3);
 
-            var cfa = new CumulativeFlowAnalysis(await _source.GetStories(), _source.StateFiltering.FilteredStates.ToArray(), fromDate);
+            var cfa = new CumulativeFlowAnalysis(await _source.GetStories(), _stateFiltering.FilteredStates.ToArray(), fromDate);
 
             SeriesCollection.Clear();
 

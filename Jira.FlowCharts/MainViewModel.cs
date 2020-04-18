@@ -34,7 +34,7 @@ namespace Jira.FlowCharts
             Items.Add(new JiraUpdateViewModel(_tasksSource, new CurrentTime()));
             Items.Add(new StoryFilteringViewModel(stateFiltering));
             Items.Add(new IssuesGridViewModel(_tasksSource));
-            Items.Add(new CumulativeFlowViewModel(_tasksSource));
+            Items.Add(new CumulativeFlowViewModel(_tasksSource, stateFiltering));
             Items.Add(new CycleTimeScatterplotViewModel(_tasksSource, issuesFrom));
             Items.Add(new CycleTimeHistogramViewModel(_tasksSource, issuesFrom));
             Items.Add(new CycleTimeHistoryViewModel(_tasksSource));
