@@ -15,7 +15,13 @@
         <ListView ItemsSource="{Binding Projects}">
             <ListView.ItemTemplate>
                 <DataTemplate DataType="local:JiraProjectViewModel">
-                    <TextBlock Text="{Binding Key}" />
+                    <TextBlock>
+                        <Run Text="{Binding Key, Mode=OneWay}" FontWeight="Bold" FontSize="13" />
+                        <LineBreak />
+                        Cached issues: <Run Text="{Binding CachedIssuesCount, Mode=OneWay}"/>
+                        <LineBreak />
+                        Last updated issue: <Run Text="{Binding LastUpdatedIssue, Mode=OneWay}"/>
+                    </TextBlock>
                 </DataTemplate>
             </ListView.ItemTemplate>
         </ListView>

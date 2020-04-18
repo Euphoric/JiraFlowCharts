@@ -87,10 +87,13 @@ namespace Jira.FlowCharts.JiraUpdate
 
             _projects.Clear();
 
-            var projectKeys = allIssues.Select(x=>x.Key.Split('-')[0]).Distinct();
-            foreach (var projectKey in projectKeys)
+            var projectGroups = allIssues.GroupBy(x=>x.Key.Split('-')[0]);
+            foreach (var projectGroup in projectGroups)
             {
-                _projects.Add(new JiraProjectViewModel(projectKey));
+                string projectKey = projectGroup.Key;
+                int issuesCount = projectGroup.Count();
+                var lastUpdatedIssue = allIssues.Max(x => x.Updated);
+                _projects.Add(new JiraProjectViewModel(projectKey, issuesCount, lastUpdatedIssue));
             }
         }
 

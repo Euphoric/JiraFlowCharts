@@ -87,21 +87,27 @@ namespace Jira.FlowCharts
             Assert.Null(_vm.UpdateError);
         }
 
-        [Fact]
-        public async Task Update_refreshes_display()
+        [Theory]
+        [InlineData(2)]
+        [InlineData(10)]
+        public async Task Update_refreshes_display(int issueCount)
         {
-            _jiraCacheAdapter.IssuesToUpdateWith.Add(new CachedIssue() { Key = "KEY-1", Updated = new DateTime(2019, 1, 1)});
-            _jiraCacheAdapter.IssuesToUpdateWith.Add(new CachedIssue() { Key = "KEY-2", Updated = new DateTime(2019, 2, 2)});
+            for (int i = 1; i <= issueCount; i++)
+            {
+                _jiraCacheAdapter.IssuesToUpdateWith.Add(new CachedIssue() { Key = "KEY-"+i, Updated = new DateTime(2019, 1, 1).AddDays(i)});
+            }
 
             await _vm.UpdateCommand.Execute().ToTask();
             Assert.Null(_vm.UpdateError);
 
-            Assert.Equal(2, _vm.CachedIssuesCount);
-            Assert.Equal(new DateTime(2019, 2, 2), _vm.LastUpdatedIssue);
+            Assert.Equal(issueCount, _vm.CachedIssuesCount);
+            Assert.Equal(new DateTime(2019, 1, 1).AddDays(issueCount), _vm.LastUpdatedIssue);
 
             var project = Assert.Single(_vm.Projects);
             Assert.NotNull(project);
             Assert.Equal("KEY", project.Key);
+            Assert.Equal(issueCount, project.CachedIssuesCount);
+            Assert.Equal(new DateTime(2019, 1, 1).AddDays(issueCount), project.LastUpdatedIssue);
         }
 
         [Fact]
