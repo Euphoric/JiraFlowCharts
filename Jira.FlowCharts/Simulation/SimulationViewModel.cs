@@ -1,4 +1,5 @@
-﻿using LiveCharts;
+﻿using System;
+using LiveCharts;
 using LiveCharts.Defaults;
 using LiveCharts.Wpf;
 using ReactiveUI;
@@ -24,6 +25,8 @@ namespace Jira.FlowCharts
         public SeriesCollection SeriesCollection => _seriesCollection.Value;
 
         private readonly ObservableAsPropertyHelper<string[]> _labels;
+        private DateTime _issuesFrom;
+
         public string[] Labels => _labels.Value;
 
         public ReactiveCommand<Unit, Simulation.FlowSimulationStatisticOutput> RunSimulation { get; }
@@ -34,9 +37,10 @@ namespace Jira.FlowCharts
             set => this.RaiseAndSetIfChanged(ref _simulatedStoriesCount, value);
         }
 
-        public SimulationViewModel(TasksSource taskSource)
+        public SimulationViewModel(TasksSource taskSource, DateTime issuesFrom)
         {
             _taskSource = taskSource;
+            _issuesFrom = issuesFrom;
             DisplayName = "Simulation";
 
             SimulatedStoriesCount = 10;
@@ -56,7 +60,7 @@ namespace Jira.FlowCharts
 
         private async Task<Simulation.FlowSimulationStatisticOutput> RunSimulationInner()
         {
-            var finishedStories = await _taskSource.GetLatestFinishedStories();
+            var finishedStories = await _taskSource.GetLatestFinishedStories(new IssuesFromParameters(_issuesFrom));
 
             var from = finishedStories.Min(x => x.Ended);
             var to = finishedStories.Max(x => x.Ended);

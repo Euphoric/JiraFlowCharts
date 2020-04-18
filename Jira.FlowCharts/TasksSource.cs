@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
@@ -181,22 +180,20 @@ namespace Jira.FlowCharts
             return stories;
         }
 
-        public DateTime? IssuesFrom { get; set; }
-
-        private async Task<IEnumerable<AnalyzedIssue>> GetLatestStories()
+        private async Task<IEnumerable<AnalyzedIssue>> GetLatestStories(IssuesFromParameters parameters)
         {
             IEnumerable<AnalyzedIssue> stories = (await GetStories()).ToArray();
 
             var latestStories = stories
-                    .Where(x => IssuesFrom == null || x.Ended >= IssuesFrom)
+                    .Where(x => parameters.IssuesFrom == null || x.Ended >= parameters.IssuesFrom)
                     .ToArray();
 
             return latestStories;
         }
 
-        public async Task<IEnumerable<FinishedIssue>> GetLatestFinishedStories()
+        public async Task<IEnumerable<FinishedIssue>> GetLatestFinishedStories(IssuesFromParameters parameters)
         {
-            var latestStories = await GetLatestStories();
+            var latestStories = await GetLatestStories(parameters);
 
             return OfFinishedStories(latestStories);
         }

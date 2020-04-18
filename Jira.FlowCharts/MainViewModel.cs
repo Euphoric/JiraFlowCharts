@@ -27,19 +27,19 @@ namespace Jira.FlowCharts
             TasksSourceJiraCacheAdapter jiraCacheAdapter = new TasksSourceJiraCacheAdapter(Path.Combine(dataPath, @"issuesCache.db"));
             JsonStatesRepository statesRepository = new JsonStatesRepository(Path.Combine(dataPath, @"analysisSettings.json"));
             _tasksSource = new TasksSource(jiraCacheAdapter, statesRepository);
-            _tasksSource.IssuesFrom = DateTime.Now.AddYears(-1);
+            var issuesFrom = DateTime.Now.AddYears(-1);
 
             Items.Add(new JiraUpdateViewModel(_tasksSource, new CurrentTime()));
             Items.Add(new StoryFilteringViewModel(_tasksSource));
             Items.Add(new IssuesGridViewModel(_tasksSource));
             Items.Add(new CumulativeFlowViewModel(_tasksSource));
-            Items.Add(new CycleTimeScatterplotViewModel(_tasksSource));
-            Items.Add(new CycleTimeHistogramViewModel(_tasksSource));
+            Items.Add(new CycleTimeScatterplotViewModel(_tasksSource, issuesFrom));
+            Items.Add(new CycleTimeHistogramViewModel(_tasksSource, issuesFrom));
             Items.Add(new CycleTimeHistoryViewModel(_tasksSource));
             // not shown now
-            //Items.Add(new CycleTimeHistogramSmoothViewModel(_tasksSource));
-            Items.Add(new StoryPointCycleTimeViewModel(_tasksSource));
-            Items.Add(new SimulationViewModel(_tasksSource));
+            //Items.Add(new CycleTimeHistogramSmoothViewModel(_tasksSource, issuesFrom));
+            Items.Add(new StoryPointCycleTimeViewModel(_tasksSource, issuesFrom));
+            Items.Add(new SimulationViewModel(_tasksSource, issuesFrom));
         }
 
         private static string GetPathToData()

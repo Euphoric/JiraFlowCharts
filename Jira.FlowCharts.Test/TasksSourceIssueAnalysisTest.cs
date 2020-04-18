@@ -196,7 +196,6 @@ namespace Jira.FlowCharts
         {
             _tasksSource.AddFilteredState("A");
             _tasksSource.AddFilteredState("C");
-            _tasksSource.IssuesFrom = new DateTime(2012,1 , 1);
 
             var issue = new CachedIssue()
             {
@@ -212,7 +211,7 @@ namespace Jira.FlowCharts
                 }
             };
             _jiraCacheAdapter.Issues.Add(issue);
-            var issues = await _tasksSource.GetLatestFinishedStories();
+            var issues = await _tasksSource.GetLatestFinishedStories(new IssuesFromParameters(new DateTime(2012,1 , 1)));
 
             var analyzedIssue = Assert.Single(issues);
 
@@ -252,7 +251,7 @@ namespace Jira.FlowCharts
                 }
             };
             _jiraCacheAdapter.Issues.Add(issue);
-            var issues = await _tasksSource.GetLatestFinishedStories();
+            var issues = await _tasksSource.GetLatestFinishedStories(new IssuesFromParameters(null));
 
             Assert.Empty(issues);
         }
@@ -273,7 +272,7 @@ namespace Jira.FlowCharts
                 }
             };
             _jiraCacheAdapter.Issues.Add(issue);
-            var issues = await _tasksSource.GetLatestFinishedStories();
+            var issues = await _tasksSource.GetLatestFinishedStories(new IssuesFromParameters(null));
 
             Assert.Empty(issues);
         }
@@ -294,7 +293,7 @@ namespace Jira.FlowCharts
                 }
             };
             _jiraCacheAdapter.Issues.Add(issue);
-            var issues = await _tasksSource.GetLatestFinishedStories();
+            var issues = await _tasksSource.GetLatestFinishedStories(new IssuesFromParameters(null));
 
             Assert.Empty(issues);
         }
@@ -304,7 +303,7 @@ namespace Jira.FlowCharts
         {
             _tasksSource.AddFilteredState("A");
             _tasksSource.AddFilteredState("C");
-            _tasksSource.IssuesFrom = new DateTime(2012, 2, 3).AddSeconds(1);
+            var issuesFrom = new DateTime(2012, 2, 3).AddSeconds(1);
 
             var issue = new CachedIssue()
             {
@@ -320,7 +319,7 @@ namespace Jira.FlowCharts
                 }
             };
             _jiraCacheAdapter.Issues.Add(issue);
-            var issues = await _tasksSource.GetLatestFinishedStories();
+            var issues = await _tasksSource.GetLatestFinishedStories(new IssuesFromParameters(issuesFrom));
 
             Assert.Empty(issues);
         }

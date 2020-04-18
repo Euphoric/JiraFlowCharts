@@ -47,6 +47,7 @@ namespace Jira.FlowCharts
         private double _percentile95;
         private double _days14;
         private double _days7;
+        private DateTime _issuesFrom;
 
         public ChartValues<IssuePoint> Stories
         {
@@ -108,9 +109,10 @@ namespace Jira.FlowCharts
             private set => Set(ref _days14, value);
         }
 
-        public CycleTimeScatterplotViewModel(TasksSource taskSource)
+        public CycleTimeScatterplotViewModel(TasksSource taskSource, DateTime issuesFrom)
         {
             _taskSource = taskSource;
+            _issuesFrom = issuesFrom;
 
             DisplayName = "Cycle time scatterplot";
         }
@@ -120,7 +122,7 @@ namespace Jira.FlowCharts
             Stories = new ChartValues<IssuePoint>();
             Bugs = new ChartValues<IssuePoint>();
 
-            var finishedTasks = await _taskSource.GetLatestFinishedStories();
+            var finishedTasks = await _taskSource.GetLatestFinishedStories(new IssuesFromParameters(_issuesFrom));
             foreach (var issue in finishedTasks)
             {
                 var sinceStart = issue.Ended - _baseDate;

@@ -18,6 +18,7 @@ namespace Jira.FlowCharts
         private readonly TasksSource _tasksSource;
         private string[] _labels;
         private SeriesCollection _seriesCollection;
+        private DateTime _issuesFrom;
 
         public SeriesCollection SeriesCollection
         {
@@ -31,15 +32,16 @@ namespace Jira.FlowCharts
             set => Set(ref _labels, value);
         }
 
-        public StoryPointCycleTimeViewModel(TasksSource tasksSource)
+        public StoryPointCycleTimeViewModel(TasksSource tasksSource, DateTime issuesFrom)
         {
             _tasksSource = tasksSource;
+            _issuesFrom = issuesFrom;
             DisplayName = "Story point vs. cycle time";
         }
 
         protected override async Task OnActivateAsync(CancellationToken cancellationToken)
         {
-            var storyPointGrouped = (await _tasksSource.GetLatestFinishedStories())
+            var storyPointGrouped = (await _tasksSource.GetLatestFinishedStories(new IssuesFromParameters(_issuesFrom)))
                 .Where(x => x.StoryPoints.HasValue)
                 .Where(x => x.StoryPoints.Value > 0)
                 .GroupBy(x => x.StoryPoints.Value)
