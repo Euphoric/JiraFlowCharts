@@ -36,12 +36,14 @@ namespace Jira.FlowCharts
         private readonly MemoryStatesRepository _statesRepository;
         private readonly TasksSource _tasksSource;
         private readonly CompareLogic _compareLogic;
+        private readonly StateFiltering _stateFiltering;
 
         public TasksSourceIssueAnalysisTest()
         {
             _jiraCacheAdapter = new TestJiraCacheAdapter();
             _statesRepository = new MemoryStatesRepository(new string[0], new string[0]);
-            _tasksSource = new TasksSource(_jiraCacheAdapter, new StateFiltering(_jiraCacheAdapter, _statesRepository));
+            _stateFiltering = new StateFiltering(_jiraCacheAdapter, _statesRepository);
+            _tasksSource = new TasksSource(_jiraCacheAdapter, _stateFiltering);
 
             _compareLogic = new CompareLogic(new ComparisonConfig() { IgnoreObjectTypes = true, MaxDifferences = 3 });
         }
@@ -67,9 +69,9 @@ namespace Jira.FlowCharts
         [Fact]
         public async Task Analyzed_issue_contains_simplified_states()
         {
-            _tasksSource.StateFiltering.AddFilteredState("A");
-            _tasksSource.StateFiltering.AddFilteredState("C");
-            _tasksSource.StateFiltering.AddResetState("D");
+            _stateFiltering.AddFilteredState("A");
+            _stateFiltering.AddFilteredState("C");
+            _stateFiltering.AddResetState("D");
 
             var issue = new CachedIssue()
             {
@@ -107,7 +109,7 @@ namespace Jira.FlowCharts
         [Fact]
         public async Task Non_started_issue_is_analyzed()
         {
-            _tasksSource.StateFiltering.AddFilteredState("B");
+            _stateFiltering.AddFilteredState("B");
 
             var issue = new CachedIssue()
             {
@@ -137,8 +139,8 @@ namespace Jira.FlowCharts
         [Fact]
         public async Task Issue_that_doesnt_have_last_state_is_not_finished()
         {
-            _tasksSource.StateFiltering.AddFilteredState("A");
-            _tasksSource.StateFiltering.AddFilteredState("C");
+            _stateFiltering.AddFilteredState("A");
+            _stateFiltering.AddFilteredState("C");
 
             var issue = new CachedIssue()
             {
@@ -194,8 +196,8 @@ namespace Jira.FlowCharts
         [Fact]
         public async Task Finished_issue_is_analyzed()
         {
-            _tasksSource.StateFiltering.AddFilteredState("A");
-            _tasksSource.StateFiltering.AddFilteredState("C");
+            _stateFiltering.AddFilteredState("A");
+            _stateFiltering.AddFilteredState("C");
 
             var issue = new CachedIssue()
             {
@@ -237,8 +239,8 @@ namespace Jira.FlowCharts
         [Fact]
         public async Task Finished_story_must_be_valid()
         {
-            _tasksSource.StateFiltering.AddFilteredState("A");
-            _tasksSource.StateFiltering.AddFilteredState("C");
+            _stateFiltering.AddFilteredState("A");
+            _stateFiltering.AddFilteredState("C");
 
             var issue = new CachedIssue()
             {
@@ -260,8 +262,8 @@ namespace Jira.FlowCharts
         [Fact]
         public async Task Finished_story_must_have_start()
         {
-            _tasksSource.StateFiltering.AddFilteredState("A");
-            _tasksSource.StateFiltering.AddFilteredState("C");
+            _stateFiltering.AddFilteredState("A");
+            _stateFiltering.AddFilteredState("C");
 
             var issue = new CachedIssue()
             {
@@ -280,8 +282,8 @@ namespace Jira.FlowCharts
         [Fact]
         public async Task Finished_story_must_have_end()
         {
-            _tasksSource.StateFiltering.AddFilteredState("A");
-            _tasksSource.StateFiltering.AddFilteredState("C");
+            _stateFiltering.AddFilteredState("A");
+            _stateFiltering.AddFilteredState("C");
 
             var issue = new CachedIssue()
             {
@@ -301,8 +303,8 @@ namespace Jira.FlowCharts
         [Fact]
         public async Task Filters_out_old_issues()
         {
-            _tasksSource.StateFiltering.AddFilteredState("A");
-            _tasksSource.StateFiltering.AddFilteredState("C");
+            _stateFiltering.AddFilteredState("A");
+            _stateFiltering.AddFilteredState("C");
             var issuesFrom = new DateTime(2012, 2, 3).AddSeconds(1);
 
             var issue = new CachedIssue()
