@@ -6,7 +6,7 @@
              xmlns:local="clr-namespace:Jira.FlowCharts.IssuesGrid"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-    <Grid>
-        <DataGrid x:Name="IssuesGrid" AutoGenerateColumns="False" ItemsSource="{Binding Issues}" />
+    <Grid x:Name="ParentGrid">
+        <DataGrid x:Name="IssuesGrid" AutoGenerateColumns="False" ItemsSource="{Binding Issues}" EnableRowVirtualization="true" VerticalScrollBarVisibility="Visible" Height="{Binding ActualHeight, ElementName=ParentGrid}" />
     </Grid>
 </UserControl>
