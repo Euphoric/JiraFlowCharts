@@ -13,11 +13,11 @@ namespace Jira.FlowCharts.StoryFiltering
 {
     public class StoryFilteringViewModel : ReactiveScreen
     {
-        private readonly StateFiltering _tasksSource;
+        private readonly StateFiltering _stateFiltering;
 
-        public StoryFilteringViewModel(TasksSource tasksSource)
+        public StoryFilteringViewModel(StateFiltering stateFiltering)
         {
-            _tasksSource = tasksSource.StateFiltering;
+            _stateFiltering = stateFiltering;
 
             DisplayName = "Story and state filtering";
 
@@ -30,13 +30,13 @@ namespace Jira.FlowCharts.StoryFiltering
         }
 
         public string SelectedAvailableState { get; set; }
-        public ObservableCollection<string> AvailableStates { get { return _tasksSource.AvailableStates; } }
+        public ObservableCollection<string> AvailableStates { get { return _stateFiltering.AvailableStates; } }
 
         public string SelectedFilteredState { get; set; }
-        public ObservableCollection<string> FilteredStates { get { return _tasksSource.FilteredStates; } }
+        public ObservableCollection<string> FilteredStates { get { return _stateFiltering.FilteredStates; } }
 
         public string SelectedResetState { get; set; }
-        public ObservableCollection<string> ResetStates { get { return _tasksSource.ResetStates; } }
+        public ObservableCollection<string> ResetStates { get { return _stateFiltering.ResetStates; } }
 
         public ReactiveCommand<Unit, Unit> MoveStateToFiltered { get; }
 
@@ -52,39 +52,39 @@ namespace Jira.FlowCharts.StoryFiltering
 
         protected override async Task OnActivateAsync(CancellationToken cancellationToken)
         {
-            await _tasksSource.ReloadStates();
+            await _stateFiltering.ReloadStates();
 
             await base.OnActivateAsync(cancellationToken);
         }
 
         private async Task MoveStateToFilteredInner()
         {
-            _tasksSource.AddFilteredState(SelectedAvailableState);
+            _stateFiltering.AddFilteredState(SelectedAvailableState);
         }
 
         private async Task MoveStateFromFilteredInner()
         {
-            _tasksSource.RemoveFilteredState(SelectedFilteredState);
+            _stateFiltering.RemoveFilteredState(SelectedFilteredState);
         }
 
         private async Task MoveStateToResetInner()
         {
-            _tasksSource.AddResetState(SelectedAvailableState);
+            _stateFiltering.AddResetState(SelectedAvailableState);
         }
 
         private async Task MoveStateFromResetInner()
         {
-            _tasksSource.RemoveResetState(SelectedResetState);
+            _stateFiltering.RemoveResetState(SelectedResetState);
         }
 
         private async Task MoveFilteredStateLowerInner()
         {
-            _tasksSource.MoveFilteredStateLower(SelectedFilteredState);
+            _stateFiltering.MoveFilteredStateLower(SelectedFilteredState);
         }
 
         private async Task MoveFilteredStateHigherInner()
         {
-            _tasksSource.MoveFilteredStateHigher(SelectedFilteredState);
+            _stateFiltering.MoveFilteredStateHigher(SelectedFilteredState);
         }
     }
 }
