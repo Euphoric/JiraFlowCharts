@@ -101,6 +101,12 @@ namespace Jira.Querying
             _isInitialized = true;
         }
 
+        public async Task<IEnumerable<string>> GetProjects()
+        {
+            var issues = await GetIssues();
+            return issues.Select(x => x.Key.Split('-')[0]).Distinct();
+        }
+
         public async Task Update(IJiraClient client, DateTime startUpdateDate, string projectKey, ICacheUpdateProgress progress = null)
         {
             progress = progress ?? new NullCacheUpdateProgres();

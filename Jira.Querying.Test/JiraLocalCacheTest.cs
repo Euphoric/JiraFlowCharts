@@ -13,7 +13,7 @@ namespace Jira.Querying
     public class JiraLocalCacheTestSqlite : JiraLocalCacheTest
     {
         public JiraLocalCacheTestSqlite()
-            :base(new SqliteJiraLocalCacheRepository())
+            : base(new SqliteJiraLocalCacheRepository())
         {
         }
     }
@@ -62,7 +62,7 @@ namespace Jira.Querying
         private readonly MemoryCacheUpdateProgress _cacheUpdateProgress;
 
         public JiraLocalCacheTest()
-            :this(JiraLocalCache.CreateMemoryRepository())
+            : this(JiraLocalCache.CreateMemoryRepository())
         {
         }
 
@@ -79,7 +79,7 @@ namespace Jira.Querying
             _cacheUpdateProgress = new MemoryCacheUpdateProgress();
         }
 
-        private Task CacheUpdate(DateTime? startUpdateDate = null, string projectKey = "AB")
+        private Task CacheUpdate(DateTime? startUpdateDate = null, string projectKey = "KEY")
         {
             return Cache.Update(_client, startUpdateDate ?? new DateTime(2018, 1, 1), projectKey, _cacheUpdateProgress);
         }
@@ -87,7 +87,7 @@ namespace Jira.Querying
         [Fact]
         public async Task Update_without_initializing_is_error()
         {
-            var ex = await Assert.ThrowsAsync<InvalidOperationException>(()=>CacheUpdate());
+            var ex = await Assert.ThrowsAsync<InvalidOperationException>(() => CacheUpdate());
             Assert.Equal("Must call Initialize before updating.", ex.Message);
         }
 
@@ -113,7 +113,7 @@ namespace Jira.Querying
         public async Task Update_parameter_check()
         {
             await Cache.Initialize();
-            await Assert.ThrowsAsync<ArgumentNullException>(()=> Cache.Update(null, new DateTime(2018, 1, 1), "AB"));
+            await Assert.ThrowsAsync<ArgumentNullException>(() => Cache.Update(null, new DateTime(2018, 1, 1), "AB"));
         }
 
         [Fact]
@@ -269,7 +269,7 @@ namespace Jira.Querying
             await Cache.Initialize();
 
             _client.UpdateIssue("KEY-1");
-            
+
             await CacheUpdate();
 
             _client.UpdateIssue("KEY-1");
@@ -307,7 +307,7 @@ namespace Jira.Querying
 
             _client.UpdateIssue("KEY-1");
             _client.UpdateIssue("KEY-2");
-            
+
             await CacheUpdate();
 
             _client.UpdateIssue("KEY-1");
@@ -347,7 +347,7 @@ namespace Jira.Querying
 
             var retrievedIssues = await Repository.GetIssues();
 
-            issues.OrderBy(x=>x.Key).ToArray().ShouldCompare(retrievedIssues.OrderBy(x => x.Key).ToArray());
+            issues.OrderBy(x => x.Key).ToArray().ShouldCompare(retrievedIssues.OrderBy(x => x.Key).ToArray());
         }
 
         [Fact]
@@ -398,6 +398,68 @@ namespace Jira.Querying
                 new ReportedIssueUpdate("KEY-1", new DateTime(2019, 1, 5)),
                 new ReportedIssueUpdate("KEY-4", new DateTime(2019, 1, 6))
                 );
+        }
+
+        [Fact]
+        public async Task No_projects_when_empty()
+        {
+            await Cache.Initialize();
+
+            string[] projects = (await Cache.GetProjects()).ToArray();
+
+            Assert.Empty(projects);
+        }
+
+        [Theory]
+        [InlineData("KEY")]
+        [InlineData("PROJ")]
+        public async Task Returns_project_after_update(string project)
+        {
+            await Cache.Initialize();
+
+            _client.UpdateIssue(project + "-1");
+
+            await CacheUpdate(projectKey: project);
+
+            string[] projects = (await Cache.GetProjects()).ToArray();
+
+            Assert.Equal(new [] { project }, projects);
+        }
+
+        [Fact]
+        public async Task Updates_only_specific_project()
+        {
+            await Cache.Initialize();
+
+            _client.UpdateIssue("A-1");
+            _client.UpdateIssue("B-1");
+            _client.UpdateIssue("C-1");
+
+            await CacheUpdate(projectKey:"A");
+
+            var retrievedIssues = await Repository.GetIssues();
+
+            var issueKeys = retrievedIssues.Select(x => x.Key).ToArray();
+            Assert.Equal(new[] {"A-1"}, issueKeys);
+        }
+
+        [Fact]
+        public async Task Returns_all_updated_projects()
+        {
+            await Cache.Initialize();
+
+            _client.UpdateIssue("A-1");
+            _client.UpdateIssue("B-1");
+            _client.UpdateIssue("C-1");
+
+            await CacheUpdate(projectKey:"A");
+            await CacheUpdate(projectKey:"B");
+            await CacheUpdate(projectKey:"C");
+
+            var retrievedIssues = await Repository.GetIssues();
+
+            var issueKeys = retrievedIssues.Select(x => x.Key).ToArray();
+            Assert.Equal(new[] {"A-1", "B-1", "C-1"}, issueKeys.OrderBy(x=>x));
         }
     }
 }

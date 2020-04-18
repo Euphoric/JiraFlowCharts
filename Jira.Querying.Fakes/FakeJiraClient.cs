@@ -15,6 +15,7 @@ namespace Jira.Querying
                 Key = key;
             }
 
+            public string Project => Key.Split('-')[0];
             public string Key { get; private set; }
             public DateTime? Created { get; set; }
             public DateTime? Updated { get; set; }
@@ -60,6 +61,7 @@ namespace Jira.Querying
             }
 
             FakeJiraIssue[] returnedJiraIssues = _issues
+                .Where(x=>x.Project == project)
                 .Where(x => WithoutSeconds(x.Updated) >= WithoutSeconds(lastUpdated))
                 .OrderBy(x => x.Updated)
                 .Skip(skipCount)
