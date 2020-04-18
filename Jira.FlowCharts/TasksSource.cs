@@ -79,12 +79,6 @@ namespace Jira.FlowCharts
                 (issue.Status != "Withdrawn" && issue.Status != "On Hold");
         }
 
-        [Obsolete("Use parametrized version.")]
-        public Task<IEnumerable<AnalyzedIssue>> GetStories()
-        {
-            return GetStories(StateFilteringParameter.GetParameters(StateFiltering));
-        }
-
         public async Task<IEnumerable<AnalyzedIssue>> GetStories(StateFilteringParameter stateFiltering)
         {
             var issues = await GetAllIssues(stateFiltering);
@@ -106,23 +100,11 @@ namespace Jira.FlowCharts
             return latestStories;
         }
 
-        [Obsolete("Use parametrized version")]
-        public Task<IEnumerable<FinishedIssue>> GetLatestFinishedStories(IssuesFromParameters parameters)
-        {
-            return GetLatestFinishedStories(parameters, StateFilteringParameter.GetParameters(StateFiltering));
-        }
-
         public async Task<IEnumerable<FinishedIssue>> GetLatestFinishedStories(IssuesFromParameters parameters, StateFilteringParameter stateFiltering)
         {
             var latestStories = await GetLatestStories(parameters, stateFiltering);
 
             return OfFinishedStories(latestStories);
-        }
-
-        [Obsolete("Use parametrized version")]
-        public Task<IEnumerable<FinishedIssue>> GetFinishedStories()
-        {
-            return GetFinishedStories(StateFilteringParameter.GetParameters(StateFiltering));
         }
 
         public async Task<IEnumerable<FinishedIssue>> GetFinishedStories(StateFilteringParameter stateFiltering)

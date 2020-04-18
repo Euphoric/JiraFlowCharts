@@ -270,6 +270,7 @@
       <DependentUpon>IssuesGridView.xaml</DependentUpon>
     </Compile>
     <Compile Include="IssuesGrid\IssuesGridViewModel.cs" />
+    <Compile Include="IStateFilteringProvider.cs" />
     <Compile Include="IStatesRepository.cs" />
     <Compile Include="JiraUpdate\ICurrentTime.cs" />
     <Compile Include="JiraUpdate\IJiraUpdateView.cs" />
@@ -297,6 +298,7 @@
     <Compile Include="Simulation\FlowSimulation.cs" />
     <Compile Include="StateFiltering.cs" />
     <Compile Include="StateFilteringParameter.cs" />
+    <Compile Include="StateFilteringProvider.cs" />
     <Compile Include="StoryFiltering\StoryFilteringView.xaml.cs">
       <DependentUpon>StoryFilteringView.xaml</DependentUpon>
     </Compile>

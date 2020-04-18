@@ -13,12 +13,12 @@ namespace Jira.FlowCharts
     public class CumulativeFlowViewModel : Screen
     {
         private readonly TasksSource _source;
-        private readonly StateFiltering _stateFiltering;
+        private readonly IStateFilteringProvider _stateFilteringProvider;
 
-        public CumulativeFlowViewModel(TasksSource source, StateFiltering stateFiltering)
+        public CumulativeFlowViewModel(TasksSource source, IStateFilteringProvider stateFilteringProvider)
         {
             _source = source;
-            _stateFiltering = stateFiltering;
+            _stateFilteringProvider = stateFilteringProvider;
             DisplayName = "Cumulative flow";
 
             SeriesCollection = new SeriesCollection();
@@ -32,7 +32,8 @@ namespace Jira.FlowCharts
         {
             var fromDate = DateTime.Now.AddMonths(-3);
 
-            var cfa = new CumulativeFlowAnalysis(await _source.GetStories(), _stateFiltering.FilteredStates.ToArray(), fromDate);
+            var stateFiltering = _stateFilteringProvider.GetStateFilteringParameter();
+            var cfa = new CumulativeFlowAnalysis(await _source.GetStories(stateFiltering), stateFiltering.FilteredStates, fromDate);
 
             SeriesCollection.Clear();
 

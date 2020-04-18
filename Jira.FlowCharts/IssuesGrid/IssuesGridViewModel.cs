@@ -17,10 +17,12 @@ namespace Jira.FlowCharts.IssuesGrid
     class IssuesGridViewModel : Screen
     {
         private readonly TasksSource _tasksSource;
+        private readonly IStateFilteringProvider _stateFilteringProvider;
 
-        public IssuesGridViewModel(TasksSource tasksSource)
+        public IssuesGridViewModel(TasksSource tasksSource, IStateFilteringProvider stateFilteringProvider)
         {
             _tasksSource = tasksSource;
+            _stateFilteringProvider = stateFilteringProvider;
             DisplayName = "Issues grid";
 
             Issues = new ObservableCollection<dynamic>();
@@ -32,7 +34,7 @@ namespace Jira.FlowCharts.IssuesGrid
         {
             Issues.Clear();
 
-            var allIssues = await _tasksSource.GetAllIssues();
+            var allIssues = await _tasksSource.GetAllIssues(_stateFilteringProvider.GetStateFilteringParameter());
 
             var mapper = new Mapper(new MapperConfiguration(cfg => { }));
             Issues.AddRange(allIssues.Select(issue => ToDynamicRow(issue, mapper)));

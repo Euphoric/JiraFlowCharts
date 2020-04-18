@@ -11,7 +11,6 @@ namespace Jira.FlowCharts
 {
     public class MainViewModel : Conductor<IScreen>.Collection.OneActive
     {
-        private readonly TasksSource _tasksSource;
         private readonly StateFiltering _stateFiltering;
 
         public MainViewModel()
@@ -29,20 +28,22 @@ namespace Jira.FlowCharts
             JsonStatesRepository statesRepository = new JsonStatesRepository(Path.Combine(dataPath, @"analysisSettings.json"));
 
             _stateFiltering = new StateFiltering(jiraCacheAdapter, statesRepository);
-            _tasksSource = new TasksSource(jiraCacheAdapter, _stateFiltering);
+            var tasksSource = new TasksSource(jiraCacheAdapter, _stateFiltering);
             var issuesFrom = DateTime.Now.AddYears(-1);
 
-            Items.Add(new JiraUpdateViewModel(_tasksSource, new CurrentTime()));
+            var stateFilteringProvider = new StateFilteringProvider(_stateFiltering);
+
+            Items.Add(new JiraUpdateViewModel(tasksSource, new CurrentTime()));
             Items.Add(new StoryFilteringViewModel(_stateFiltering));
-            Items.Add(new IssuesGridViewModel(_tasksSource));
-            Items.Add(new CumulativeFlowViewModel(_tasksSource, _stateFiltering));
-            Items.Add(new CycleTimeScatterplotViewModel(_tasksSource, issuesFrom));
-            Items.Add(new CycleTimeHistogramViewModel(_tasksSource, issuesFrom));
-            Items.Add(new CycleTimeHistoryViewModel(_tasksSource));
+            Items.Add(new IssuesGridViewModel(tasksSource, stateFilteringProvider));
+            Items.Add(new CumulativeFlowViewModel(tasksSource, stateFilteringProvider));
+            Items.Add(new CycleTimeScatterplotViewModel(tasksSource, issuesFrom, stateFilteringProvider));
+            Items.Add(new CycleTimeHistogramViewModel(tasksSource, issuesFrom, stateFilteringProvider));
+            Items.Add(new CycleTimeHistoryViewModel(tasksSource, stateFilteringProvider));
             // not shown now
-            //Items.Add(new CycleTimeHistogramSmoothViewModel(_tasksSource, issuesFrom));
-            Items.Add(new StoryPointCycleTimeViewModel(_tasksSource, issuesFrom));
-            Items.Add(new SimulationViewModel(_tasksSource, issuesFrom));
+            //Items.Add(new CycleTimeHistogramSmoothViewModel(tasksSource, issuesFrom, stateFilteringProvider));
+            Items.Add(new StoryPointCycleTimeViewModel(tasksSource, issuesFrom, stateFilteringProvider));
+            Items.Add(new SimulationViewModel(tasksSource, issuesFrom, stateFilteringProvider));
         }
 
         private static string GetPathToData()

@@ -26,6 +26,7 @@ namespace Jira.FlowCharts
 
         private readonly ObservableAsPropertyHelper<string[]> _labels;
         private DateTime _issuesFrom;
+        private readonly IStateFilteringProvider _stateFilteringProvider;
 
         public string[] Labels => _labels.Value;
 
@@ -37,10 +38,11 @@ namespace Jira.FlowCharts
             set => this.RaiseAndSetIfChanged(ref _simulatedStoriesCount, value);
         }
 
-        public SimulationViewModel(TasksSource taskSource, DateTime issuesFrom)
+        public SimulationViewModel(TasksSource taskSource, DateTime issuesFrom, IStateFilteringProvider stateFilteringProvider)
         {
             _taskSource = taskSource;
             _issuesFrom = issuesFrom;
+            _stateFilteringProvider = stateFilteringProvider;
             DisplayName = "Simulation";
 
             SimulatedStoriesCount = 10;
@@ -60,7 +62,7 @@ namespace Jira.FlowCharts
 
         private async Task<Simulation.FlowSimulationStatisticOutput> RunSimulationInner()
         {
-            var finishedStories = await _taskSource.GetLatestFinishedStories(new IssuesFromParameters(_issuesFrom));
+            var finishedStories = await _taskSource.GetLatestFinishedStories(new IssuesFromParameters(_issuesFrom), _stateFilteringProvider.GetStateFilteringParameter());
 
             var from = finishedStories.Min(x => x.Ended);
             var to = finishedStories.Max(x => x.Ended);
