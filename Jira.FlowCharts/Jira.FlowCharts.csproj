@@ -272,6 +272,7 @@
     <Compile Include="IStatesRepository.cs" />
     <Compile Include="JiraUpdate\ICurrentTime.cs" />
     <Compile Include="JiraUpdate\IJiraUpdateView.cs" />
+    <Compile Include="JiraUpdate\JiraProjectViewModel.cs" />
     <Compile Include="JiraUpdate\JiraUpdateView.xaml.cs">
       <DependentUpon>JiraUpdateView.xaml</DependentUpon>
     </Compile>

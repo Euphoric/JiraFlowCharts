@@ -1,8 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reactive;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Jira.Querying;
@@ -28,6 +27,8 @@ namespace Jira.FlowCharts.JiraUpdate
 
             UpdateCommand = ReactiveCommand.CreateFromTask(UpdateJira);
             UpdateProgress = -1;
+
+            _projects = new ObservableCollection<JiraProjectViewModel>();
         }
 
         public string JiraUrl { get; set; }
@@ -70,6 +71,9 @@ namespace Jira.FlowCharts.JiraUpdate
             private set => Set(ref _updateProgress, value);
         }
 
+        private readonly ObservableCollection<JiraProjectViewModel> _projects;
+        public ReadOnlyObservableCollection<JiraProjectViewModel> Projects => new ReadOnlyObservableCollection<JiraProjectViewModel>(_projects);
+
         protected override async Task OnInitializeAsync(CancellationToken cancellationToken)
         {
             await UpdateDisplay();
@@ -77,9 +81,17 @@ namespace Jira.FlowCharts.JiraUpdate
 
         private async Task UpdateDisplay()
         {
-            var allTasks = (await _tasksSource.GetAllIssues()).ToList();
-            CachedIssuesCount = allTasks.Count;
-            LastUpdatedIssue = allTasks.Max(x => x.Updated);
+            var allIssues = (await _tasksSource.GetAllIssues()).ToList();
+            CachedIssuesCount = allIssues.Count;
+            LastUpdatedIssue = allIssues.Max(x => x.Updated);
+
+            _projects.Clear();
+
+            var projectKeys = allIssues.Select(x=>x.Key.Split('-')[0]).Distinct();
+            foreach (var projectKey in projectKeys)
+            {
+                _projects.Add(new JiraProjectViewModel(projectKey));
+            }
         }
 
         private async Task UpdateJira()

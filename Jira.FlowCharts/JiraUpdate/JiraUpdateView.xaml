@@ -9,40 +9,53 @@
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto"/>
-            <ColumnDefinition Width="Auto"/>
             <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="3*"/>
         </Grid.ColumnDefinitions>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
-        <TextBlock Margin="2" Grid.ColumnSpan="2">
+        <ListView ItemsSource="{Binding Projects}">
+            <ListView.ItemTemplate>
+                <DataTemplate DataType="local:JiraProjectViewModel">
+                    <TextBlock Text="{Binding Key}" />
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+        <Grid Grid.Column="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <TextBlock Margin="2" Grid.ColumnSpan="2">
             Cached issues: <Run Text="{Binding CachedIssuesCount, Mode=OneWay}"/>
             <LineBreak />
             Last updated issue: <Run Text="{Binding LastUpdatedIssue, Mode=OneWay}"/>
-        </TextBlock>
-        <TextBlock Margin="2" Grid.Row="1" Grid.Column="0">Jira URL:</TextBlock>
-        <TextBox Grid.Row="1" Grid.Column="1" MinWidth="500" Text="{Binding JiraUrl}" />
-        <TextBlock Margin="2" Grid.Row="2" Grid.Column="0">Jira username:</TextBlock>
-        <TextBox Grid.Row="2" Grid.Column="1" MinWidth="500" Text="{Binding JiraUsername}" />
-        <TextBlock Margin="2" Grid.Row="3" Grid.Column="0">Jira password:</TextBlock>
-        <PasswordBox Grid.Row="3" Grid.Column="1" MinWidth="500" x:Name="JiraPasswordBox" />
+            </TextBlock>
+            <TextBlock Margin="2" Grid.Row="1" Grid.Column="0">Jira URL:</TextBlock>
+            <TextBox Grid.Row="1" Grid.Column="1" MinWidth="500" Text="{Binding JiraUrl}" />
+            <TextBlock Margin="2" Grid.Row="2" Grid.Column="0">Jira username:</TextBlock>
+            <TextBox Grid.Row="2" Grid.Column="1" MinWidth="500" Text="{Binding JiraUsername}" />
+            <TextBlock Margin="2" Grid.Row="3" Grid.Column="0">Jira password:</TextBlock>
+            <PasswordBox Grid.Row="3" Grid.Column="1" MinWidth="500" x:Name="JiraPasswordBox" />
 
-        <TextBlock Margin="2" Grid.Row="4" Grid.Column="0">Project key:</TextBlock>
-        <TextBox Grid.Row="4" Grid.Column="1" MinWidth="500" Text="{Binding ProjectKey}" />
-        
-        <Button Margin="2" Grid.Row="5" Grid.Column="1" Command="{Binding UpdateCommand}">Update</Button>
-        <Grid Grid.Row="6" Grid.Column="1">
-            <ProgressBar Margin="2" Height="15" Minimum="0" Maximum="100" Value="{Binding UpdateProgress, Mode=OneWay}" />
-            <TextBlock HorizontalAlignment="Center" Text="{Binding LastUpdatedKey, Mode=OneWay}" />
+            <TextBlock Margin="2" Grid.Row="4" Grid.Column="0">Project key:</TextBlock>
+            <TextBox Grid.Row="4" Grid.Column="1" MinWidth="500" Text="{Binding ProjectKey}" />
+
+            <Button Margin="2" Grid.Row="5" Grid.Column="1" Command="{Binding UpdateCommand}">Update</Button>
+            <Grid Grid.Row="6" Grid.Column="1">
+                <ProgressBar Margin="2" Height="15" Minimum="0" Maximum="100" Value="{Binding UpdateProgress, Mode=OneWay}" />
+                <TextBlock HorizontalAlignment="Center" Text="{Binding LastUpdatedKey, Mode=OneWay}" />
+            </Grid>
+            <TextBlock Grid.Row="7" Grid.Column="1" Text="{Binding UpdateError}" Foreground="Red" />
         </Grid>
-        <TextBlock Grid.Row="7" Grid.Column="1" Text="{Binding UpdateError}" Foreground="Red" />
     </Grid>
 </UserControl>
