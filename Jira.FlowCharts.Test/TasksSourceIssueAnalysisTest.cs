@@ -16,7 +16,7 @@ namespace Jira.FlowCharts
         {
             public Task<string[]> GetAllStates()
             {
-                throw new NotSupportedException("Use differnet test class.");
+                throw new NotSupportedException("Use different test class.");
             }
 
             public List<CachedIssue> Issues { get; set; } = new List<CachedIssue>();
@@ -28,22 +28,18 @@ namespace Jira.FlowCharts
 
             public Task UpdateIssues(JiraLoginParameters jiraLoginParameters, string projectKey, ICacheUpdateProgress cacheUpdateProgress)
             {
-                throw new NotSupportedException("Use differnet test class.");
+                throw new NotSupportedException("Use different test class.");
             }
         }
 
         private readonly TestJiraCacheAdapter _jiraCacheAdapter;
-        private readonly MemoryStatesRepository _statesRepository;
         private readonly TasksSource _tasksSource;
         private readonly CompareLogic _compareLogic;
-        private readonly StateFiltering _stateFiltering;
 
         public TasksSourceIssueAnalysisTest()
         {
             _jiraCacheAdapter = new TestJiraCacheAdapter();
-            _statesRepository = new MemoryStatesRepository(new string[0], new string[0]);
-            _stateFiltering = new StateFiltering(_jiraCacheAdapter, _statesRepository);
-            _tasksSource = new TasksSource(_jiraCacheAdapter, _stateFiltering);
+            _tasksSource = new TasksSource(_jiraCacheAdapter, null);
 
             _compareLogic = new CompareLogic(new ComparisonConfig() { IgnoreObjectTypes = true, MaxDifferences = 3 });
         }
@@ -51,7 +47,9 @@ namespace Jira.FlowCharts
         [Fact]
         public async Task Retrieves_no_issues()
         {
-            var issues = await _tasksSource.GetAllIssues();
+            var stateFiltering = new StateFilteringParameter(new string[0], new string[0]);
+
+            var issues = await _tasksSource.GetAllIssues(stateFiltering);
 
             Assert.Empty(issues);
         }
@@ -60,8 +58,10 @@ namespace Jira.FlowCharts
         [AutoFixture.Xunit2.InlineAutoData]
         public async Task Retrieves_issue(CachedIssue issue)
         {
+            var stateFiltering = new StateFilteringParameter(new string[0], new string[0]);
+
             _jiraCacheAdapter.Issues.Add(issue);
-            var issues = await _tasksSource.GetAllIssues();
+            var issues = await _tasksSource.GetAllIssues(stateFiltering);
 
             _compareLogic.AssertEqual<object>(issues, _jiraCacheAdapter.Issues);
         }
@@ -69,9 +69,7 @@ namespace Jira.FlowCharts
         [Fact]
         public async Task Analyzed_issue_contains_simplified_states()
         {
-            _stateFiltering.AddFilteredState("A");
-            _stateFiltering.AddFilteredState("C");
-            _stateFiltering.AddResetState("D");
+            var stateFiltering = new StateFilteringParameter(new []{"A", "C"}, new []{"D"});
 
             var issue = new CachedIssue()
             {
@@ -86,7 +84,7 @@ namespace Jira.FlowCharts
                 }
             };
             _jiraCacheAdapter.Issues.Add(issue);
-            var issues = await _tasksSource.GetAllIssues();
+            var issues = await _tasksSource.GetAllIssues(stateFiltering);
 
             var analyzedIssue = Assert.Single(issues);
 
@@ -109,7 +107,7 @@ namespace Jira.FlowCharts
         [Fact]
         public async Task Non_started_issue_is_analyzed()
         {
-            _stateFiltering.AddFilteredState("B");
+            var stateFiltering = new StateFilteringParameter(new []{"B"}, new string[0]);
 
             var issue = new CachedIssue()
             {
@@ -119,7 +117,7 @@ namespace Jira.FlowCharts
                 }
             };
             _jiraCacheAdapter.Issues.Add(issue);
-            var issues = await _tasksSource.GetAllIssues();
+            var issues = await _tasksSource.GetAllIssues(stateFiltering);
 
             var analyzedIssue = Assert.Single(issues);
 
@@ -139,8 +137,7 @@ namespace Jira.FlowCharts
         [Fact]
         public async Task Issue_that_doesnt_have_last_state_is_not_finished()
         {
-            _stateFiltering.AddFilteredState("A");
-            _stateFiltering.AddFilteredState("C");
+            var stateFiltering = new StateFilteringParameter(new []{"A", "C"}, new string[0]);
 
             var issue = new CachedIssue()
             {
@@ -151,7 +148,7 @@ namespace Jira.FlowCharts
                 }
             };
             _jiraCacheAdapter.Issues.Add(issue);
-            var issues = await _tasksSource.GetAllIssues();
+            var issues = await _tasksSource.GetAllIssues(stateFiltering);
 
             var analyzedIssue = Assert.Single(issues);
 
@@ -173,13 +170,15 @@ namespace Jira.FlowCharts
         [Fact]
         public async Task Analyzed_as_valid_issue()
         {
+            var stateFiltering = new StateFilteringParameter(new string[0], new string[0]);
+
             var issue = new CachedIssue()
             {
                 Type = "Story",
                 StatusChanges = new Collection<CachedIssueStatusChange>()
             };
             _jiraCacheAdapter.Issues.Add(issue);
-            var issues = await _tasksSource.GetAllIssues();
+            var issues = await _tasksSource.GetAllIssues(stateFiltering);
 
             var analyzedIssue = Assert.Single(issues);
 
@@ -196,8 +195,7 @@ namespace Jira.FlowCharts
         [Fact]
         public async Task Finished_issue_is_analyzed()
         {
-            _stateFiltering.AddFilteredState("A");
-            _stateFiltering.AddFilteredState("C");
+            var stateFiltering = new StateFilteringParameter(new []{"A", "C"}, new string[0]);
 
             var issue = new CachedIssue()
             {
@@ -213,7 +211,7 @@ namespace Jira.FlowCharts
                 }
             };
             _jiraCacheAdapter.Issues.Add(issue);
-            var issues = await _tasksSource.GetLatestFinishedStories(new IssuesFromParameters(new DateTime(2012,1 , 1)));
+            var issues = await _tasksSource.GetLatestFinishedStories(new IssuesFromParameters(new DateTime(2012,1 , 1)), stateFiltering);
 
             var analyzedIssue = Assert.Single(issues);
 
@@ -239,8 +237,7 @@ namespace Jira.FlowCharts
         [Fact]
         public async Task Finished_story_must_be_valid()
         {
-            _stateFiltering.AddFilteredState("A");
-            _stateFiltering.AddFilteredState("C");
+            var stateFiltering = new StateFilteringParameter(new []{"A", "C"}, new string[0]);
 
             var issue = new CachedIssue()
             {
@@ -253,7 +250,7 @@ namespace Jira.FlowCharts
                 }
             };
             _jiraCacheAdapter.Issues.Add(issue);
-            var issues = await _tasksSource.GetLatestFinishedStories(new IssuesFromParameters(null));
+            var issues = await _tasksSource.GetLatestFinishedStories(new IssuesFromParameters(null), stateFiltering);
 
             Assert.Empty(issues);
         }
@@ -262,8 +259,7 @@ namespace Jira.FlowCharts
         [Fact]
         public async Task Finished_story_must_have_start()
         {
-            _stateFiltering.AddFilteredState("A");
-            _stateFiltering.AddFilteredState("C");
+            var stateFiltering = new StateFilteringParameter(new []{"A", "C"}, new string[0]);
 
             var issue = new CachedIssue()
             {
@@ -274,7 +270,7 @@ namespace Jira.FlowCharts
                 }
             };
             _jiraCacheAdapter.Issues.Add(issue);
-            var issues = await _tasksSource.GetLatestFinishedStories(new IssuesFromParameters(null));
+            var issues = await _tasksSource.GetLatestFinishedStories(new IssuesFromParameters(null), stateFiltering);
 
             Assert.Empty(issues);
         }
@@ -282,8 +278,7 @@ namespace Jira.FlowCharts
         [Fact]
         public async Task Finished_story_must_have_end()
         {
-            _stateFiltering.AddFilteredState("A");
-            _stateFiltering.AddFilteredState("C");
+            var stateFiltering = new StateFilteringParameter(new []{"A", "C"}, new string[0]);
 
             var issue = new CachedIssue()
             {
@@ -295,7 +290,7 @@ namespace Jira.FlowCharts
                 }
             };
             _jiraCacheAdapter.Issues.Add(issue);
-            var issues = await _tasksSource.GetLatestFinishedStories(new IssuesFromParameters(null));
+            var issues = await _tasksSource.GetLatestFinishedStories(new IssuesFromParameters(null), stateFiltering);
 
             Assert.Empty(issues);
         }
@@ -303,8 +298,7 @@ namespace Jira.FlowCharts
         [Fact]
         public async Task Filters_out_old_issues()
         {
-            _stateFiltering.AddFilteredState("A");
-            _stateFiltering.AddFilteredState("C");
+            var stateFiltering = new StateFilteringParameter(new []{"A", "C"}, new string[0]);
             var issuesFrom = new DateTime(2012, 2, 3).AddSeconds(1);
 
             var issue = new CachedIssue()
@@ -321,7 +315,7 @@ namespace Jira.FlowCharts
                 }
             };
             _jiraCacheAdapter.Issues.Add(issue);
-            var issues = await _tasksSource.GetLatestFinishedStories(new IssuesFromParameters(issuesFrom));
+            var issues = await _tasksSource.GetLatestFinishedStories(new IssuesFromParameters(issuesFrom), stateFiltering);
 
             Assert.Empty(issues);
         }
