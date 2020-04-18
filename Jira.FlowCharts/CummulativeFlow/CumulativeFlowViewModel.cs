@@ -30,10 +30,10 @@ namespace Jira.FlowCharts
 
         protected override async Task OnActivateAsync(CancellationToken token)
         {
-            var fromDate = DateTime.Now.AddMonths(-3);
-
             var stateFiltering = _stateFilteringProvider.GetStateFilteringParameter();
-            var cfa = new CumulativeFlowAnalysis(await _source.GetStories(stateFiltering), stateFiltering.FilteredStates, fromDate);
+            var stories = (await _source.GetStories(stateFiltering)).ToArray();
+            var fromDate = stories.Where(x=>x.Ended.HasValue).Max(x=>x.Ended.Value).AddMonths(-3);
+            var cfa = new CumulativeFlowAnalysis(stories, stateFiltering.FilteredStates, fromDate);
 
             SeriesCollection.Clear();
 
