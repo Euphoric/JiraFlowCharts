@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
@@ -33,18 +34,26 @@ namespace Jira.FlowCharts
             await _jiraCache.UpdateIssues(jiraLoginParameters, projectName, cacheUpdateProgress);
         }
 
+        [Obsolete("Use parametrized version")]
         public async Task<IEnumerable<AnalyzedIssue>> GetAllIssues()
+        {
+            return await GetAllIssues(StateFilteringParameter.GetParameters(StateFiltering));
+        }
+
+        public async Task<IEnumerable<AnalyzedIssue>> GetAllIssues(StateFilteringParameter stateFiltering)
         {
             List<CachedIssue> issues = await _jiraCache.GetIssues();
 
             List<AnalyzedIssue> analyzedIssues = _mapper.Map<List<AnalyzedIssue>>(issues);
 
-            SimplifyStateChangeOrder simplify = new SimplifyStateChangeOrder(StateFiltering.FilteredStates.ToArray(), StateFiltering.ResetStates.ToArray());
-            var finishedState = StateFiltering.FilteredStates.LastOrDefault();
+            SimplifyStateChangeOrder simplify =
+                new SimplifyStateChangeOrder(stateFiltering.FilteredStates, stateFiltering.ResetStates);
+            var finishedState = stateFiltering.FilteredStates.LastOrDefault();
 
             foreach (var item in analyzedIssues)
             {
-                item.SimplifiedStatusChanges = new Collection<CachedIssueStatusChange>(simplify.FilterStatusChanges(item.StatusChanges).ToList());
+                item.SimplifiedStatusChanges =
+                    new Collection<CachedIssueStatusChange>(simplify.FilterStatusChanges(item.StatusChanges).ToList());
 
                 item.Started = item.SimplifiedStatusChanges.FirstOrDefault()?.ChangeTime;
 
@@ -53,6 +62,7 @@ namespace Jira.FlowCharts
                 {
                     item.Ended = lastState.ChangeTime;
                 }
+
                 item.Duration = item.Ended - item.Started;
             }
 
