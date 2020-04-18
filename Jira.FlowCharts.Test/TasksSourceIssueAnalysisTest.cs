@@ -67,9 +67,9 @@ namespace Jira.FlowCharts
         [Fact]
         public async Task Analyzed_issue_contains_simplified_states()
         {
-            _tasksSource.AddFilteredState("A");
-            _tasksSource.AddFilteredState("C");
-            _tasksSource.AddResetState("D");
+            _tasksSource.StateFiltering.AddFilteredState("A");
+            _tasksSource.StateFiltering.AddFilteredState("C");
+            _tasksSource.StateFiltering.AddResetState("D");
 
             var issue = new CachedIssue()
             {
@@ -107,7 +107,7 @@ namespace Jira.FlowCharts
         [Fact]
         public async Task Non_started_issue_is_analyzed()
         {
-            _tasksSource.AddFilteredState("B");
+            _tasksSource.StateFiltering.AddFilteredState("B");
 
             var issue = new CachedIssue()
             {
@@ -137,8 +137,8 @@ namespace Jira.FlowCharts
         [Fact]
         public async Task Issue_that_doesnt_have_last_state_is_not_finished()
         {
-            _tasksSource.AddFilteredState("A");
-            _tasksSource.AddFilteredState("C");
+            _tasksSource.StateFiltering.AddFilteredState("A");
+            _tasksSource.StateFiltering.AddFilteredState("C");
 
             var issue = new CachedIssue()
             {
@@ -194,8 +194,8 @@ namespace Jira.FlowCharts
         [Fact]
         public async Task Finished_issue_is_analyzed()
         {
-            _tasksSource.AddFilteredState("A");
-            _tasksSource.AddFilteredState("C");
+            _tasksSource.StateFiltering.AddFilteredState("A");
+            _tasksSource.StateFiltering.AddFilteredState("C");
 
             var issue = new CachedIssue()
             {
@@ -237,8 +237,8 @@ namespace Jira.FlowCharts
         [Fact]
         public async Task Finished_story_must_be_valid()
         {
-            _tasksSource.AddFilteredState("A");
-            _tasksSource.AddFilteredState("C");
+            _tasksSource.StateFiltering.AddFilteredState("A");
+            _tasksSource.StateFiltering.AddFilteredState("C");
 
             var issue = new CachedIssue()
             {
@@ -260,8 +260,8 @@ namespace Jira.FlowCharts
         [Fact]
         public async Task Finished_story_must_have_start()
         {
-            _tasksSource.AddFilteredState("A");
-            _tasksSource.AddFilteredState("C");
+            _tasksSource.StateFiltering.AddFilteredState("A");
+            _tasksSource.StateFiltering.AddFilteredState("C");
 
             var issue = new CachedIssue()
             {
@@ -280,8 +280,8 @@ namespace Jira.FlowCharts
         [Fact]
         public async Task Finished_story_must_have_end()
         {
-            _tasksSource.AddFilteredState("A");
-            _tasksSource.AddFilteredState("C");
+            _tasksSource.StateFiltering.AddFilteredState("A");
+            _tasksSource.StateFiltering.AddFilteredState("C");
 
             var issue = new CachedIssue()
             {
@@ -301,8 +301,8 @@ namespace Jira.FlowCharts
         [Fact]
         public async Task Filters_out_old_issues()
         {
-            _tasksSource.AddFilteredState("A");
-            _tasksSource.AddFilteredState("C");
+            _tasksSource.StateFiltering.AddFilteredState("A");
+            _tasksSource.StateFiltering.AddFilteredState("C");
             var issuesFrom = new DateTime(2012, 2, 3).AddSeconds(1);
 
             var issue = new CachedIssue()

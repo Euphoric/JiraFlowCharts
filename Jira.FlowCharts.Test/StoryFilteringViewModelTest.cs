@@ -178,21 +178,21 @@ namespace Jira.FlowCharts
 
             Assert.Equal(new[] { "B", "C" }, _vm.AvailableStates);
             Assert.Equal(new[] { "A" }, _vm.FilteredStates);
-            Assert.Equal(new[] { "A" }, _tasksSource.FilteredStates);
+            Assert.Equal(new[] { "A" }, _tasksSource.StateFiltering.FilteredStates);
 
             _vm.SelectedAvailableState = "C";
             await _vm.MoveStateToFiltered.Execute().ToTask();
 
             Assert.Equal(new[] { "B" }, _vm.AvailableStates);
             Assert.Equal(new[] { "A", "C" }, _vm.FilteredStates);
-            Assert.Equal(new[] { "A", "C" }, _tasksSource.FilteredStates);
+            Assert.Equal(new[] { "A", "C" }, _tasksSource.StateFiltering.FilteredStates);
 
             _vm.SelectedAvailableState = "B";
             await _vm.MoveStateToFiltered.Execute().ToTask();
 
             Assert.Empty(_vm.AvailableStates);
             Assert.Equal(new[] { "A", "C", "B" }, _vm.FilteredStates);
-            Assert.Equal(new[] { "A", "C", "B" }, _tasksSource.FilteredStates);
+            Assert.Equal(new[] { "A", "C", "B" }, _tasksSource.StateFiltering.FilteredStates);
         }
 
         [Fact]
@@ -208,13 +208,13 @@ namespace Jira.FlowCharts
 
             Assert.Equal(new[] { "B", "C" }, _vm.AvailableStates);
             Assert.Equal(new[] { "A" }, _vm.FilteredStates);
-            Assert.Equal(new[] { "A" }, _tasksSource.FilteredStates);
+            Assert.Equal(new[] { "A" }, _tasksSource.StateFiltering.FilteredStates);
 
             await Reactivate();
 
             Assert.Equal(new[] { "B", "C" }, _vm.AvailableStates);
             Assert.Equal(new[] { "A" }, _vm.FilteredStates);
-            Assert.Equal(new[] { "A" }, _tasksSource.FilteredStates);
+            Assert.Equal(new[] { "A" }, _tasksSource.StateFiltering.FilteredStates);
         }
 
         [Fact]
@@ -246,7 +246,7 @@ namespace Jira.FlowCharts
 
             Assert.Equal(new[] { "B" }, _vm.AvailableStates);
             Assert.Equal(new[] { "A", "C" }, _vm.FilteredStates);
-            Assert.Equal(new[] { "A", "C" }, _tasksSource.FilteredStates);
+            Assert.Equal(new[] { "A", "C" }, _tasksSource.StateFiltering.FilteredStates);
 
             _vm.SelectedFilteredState = "C";
 
@@ -254,7 +254,7 @@ namespace Jira.FlowCharts
 
             Assert.Equal(new[] { "B", "C" }, _vm.AvailableStates);
             Assert.Equal(new[] { "A", }, _vm.FilteredStates);
-            Assert.Equal(new[] { "A", }, _tasksSource.FilteredStates);
+            Assert.Equal(new[] { "A", }, _tasksSource.StateFiltering.FilteredStates);
 
             _vm.SelectedFilteredState = "A";
 
@@ -262,7 +262,7 @@ namespace Jira.FlowCharts
 
             Assert.Equal(new[] { "B", "C", "A" }, _vm.AvailableStates);
             Assert.Equal(new string[] { }, _vm.FilteredStates);
-            Assert.Equal(new string[] { }, _tasksSource.FilteredStates);
+            Assert.Equal(new string[] { }, _tasksSource.StateFiltering.FilteredStates);
         }
 
         [Fact]
@@ -280,13 +280,13 @@ namespace Jira.FlowCharts
 
             Assert.Equal(new[] { "B" }, _vm.AvailableStates);
             Assert.Equal(new[] { "A", "C" }, _vm.FilteredStates);
-            Assert.Equal(new[] { "A", "C" }, _tasksSource.FilteredStates);
+            Assert.Equal(new[] { "A", "C" }, _tasksSource.StateFiltering.FilteredStates);
 
             await Reactivate();
 
             Assert.Equal(new[] { "B" }, _vm.AvailableStates);
             Assert.Equal(new[] { "A", "C" }, _vm.FilteredStates);
-            Assert.Equal(new[] { "A", "C" }, _tasksSource.FilteredStates);
+            Assert.Equal(new[] { "A", "C" }, _tasksSource.StateFiltering.FilteredStates);
         }
 
 
@@ -317,21 +317,21 @@ namespace Jira.FlowCharts
 
             Assert.Equal(new[] { "B", "C" }, _vm.AvailableStates);
             Assert.Equal(new[] { "A" }, _vm.ResetStates);
-            Assert.Equal(new[] { "A" }, _tasksSource.ResetStates);
+            Assert.Equal(new[] { "A" }, _tasksSource.StateFiltering.ResetStates);
 
             _vm.SelectedAvailableState = "C";
             await _vm.MoveStateToReset.Execute().ToTask();
 
             Assert.Equal(new[] { "B" }, _vm.AvailableStates);
             Assert.Equal(new[] { "A", "C" }, _vm.ResetStates);
-            Assert.Equal(new[] { "A", "C" }, _tasksSource.ResetStates);
+            Assert.Equal(new[] { "A", "C" }, _tasksSource.StateFiltering.ResetStates);
 
             _vm.SelectedAvailableState = "B";
             await _vm.MoveStateToReset.Execute().ToTask();
 
             Assert.Empty(_vm.AvailableStates);
             Assert.Equal(new[] { "A", "C", "B" }, _vm.ResetStates);
-            Assert.Equal(new[] { "A", "C", "B" }, _tasksSource.ResetStates);
+            Assert.Equal(new[] { "A", "C", "B" }, _tasksSource.StateFiltering.ResetStates);
         }
 
         [Fact]
@@ -347,13 +347,13 @@ namespace Jira.FlowCharts
 
             Assert.Equal(new[] { "B", "C" }, _vm.AvailableStates);
             Assert.Equal(new[] { "A" }, _vm.ResetStates);
-            Assert.Equal(new[] { "A" }, _tasksSource.ResetStates);
+            Assert.Equal(new[] { "A" }, _tasksSource.StateFiltering.ResetStates);
 
             await Reactivate();
 
             Assert.Equal(new[] { "B", "C" }, _vm.AvailableStates);
             Assert.Equal(new[] { "A" }, _vm.ResetStates);
-            Assert.Equal(new[] { "A" }, _tasksSource.ResetStates);
+            Assert.Equal(new[] { "A" }, _tasksSource.StateFiltering.ResetStates);
         }
 
         [Fact]
@@ -385,7 +385,7 @@ namespace Jira.FlowCharts
 
             Assert.Equal(new[] { "B" }, _vm.AvailableStates);
             Assert.Equal(new[] { "A", "C" }, _vm.ResetStates);
-            Assert.Equal(new[] { "A", "C" }, _tasksSource.ResetStates);
+            Assert.Equal(new[] { "A", "C" }, _tasksSource.StateFiltering.ResetStates);
 
             _vm.SelectedResetState = "C";
 
@@ -393,7 +393,7 @@ namespace Jira.FlowCharts
 
             Assert.Equal(new[] { "B", "C" }, _vm.AvailableStates);
             Assert.Equal(new[] { "A", }, _vm.ResetStates);
-            Assert.Equal(new[] { "A", }, _tasksSource.ResetStates);
+            Assert.Equal(new[] { "A", }, _tasksSource.StateFiltering.ResetStates);
 
             _vm.SelectedResetState = "A";
 
@@ -401,7 +401,7 @@ namespace Jira.FlowCharts
 
             Assert.Equal(new[] { "B", "C", "A" }, _vm.AvailableStates);
             Assert.Equal(new string[] { }, _vm.ResetStates);
-            Assert.Equal(new string[] { }, _tasksSource.ResetStates);
+            Assert.Equal(new string[] { }, _tasksSource.StateFiltering.ResetStates);
         }
 
         [Fact]
@@ -419,13 +419,13 @@ namespace Jira.FlowCharts
 
             Assert.Equal(new[] { "B" }, _vm.AvailableStates);
             Assert.Equal(new[] { "A", "C" }, _vm.ResetStates);
-            Assert.Equal(new[] { "A", "C" }, _tasksSource.ResetStates);
+            Assert.Equal(new[] { "A", "C" }, _tasksSource.StateFiltering.ResetStates);
 
             await Reactivate();
 
             Assert.Equal(new[] { "B" }, _vm.AvailableStates);
             Assert.Equal(new[] { "A", "C" }, _vm.ResetStates);
-            Assert.Equal(new[] { "A", "C" }, _tasksSource.ResetStates);
+            Assert.Equal(new[] { "A", "C" }, _tasksSource.StateFiltering.ResetStates);
         }
 
         [Fact]
@@ -445,7 +445,7 @@ namespace Jira.FlowCharts
 
             Assert.Equal(new[] { "B" }, _vm.AvailableStates);
             Assert.Equal(new[] { "A", "C" }, _vm.ResetStates);
-            Assert.Equal(new[] { "A", "C" }, _tasksSource.ResetStates);
+            Assert.Equal(new[] { "A", "C" }, _tasksSource.StateFiltering.ResetStates);
         }
 
         [Fact]

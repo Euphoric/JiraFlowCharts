@@ -13,11 +13,11 @@ namespace Jira.FlowCharts.StoryFiltering
 {
     public class StoryFilteringViewModel : ReactiveScreen
     {
-        private readonly TasksSource _tasksSource;
+        private readonly StateFiltering _tasksSource;
 
         public StoryFilteringViewModel(TasksSource tasksSource)
         {
-            _tasksSource = tasksSource;
+            _tasksSource = tasksSource.StateFiltering;
 
             DisplayName = "Story and state filtering";
 

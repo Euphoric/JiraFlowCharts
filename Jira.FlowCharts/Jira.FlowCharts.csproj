@@ -295,6 +295,7 @@
     <Compile Include="Simulation\FlowSimulationStatistics.cs" />
     <Compile Include="Simulation\NewEvent.cs" />
     <Compile Include="Simulation\FlowSimulation.cs" />
+    <Compile Include="StateFiltering.cs" />
     <Compile Include="StoryFiltering\StoryFilteringView.xaml.cs">
       <DependentUpon>StoryFilteringView.xaml</DependentUpon>
     </Compile>

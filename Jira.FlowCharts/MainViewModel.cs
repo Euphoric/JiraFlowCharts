@@ -54,7 +54,7 @@ namespace Jira.FlowCharts
 
         protected override async Task OnInitializeAsync(CancellationToken cancellationToken)
         {
-            await _tasksSource.ReloadStates();
+            await _tasksSource.StateFiltering.ReloadStates();
         }
     }
 }

@@ -3,7 +3,6 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
-using DynamicData;
 using Jira.Querying;
 
 namespace Jira.FlowCharts
@@ -11,21 +10,15 @@ namespace Jira.FlowCharts
     public class TasksSource
     {
         private readonly ITasksSourceJiraCacheAdapter _jiraCache;
-        private readonly IStatesRepository _statesRepository;
         private readonly IMapper _mapper;
 
-        public ObservableCollection<string> AvailableStates { get; }
-        public ObservableCollection<string> FilteredStates { get; }
-        public ObservableCollection<string> ResetStates { get; }
-        
+        public StateFiltering StateFiltering { get; }
+
         public TasksSource(ITasksSourceJiraCacheAdapter jiraCacheAdapter, IStatesRepository statesRepository)
         {
             _jiraCache = jiraCacheAdapter;
-            _statesRepository = statesRepository;
 
-            AvailableStates = new ObservableCollection<string>();
-            FilteredStates = new ObservableCollection<string>();
-            ResetStates = new ObservableCollection<string>();
+            StateFiltering = new StateFiltering(jiraCacheAdapter, statesRepository);
 
             var config = new MapperConfiguration(cfg =>
             {
@@ -40,108 +33,14 @@ namespace Jira.FlowCharts
             await _jiraCache.UpdateIssues(jiraLoginParameters, projectName, cacheUpdateProgress);
         }
 
-        public async Task<string[]> GetAllStates()
-        {
-            return await _jiraCache.GetAllStates();
-        }
-
-        public async Task ReloadStates()
-        {
-            AvailableStates.Clear();
-            FilteredStates.Clear();
-            ResetStates.Clear();
-
-            var allStates = await GetAllStates();
-            var filteredStates = _statesRepository.GetFilteredStates();
-            var resetStates = _statesRepository.GetResetStates();
-
-            AvailableStates.AddRange(allStates.Except(filteredStates).Except(resetStates));
-            FilteredStates.AddRange(filteredStates);
-            ResetStates.AddRange(resetStates);
-        }
-
-        public void AddFilteredState(string state)
-        {
-            if (state == null)
-                return;
-
-            AvailableStates.Remove(state);
-            FilteredStates.Add(state);
-            _statesRepository.SetFilteredStates(FilteredStates.ToArray());
-        }
-
-        public void RemoveFilteredState(string state)
-        {
-            if (state == null)
-                return;
-
-            AvailableStates.Add(state);
-            FilteredStates.Remove(state);
-            _statesRepository.SetFilteredStates(FilteredStates.ToArray());
-        }
-
-        public void AddResetState(string state)
-        {
-            if (state == null)
-                return;
-
-            AvailableStates.Remove(state);
-            ResetStates.Add(state);
-            _statesRepository.SetResetStates(ResetStates.ToArray());
-        }
-
-        public void RemoveResetState(string state)
-        {
-            if (state == null)
-                return;
-
-            AvailableStates.Add(state);
-            ResetStates.Remove(state);
-            _statesRepository.SetResetStates(ResetStates.ToArray());
-        }
-
-        public void MoveFilteredStateLower(string state)
-        {
-            if (state == null)
-                return;
-
-            var stateAt = FilteredStates.IndexOf(state);
-            if (stateAt == 0)
-                return;
-
-            stateAt--;
-            var reinsertState = FilteredStates[stateAt];
-            FilteredStates.RemoveAt(stateAt);
-            FilteredStates.Insert(stateAt + 1, reinsertState);
-
-            _statesRepository.SetFilteredStates(FilteredStates.ToArray());
-        }
-
-        public void MoveFilteredStateHigher(string state)
-        {
-            if (state == null)
-                return;
-
-            var stateAt = FilteredStates.IndexOf(state);
-            if (stateAt == FilteredStates.Count-1)
-                return;
-
-            stateAt++;
-            var reinsertState = FilteredStates[stateAt];
-            FilteredStates.RemoveAt(stateAt);
-            FilteredStates.Insert(stateAt - 1, reinsertState);
-
-            _statesRepository.SetFilteredStates(FilteredStates.ToArray());
-        }
-
         public async Task<IEnumerable<AnalyzedIssue>> GetAllIssues()
         {
             List<CachedIssue> issues = await _jiraCache.GetIssues();
 
             List<AnalyzedIssue> analyzedIssues = _mapper.Map<List<AnalyzedIssue>>(issues);
 
-            SimplifyStateChangeOrder simplify = new SimplifyStateChangeOrder(FilteredStates.ToArray(), ResetStates.ToArray());
-            var finishedState = FilteredStates.LastOrDefault();
+            SimplifyStateChangeOrder simplify = new SimplifyStateChangeOrder(StateFiltering.FilteredStates.ToArray(), StateFiltering.ResetStates.ToArray());
+            var finishedState = StateFiltering.FilteredStates.LastOrDefault();
 
             foreach (var item in analyzedIssues)
             {
@@ -164,9 +63,9 @@ namespace Jira.FlowCharts
         {
             // TODO : Automated tests and ability to change for user
 
-            return 
-                (issue.Type == "Story" || issue.Type == "Bug") && 
-                (issue.Resolution != "Cancelled" && issue.Resolution != "Duplicate") && 
+            return
+                (issue.Type == "Story" || issue.Type == "Bug") &&
+                (issue.Resolution != "Cancelled" && issue.Resolution != "Duplicate") &&
                 (issue.Status != "Withdrawn" && issue.Status != "On Hold");
         }
 
