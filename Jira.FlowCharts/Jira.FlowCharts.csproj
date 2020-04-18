@@ -282,6 +282,7 @@
     <Compile Include="JsonStatesRepository.cs" />
     <Compile Include="MainViewModel.cs" />
     <Compile Include="MemoryStatesRepository.cs" />
+    <Compile Include="ProjectStatistics.cs" />
     <Compile Include="ReactiveScreen.cs" />
     <Compile Include="SimplifyStateChangeOrder.cs" />
     <Compile Include="Simulation\SimulationView.xaml.cs">

@@ -34,12 +34,6 @@ namespace Jira.FlowCharts
             await _jiraCache.UpdateIssues(jiraLoginParameters, projectName, cacheUpdateProgress);
         }
 
-        [Obsolete("Use parametrized version")]
-        public async Task<IEnumerable<AnalyzedIssue>> GetAllIssues()
-        {
-            return await GetAllIssues(StateFilteringParameter.GetParameters(StateFiltering));
-        }
-
         public async Task<IEnumerable<AnalyzedIssue>> GetAllIssues(StateFilteringParameter stateFiltering)
         {
             List<CachedIssue> issues = await _jiraCache.GetIssues();
@@ -140,6 +134,16 @@ namespace Jira.FlowCharts
             };
 
             return flowIssue;
+        }
+
+        public async Task<IEnumerable<ProjectStatistics>> GetProjectsStatistics()
+        {
+            var allIssues = await _jiraCache.GetIssues();
+
+            return 
+                allIssues
+                .GroupBy(x=>x.Key.Split('-')[0])
+                .Select(grp=> new ProjectStatistics(grp.Key, grp.Count(), grp.Max(x => x.Updated)));
         }
     }
 }

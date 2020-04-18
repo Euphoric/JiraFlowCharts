@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reactive;
@@ -67,17 +68,13 @@ namespace Jira.FlowCharts.JiraUpdate
 
         private async Task UpdateDisplay()
         {
-            var allIssues = (await _tasksSource.GetAllIssues()).ToList();
-
             _projects.Clear();
 
-            var projectGroups = allIssues.GroupBy(x=>x.Key.Split('-')[0]);
-            foreach (var projectGroup in projectGroups)
+            IEnumerable<ProjectStatistics> projects = await _tasksSource.GetProjectsStatistics();
+
+            foreach (var project in projects)
             {
-                string projectKey = projectGroup.Key;
-                int issuesCount = projectGroup.Count();
-                var lastUpdatedIssue = allIssues.Max(x => x.Updated);
-                _projects.Add(new JiraProjectViewModel(projectKey, issuesCount, lastUpdatedIssue));
+                _projects.Add(new JiraProjectViewModel(project.Key, project.IssueCount, project.LastUpdateTime));
             }
         }
 
