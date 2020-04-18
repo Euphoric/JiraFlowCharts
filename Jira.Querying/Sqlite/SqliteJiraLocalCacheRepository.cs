@@ -62,9 +62,9 @@ namespace Jira.Querying.Sqlite
             return _mapper.Map<IEnumerable<CachedIssue>>(dbIssues);
         }
 
-        public async Task<DateTime?> LastUpdatedIssueTime()
+        public async Task<DateTime?> LastUpdatedIssueTime(string projectKey)
         {
-            return await _dbContext.Issues.Select(x => x.Updated).MaxAsync();
+            return await _dbContext.Issues.Where(x=>x.Key.StartsWith(projectKey)).Select(x => x.Updated).MaxAsync();
         }
 
         public void Dispose()

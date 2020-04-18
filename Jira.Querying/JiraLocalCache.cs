@@ -30,7 +30,7 @@ namespace Jira.Querying
 
             Task AddOrReplaceCachedIssue(CachedIssue flatIssue);
 
-            Task<DateTime?> LastUpdatedIssueTime();
+            Task<DateTime?> LastUpdatedIssueTime(string projectKey);
 
             bool IsDisposed { get; }
         }
@@ -64,9 +64,15 @@ namespace Jira.Querying
                 return Task.CompletedTask;
             }
 
-            public Task<DateTime?> LastUpdatedIssueTime()
+            public Task<DateTime?> LastUpdatedIssueTime(string projectKey)
             {
-                return Task.FromResult(_issues.Select(x => x.Updated).Max());
+                var lastUpdatedTime = 
+                    _issues
+                        .Where(x=>x.Key.StartsWith(projectKey))
+                        .Select(x => x.Updated)
+                        .Max();
+
+                return Task.FromResult(lastUpdatedTime);
             }
 
             public void Dispose()
@@ -126,7 +132,7 @@ namespace Jira.Querying
                 throw new InvalidOperationException($"Must call {nameof(Initialize)} before updating.");
             }
 
-            DateTime lastUpdateDate = await GetLastUpdateDateTime(startUpdateDate);
+            DateTime lastUpdateDate = await GetLastUpdateDateTime(projectKey, startUpdateDate);
 
             int itemPaging = 0;
             while (true)
@@ -155,11 +161,11 @@ namespace Jira.Querying
         /// <summary>
         /// Retrieves last updated date. If there are no issues, uses set default. If there are, uses date time of last updated issue.
         /// </summary>
-        private async Task<DateTime> GetLastUpdateDateTime(DateTime startUpdatedDate)
+        private async Task<DateTime> GetLastUpdateDateTime(string projectKey, DateTime startUpdatedDate)
         {
             DateTime lastUpdateDate = startUpdatedDate;
 
-            var lastIssueUpdate = await _repository.LastUpdatedIssueTime();
+            var lastIssueUpdate = await _repository.LastUpdatedIssueTime(projectKey);
 
             if (lastIssueUpdate.HasValue)
             {

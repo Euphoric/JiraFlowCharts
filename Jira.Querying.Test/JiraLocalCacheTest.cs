@@ -437,7 +437,7 @@ namespace Jira.Querying
 
             await CacheUpdate(projectKey:"A");
 
-            var retrievedIssues = await Repository.GetIssues();
+            var retrievedIssues = await Cache.GetIssues();
 
             var issueKeys = retrievedIssues.Select(x => x.Key).ToArray();
             Assert.Equal(new[] {"A-1"}, issueKeys);
@@ -456,10 +456,27 @@ namespace Jira.Querying
             await CacheUpdate(projectKey:"B");
             await CacheUpdate(projectKey:"C");
 
-            var retrievedIssues = await Repository.GetIssues();
+            var retrievedIssues = await Cache.GetIssues();
 
             var issueKeys = retrievedIssues.Select(x => x.Key).ToArray();
             Assert.Equal(new[] {"A-1", "B-1", "C-1"}, issueKeys.OrderBy(x=>x));
+        }
+
+        [Fact]
+        public async Task Last_update_times_are_independent_per_project()
+        {
+            await Cache.Initialize();
+
+            _client.UpdateIssue("A-1");
+            _client.UpdateIssue("B-1");
+
+            await CacheUpdate(projectKey:"B");
+            await CacheUpdate(projectKey:"A");
+
+            var retrievedIssues = await Cache.GetIssues();
+
+            var issueKeys = retrievedIssues.Select(x => x.Key).ToArray();
+            Assert.Equal(new[] {"A-1", "B-1"}, issueKeys.OrderBy(x=>x));
         }
     }
 }
