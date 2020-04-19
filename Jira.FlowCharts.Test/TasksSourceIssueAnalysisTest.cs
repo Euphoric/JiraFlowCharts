@@ -26,6 +26,11 @@ namespace Jira.FlowCharts
                 return Task.FromResult(Issues);
             }
 
+            public Task<List<CachedIssue>> GetIssues(string projectKey)
+            {
+                return Task.FromResult(Issues);
+            }
+
             public Task UpdateIssues(JiraLoginParameters jiraLoginParameters, string projectKey, ICacheUpdateProgress cacheUpdateProgress, DateTime startUpdateDate)
             {
                 throw new NotSupportedException("Use different test class.");

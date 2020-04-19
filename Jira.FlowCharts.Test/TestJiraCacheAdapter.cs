@@ -17,6 +17,11 @@ namespace Jira.FlowCharts
             return Task.FromResult(_issues);
         }
 
+        public Task<List<CachedIssue>> GetIssues(string projectKey)
+        {
+            return Task.FromResult(_issues);
+        }
+
         public List<CachedIssue> IssuesToUpdateWith { get; } = new List<CachedIssue>();
 
         public string ExpectedProjectKey { get; internal set; }
