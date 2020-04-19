@@ -15,7 +15,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Jira.FlowCharts.Test", "Jir
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Jira.Simulation.Test", "Jira.Simulation.Test\Jira.Simulation.Test.csproj", "{CEF44AD0-3645-4F0E-BAC1-C9F145D34141}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Jira.Querying.Fakes", "Jira.Querying.Fakes\Jira.Querying.Fakes.csproj", "{E864C4DC-2543-4EE3-8417-1DEC4FF9D7E8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Jira.Querying.Fakes", "Jira.Querying.Fakes\Jira.Querying.Fakes.csproj", "{E864C4DC-2543-4EE3-8417-1DEC4FF9D7E8}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{B721EC80-03BC-4C20-876A-C9EC39D999EC}"
+	ProjectSection(SolutionItems) = preProject
+		add_migration.ps1 = add_migration.ps1
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

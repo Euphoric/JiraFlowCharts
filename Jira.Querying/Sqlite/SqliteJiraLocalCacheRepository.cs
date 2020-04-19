@@ -17,10 +17,8 @@ namespace Jira.Querying.Sqlite
 
         public SqliteJiraLocalCacheRepository(string databaseFile = null)
         {
-            var optionsBuilder = new DbContextOptionsBuilder<IssuesCacheContext>();
-            var connectionString = databaseFile == null ? "DataSource=:memory:" : $"DataSource={Path.GetFullPath(databaseFile)}";
-            optionsBuilder.UseSqlite(connectionString);
-            _dbContext = new IssuesCacheContext(optionsBuilder.Options);
+            var dbContextOptions = CreateSqliteOptions(databaseFile);
+            _dbContext = new IssuesCacheContext(dbContextOptions);
 
             var config = new MapperConfiguration(cfg => {
                 cfg.CreateMap<CachedIssue, CachedIssueDb>();
@@ -31,6 +29,15 @@ namespace Jira.Querying.Sqlite
             }
 );
             _mapper = config.CreateMapper();
+        }
+
+        internal static DbContextOptions<IssuesCacheContext> CreateSqliteOptions(string databaseFile)
+        {
+            var optionsBuilder = new DbContextOptionsBuilder<IssuesCacheContext>();
+            var connectionString =  databaseFile == null ? "DataSource=:memory:" : $"DataSource={Path.GetFullPath(databaseFile)}";
+            optionsBuilder.UseSqlite(connectionString);
+            var optionsBuilderOptions = optionsBuilder.Options;
+            return optionsBuilderOptions;
         }
 
         public async Task Initialize()
