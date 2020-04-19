@@ -449,7 +449,7 @@ namespace Jira.Querying
             Assert.NotNull(project);
 
             Assert.Equal(issueCount, project.IssueCount);
-            Assert.Equal(new DateTime(2019, 1, 1).AddDays(issueCount - 1), project.LastUpdatedDate);
+            Assert.Equal(new DateTime(2019, 1, 1).AddDays(issueCount - 1), project.LastUpdatedTime);
         }
 
         [Fact]

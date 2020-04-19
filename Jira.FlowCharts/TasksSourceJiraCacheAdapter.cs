@@ -14,6 +14,7 @@ namespace Jira.FlowCharts
         Task<List<CachedIssue>> GetIssues(string projectKey);
         Task UpdateIssues(JiraLoginParameters jiraLoginParameters, string projectKey, ICacheUpdateProgress cacheUpdateProgress, DateTime startUpdateDate);
         Task<string[]> GetAllStates();
+        Task<ProjectStatistic[]> GetProjects();
     }
 
     public class TasksSourceJiraCacheAdapter : ITasksSourceJiraCacheAdapter
@@ -73,6 +74,16 @@ namespace Jira.FlowCharts
                 var issueChangeStatus = cachedIssues.SelectMany(x => x.StatusChanges).Select(x => x.State);
 
                 return issueStatus.Concat(issueChangeStatus).Distinct().ToArray();
+            }
+        }
+
+        public async Task<ProjectStatistic[]> GetProjects()
+        {
+            using (var cache = new JiraLocalCache(CreateRepository()))
+            {
+                await cache.Initialize();
+
+                return await cache.GetProjects();
             }
         }
     }

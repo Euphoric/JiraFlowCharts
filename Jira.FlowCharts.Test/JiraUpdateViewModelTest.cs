@@ -90,12 +90,9 @@ namespace Jira.FlowCharts
         [Theory]
         [InlineData(2)]
         [InlineData(10)]
-        public async Task Update_refreshes_display(int issueCount)
+        public async Task Update_refreshes_single_project_statistics(int issueCount)
         {
-            for (int i = 1; i <= issueCount; i++)
-            {
-                _jiraCacheAdapter.IssuesToUpdateWith.Add(new CachedIssue() { Key = "KEY-"+i, Updated = new DateTime(2019, 1, 1).AddDays(i)});
-            }
+            _jiraCacheAdapter.ProjectStatsStatistics.Add(new ProjectStatistic("KEY", issueCount, new DateTime(2019, 1, issueCount)));
 
             await _vm.UpdateCommand.Execute().ToTask();
             Assert.Null(_vm.UpdateError);
@@ -104,32 +101,20 @@ namespace Jira.FlowCharts
             Assert.NotNull(project);
             Assert.Equal("KEY", project.Key);
             Assert.Equal(issueCount, project.CachedIssuesCount);
-            Assert.Equal(new DateTime(2019, 1, 1).AddDays(issueCount), project.LastUpdatedIssue);
+            Assert.Equal(new DateTime(2019, 1, issueCount), project.LastUpdatedIssue);
         }
 
         [Fact]
         public async Task Updates_multiple_projects()
         {
-            _jiraCacheAdapter.IssuesToUpdateWith.Add(new CachedIssue() { Key = "KEY-1", Updated = new DateTime(2019, 1, 1)});
-            _jiraCacheAdapter.IssuesToUpdateWith.Add(new CachedIssue() { Key = "PROJ-1", Updated = new DateTime(2019, 2, 2)});
+            _jiraCacheAdapter.ProjectStatsStatistics.Add(new ProjectStatistic("KEY", 13, new DateTime(2019, 1, 2)));
+            _jiraCacheAdapter.ProjectStatsStatistics.Add(new ProjectStatistic("PROJ", 23, new DateTime(2019, 1, 2)));
 
             await _vm.UpdateCommand.Execute().ToTask();
             Assert.Null(_vm.UpdateError);
 
             var projectKeys = _vm.Projects.Select(x=>x.Key);
             Assert.Equal(new[] {"KEY", "PROJ"}, projectKeys);
-        }
-
-        [Fact]
-        public async Task Multiple_updates_have_correct_project_count()
-        {
-            _jiraCacheAdapter.IssuesToUpdateWith.Add(new CachedIssue() { Key = "KEY-1", Updated = new DateTime(2019, 1, 1)});
-            _jiraCacheAdapter.IssuesToUpdateWith.Add(new CachedIssue() { Key = "KEY-2", Updated = new DateTime(2019, 2, 2)});
-
-            await _vm.UpdateCommand.Execute().ToTask();
-            await _vm.UpdateCommand.Execute().ToTask();
-
-            Assert.Single(_vm.Projects);
         }
 
         [Fact]

@@ -53,5 +53,12 @@ namespace Jira.FlowCharts
         {
             return Task.FromResult(AllStates);
         }
+
+        public List<ProjectStatistic> ProjectStatsStatistics { get; }= new List<ProjectStatistic>();
+
+        public Task<ProjectStatistic[]> GetProjects()
+        {
+            return Task.FromResult(ProjectStatsStatistics.ToArray());
+        }
     }
 }

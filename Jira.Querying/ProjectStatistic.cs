@@ -6,13 +6,13 @@ namespace Jira.Querying
     {
         public string Key { get; }
         public int IssueCount { get; }
-        public DateTime? LastUpdatedDate { get; }
+        public DateTime? LastUpdatedTime { get; }
 
-        public ProjectStatistic(string key, int issueCount, DateTime? lastUpdatedDate)
+        public ProjectStatistic(string key, int issueCount, DateTime? lastUpdatedTime)
         {
             Key = key;
             IssueCount = issueCount;
-            LastUpdatedDate = lastUpdatedDate;
+            LastUpdatedTime = lastUpdatedTime;
         }
     }
 }

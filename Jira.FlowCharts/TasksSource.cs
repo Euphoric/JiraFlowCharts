@@ -135,12 +135,11 @@ namespace Jira.FlowCharts
 
         public async Task<IEnumerable<ProjectStatistics>> GetProjectsStatistics()
         {
-            var allIssues = await _jiraCache.GetIssues();
+            var allIssues = await _jiraCache.GetProjects();
 
             return 
                 allIssues
-                .GroupBy(x=>x.Key.Split('-')[0])
-                .Select(grp=> new ProjectStatistics(grp.Key, grp.Count(), grp.Max(x => x.Updated)));
+                    .Select(proj=> new ProjectStatistics(proj.Key, proj.IssueCount, proj.LastUpdatedTime));
         }
     }
 }

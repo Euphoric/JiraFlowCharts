@@ -35,6 +35,11 @@ namespace Jira.FlowCharts
             {
                 throw new NotSupportedException("Use different test class.");
             }
+
+            public Task<ProjectStatistic[]> GetProjects()
+            {
+                throw new NotSupportedException("Use different test class.");
+            }
         }
 
         private readonly TestJiraCacheAdapter _jiraCacheAdapter;
