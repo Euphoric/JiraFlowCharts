@@ -144,6 +144,7 @@ namespace Jira.FlowCharts
         {
             var flowIssue = new FinishedIssue()
             {
+                Project = issue.Project,
                 Key = issue.Key,
                 Title = issue.Title,
                 Type = issue.Type,

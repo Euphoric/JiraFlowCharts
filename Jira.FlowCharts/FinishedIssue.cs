@@ -6,6 +6,7 @@ namespace Jira.FlowCharts
 {
     public class FinishedIssue
     {
+        public string Project { get; set; }
         public string Key { get; set; }
         public string Title { get; set; }
         public string Type { get; set; }

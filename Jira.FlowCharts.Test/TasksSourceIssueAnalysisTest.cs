@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Jira.Querying;
 using KellermanSoftware.CompareNetObjects;
@@ -23,12 +22,14 @@ namespace Jira.FlowCharts
 
             public Task<List<CachedIssue>> GetIssues()
             {
-                return Task.FromResult(Issues);
+                throw new NotSupportedException("Should be removed.");
             }
 
             public Task<List<CachedIssue>> GetIssues(string projectKey)
             {
-                return Task.FromResult(Issues);
+                Assert.NotNull(projectKey);
+
+                return Task.FromResult(Issues.Where(x=>x.Project == projectKey).ToList());
             }
 
             public Task UpdateIssues(JiraLoginParameters jiraLoginParameters, string projectKey, ICacheUpdateProgress cacheUpdateProgress, DateTime startUpdateDate)
@@ -46,6 +47,8 @@ namespace Jira.FlowCharts
         private readonly TasksSource _tasksSource;
         private readonly CompareLogic _compareLogic;
 
+        private static string DefaultProjectKey = "KEY";
+
         public TasksSourceIssueAnalysisTest()
         {
             _jiraCacheAdapter = new TestJiraCacheAdapter();
@@ -59,7 +62,7 @@ namespace Jira.FlowCharts
         {
             var stateFiltering = new StateFilteringParameter(new string[0], new string[0]);
 
-            var issues = await _tasksSource.GetAllIssues(stateFiltering);
+            var issues = await _tasksSource.GetAllIssues(DefaultProjectKey, stateFiltering);
 
             Assert.Empty(issues);
         }
@@ -70,8 +73,11 @@ namespace Jira.FlowCharts
         {
             var stateFiltering = new StateFilteringParameter(new string[0], new string[0]);
 
+            issue.Project = DefaultProjectKey;
+            issue.Key = DefaultProjectKey + "-1";
             _jiraCacheAdapter.Issues.Add(issue);
-            var issues = await _tasksSource.GetAllIssues(stateFiltering);
+
+            var issues = await _tasksSource.GetAllIssues(DefaultProjectKey, stateFiltering);
 
             _compareLogic.AssertEqual<object>(issues, _jiraCacheAdapter.Issues);
         }
@@ -83,6 +89,8 @@ namespace Jira.FlowCharts
 
             var issue = new CachedIssue()
             {
+                Project = DefaultProjectKey,
+                Key = DefaultProjectKey + "-1",
                 StatusChanges = new Collection<CachedIssueStatusChange>()
                 {
                     new CachedIssueStatusChange(new DateTime(2012, 1, 1), "A"),
@@ -94,12 +102,14 @@ namespace Jira.FlowCharts
                 }
             };
             _jiraCacheAdapter.Issues.Add(issue);
-            var issues = await _tasksSource.GetAllIssues(stateFiltering);
+            var issues = await _tasksSource.GetAllIssues(DefaultProjectKey, stateFiltering);
 
             var analyzedIssue = Assert.Single(issues);
 
-            var expectedIssue = new AnalyzedIssue()
+            var expectedIssue = new AnalyzedIssue
             {
+                Project = DefaultProjectKey,
+                Key = DefaultProjectKey + "-1",
                 StatusChanges = issue.StatusChanges,
                 SimplifiedStatusChanges = new Collection<CachedIssueStatusChange>()
                 {
@@ -121,21 +131,24 @@ namespace Jira.FlowCharts
 
             var issue = new CachedIssue()
             {
+                Project = DefaultProjectKey,
+                Key = DefaultProjectKey + "-1",
                 StatusChanges = new Collection<CachedIssueStatusChange>()
                 {
                     new CachedIssueStatusChange(new DateTime(2012, 1, 1), "A"),
                 }
             };
             _jiraCacheAdapter.Issues.Add(issue);
-            var issues = await _tasksSource.GetAllIssues(stateFiltering);
+            var issues = await _tasksSource.GetAllIssues(DefaultProjectKey, stateFiltering);
 
             var analyzedIssue = Assert.Single(issues);
 
             var expectedIssue = new AnalyzedIssue()
             {
+                Project = DefaultProjectKey,
+                Key = DefaultProjectKey + "-1",
                 StatusChanges = issue.StatusChanges,
-                SimplifiedStatusChanges = new Collection<CachedIssueStatusChange>()
-                { },
+                SimplifiedStatusChanges = new Collection<CachedIssueStatusChange>(),
                 Started = null,
                 Ended = null,
                 Duration = null
@@ -151,6 +164,8 @@ namespace Jira.FlowCharts
 
             var issue = new CachedIssue()
             {
+                Project = DefaultProjectKey,
+                Key = DefaultProjectKey + "-1",
                 StatusChanges = new Collection<CachedIssueStatusChange>()
                 {
                     new CachedIssueStatusChange(new DateTime(2012, 2, 1), "A"),
@@ -158,12 +173,14 @@ namespace Jira.FlowCharts
                 }
             };
             _jiraCacheAdapter.Issues.Add(issue);
-            var issues = await _tasksSource.GetAllIssues(stateFiltering);
+            var issues = await _tasksSource.GetAllIssues(DefaultProjectKey, stateFiltering);
 
             var analyzedIssue = Assert.Single(issues);
 
             var expectedIssue = new AnalyzedIssue()
             {
+                Project = DefaultProjectKey,
+                Key = DefaultProjectKey + "-1",
                 StatusChanges = issue.StatusChanges,
                 SimplifiedStatusChanges = new Collection<CachedIssueStatusChange>()
                 {
@@ -184,16 +201,20 @@ namespace Jira.FlowCharts
 
             var issue = new CachedIssue()
             {
+                Project = DefaultProjectKey,
+                Key = DefaultProjectKey + "-1",
                 Type = "Story",
                 StatusChanges = new Collection<CachedIssueStatusChange>()
             };
             _jiraCacheAdapter.Issues.Add(issue);
-            var issues = await _tasksSource.GetAllIssues(stateFiltering);
+            var issues = await _tasksSource.GetAllIssues(DefaultProjectKey, stateFiltering);
 
             var analyzedIssue = Assert.Single(issues);
 
             var expectedIssue = new AnalyzedIssue()
             {
+                Project = DefaultProjectKey,
+                Key = DefaultProjectKey + "-1",
                 Type = "Story",
                 StatusChanges = issue.StatusChanges,
                 SimplifiedStatusChanges = new Collection<CachedIssueStatusChange>()
@@ -209,7 +230,8 @@ namespace Jira.FlowCharts
 
             var issue = new CachedIssue()
             {
-                Key = "AC-1",
+                Project = DefaultProjectKey,
+                Key = DefaultProjectKey + "-1",
                 Title = "Title",
                 Type = "Story",
                 StoryPoints = 12,
@@ -221,13 +243,14 @@ namespace Jira.FlowCharts
                 }
             };
             _jiraCacheAdapter.Issues.Add(issue);
-            var issues = await _tasksSource.GetLatestFinishedStories(new IssuesFromParameters(new DateTime(2012,1 , 1)), stateFiltering);
+            var issues = await _tasksSource.GetLatestFinishedStories(DefaultProjectKey, new IssuesFromParameters(new DateTime(2012,1 , 1)), stateFiltering);
 
             var analyzedIssue = Assert.Single(issues);
 
             var expectedIssue = new FinishedIssue()
             {
-                Key = issue.Key,
+                Project = DefaultProjectKey,
+                Key = DefaultProjectKey + "-1",
                 Title = issue.Title,
                 Type = issue.Type,
                 StoryPoints = issue.StoryPoints,
@@ -260,7 +283,7 @@ namespace Jira.FlowCharts
                 }
             };
             _jiraCacheAdapter.Issues.Add(issue);
-            var issues = await _tasksSource.GetLatestFinishedStories(new IssuesFromParameters(null), stateFiltering);
+            var issues = await _tasksSource.GetLatestFinishedStories(DefaultProjectKey, new IssuesFromParameters(null), stateFiltering);
 
             Assert.Empty(issues);
         }
@@ -280,7 +303,7 @@ namespace Jira.FlowCharts
                 }
             };
             _jiraCacheAdapter.Issues.Add(issue);
-            var issues = await _tasksSource.GetLatestFinishedStories(new IssuesFromParameters(null), stateFiltering);
+            var issues = await _tasksSource.GetLatestFinishedStories(DefaultProjectKey, new IssuesFromParameters(null), stateFiltering);
 
             Assert.Empty(issues);
         }
@@ -300,7 +323,7 @@ namespace Jira.FlowCharts
                 }
             };
             _jiraCacheAdapter.Issues.Add(issue);
-            var issues = await _tasksSource.GetLatestFinishedStories(new IssuesFromParameters(null), stateFiltering);
+            var issues = await _tasksSource.GetLatestFinishedStories(DefaultProjectKey, new IssuesFromParameters(null), stateFiltering);
 
             Assert.Empty(issues);
         }
@@ -325,7 +348,7 @@ namespace Jira.FlowCharts
                 }
             };
             _jiraCacheAdapter.Issues.Add(issue);
-            var issues = await _tasksSource.GetLatestFinishedStories(new IssuesFromParameters(issuesFrom), stateFiltering);
+            var issues = await _tasksSource.GetLatestFinishedStories(DefaultProjectKey, new IssuesFromParameters(issuesFrom), stateFiltering);
 
             Assert.Empty(issues);
         }
