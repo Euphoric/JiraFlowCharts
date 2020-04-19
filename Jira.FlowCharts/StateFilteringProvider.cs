@@ -4,9 +4,14 @@
     {
         private readonly StateFiltering _stateFiltering;
 
-        public StateFilteringProvider(StateFiltering stateFiltering)
+        public StateFilteringProvider(ITasksSourceJiraCacheAdapter jiraCacheAdapter, IStatesRepository statesRepository)
         {
-            _stateFiltering = stateFiltering;
+            _stateFiltering = new StateFiltering(jiraCacheAdapter, statesRepository);
+        }
+
+        public StateFiltering GetStateFiltering()
+        {
+            return _stateFiltering;
         }
 
         public StateFilteringParameter GetStateFilteringParameter()

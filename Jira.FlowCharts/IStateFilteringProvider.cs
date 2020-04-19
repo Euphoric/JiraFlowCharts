@@ -2,6 +2,7 @@
 {
     public interface IStateFilteringProvider
     {
+        StateFiltering GetStateFiltering();
         StateFilteringParameter GetStateFilteringParameter();
     }
 }

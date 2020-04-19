@@ -12,8 +12,6 @@ namespace Jira.FlowCharts
 {
     public class MainViewModel : Conductor<IScreen>.Collection.OneActive
     {
-        private readonly StateFiltering _stateFiltering;
-
         public ProjectSelectorViewModel ProjectSelector { get; }
 
         public MainViewModel()
@@ -29,17 +27,15 @@ namespace Jira.FlowCharts
 
             TasksSourceJiraCacheAdapter jiraCacheAdapter = new TasksSourceJiraCacheAdapter(Path.Combine(dataPath, @"issuesCache.db"));
             JsonStatesRepository statesRepository = new JsonStatesRepository(Path.Combine(dataPath, @"analysisSettings.json"));
-
-            _stateFiltering = new StateFiltering(jiraCacheAdapter, statesRepository);
+            var stateFilteringProvider = new StateFilteringProvider(jiraCacheAdapter, statesRepository);
             var tasksSource = new TasksSource(jiraCacheAdapter);
+
             var issuesFrom = DateTime.Now.AddYears(-1);
 
-            var stateFilteringProvider = new StateFilteringProvider(_stateFiltering);
-            
             ProjectSelector = new ProjectSelectorViewModel(tasksSource);
 
             Items.Add(new JiraUpdateViewModel(tasksSource, new CurrentTime()));
-            Items.Add(new StoryFilteringViewModel(_stateFiltering));
+            Items.Add(new StoryFilteringViewModel(stateFilteringProvider));
             Items.Add(new IssuesGridViewModel(tasksSource, stateFilteringProvider));
             Items.Add(new CumulativeFlowViewModel(tasksSource, stateFilteringProvider));
             Items.Add(new CycleTimeScatterplotViewModel(tasksSource, issuesFrom, stateFilteringProvider));
@@ -59,11 +55,6 @@ namespace Jira.FlowCharts
             var appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
             return Path.Combine(appData, "JiraFlowMetrics");
 #endif
-        }
-
-        protected override async Task OnInitializeAsync(CancellationToken cancellationToken)
-        {
-            await _stateFiltering.ReloadStates();
         }
 
         protected override async Task OnActivateAsync(CancellationToken cancellationToken)

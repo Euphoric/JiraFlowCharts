@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
+﻿using System.Collections.ObjectModel;
 using System.Reactive;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using DynamicData;
 using ReactiveUI;
 
 namespace Jira.FlowCharts.StoryFiltering
@@ -15,9 +10,9 @@ namespace Jira.FlowCharts.StoryFiltering
     {
         private readonly StateFiltering _stateFiltering;
 
-        public StoryFilteringViewModel(StateFiltering stateFiltering)
+        public StoryFilteringViewModel(IStateFilteringProvider stateFiltering)
         {
-            _stateFiltering = stateFiltering;
+            _stateFiltering = stateFiltering.GetStateFiltering();
 
             DisplayName = "Story and state filtering";
 
