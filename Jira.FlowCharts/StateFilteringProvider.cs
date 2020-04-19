@@ -16,10 +16,10 @@ namespace Jira.FlowCharts
             return _stateFiltering;
         }
 
-        public Task<StateFilteringParameter> GetStateFilteringParameter()
+        public async Task<StateFilteringParameter> GetStateFilteringParameter()
         {
-            var result = StateFilteringParameter.GetParameters(_stateFiltering);
-            return Task.FromResult(result);
+            await _stateFiltering.ReloadStates();
+            return StateFilteringParameter.GetParameters(_stateFiltering);
         }
     }
 }
