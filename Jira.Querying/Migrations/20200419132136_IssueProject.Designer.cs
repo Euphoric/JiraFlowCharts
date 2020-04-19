@@ -3,14 +3,16 @@ using System;
 using Jira.Querying.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Jira.Querying.Migrations
 {
     [DbContext(typeof(IssuesCacheContext))]
-    partial class IssuesCacheContextModelSnapshot : ModelSnapshot
+    [Migration("20200419132136_IssueProject")]
+    partial class IssueProject
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

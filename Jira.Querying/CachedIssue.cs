@@ -5,6 +5,7 @@ namespace Jira.Querying
 {
     public class CachedIssue
     {
+        public string Project { get; set; }
         public string Key { get; set; }
         public string Title { get; set; }
         public string Type { get; set; }

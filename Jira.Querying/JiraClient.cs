@@ -41,10 +41,10 @@ namespace Jira.Querying
 
             var innerIssues =
                 issues
-                .Select(iss=>new InnerJiraIssue(iss))
+                .Select(iss=>(IJiraIssue)new InnerJiraIssue(iss))
                 .ToArray();
 
-            return Task.FromResult<IJiraIssue[]>(innerIssues);
+            return Task.FromResult(innerIssues);
         }
 
         private class InnerJiraIssue : IJiraIssue
@@ -108,8 +108,9 @@ namespace Jira.Querying
                 storyPoints = storyPointInt;
             }
 
-            return new CachedIssue()
+            return new CachedIssue
             {
+                Project = issue.Project,
                 Key = issue.Key?.Value,
                 Title = issue.Summary,
                 Type = issue.Type?.Name,

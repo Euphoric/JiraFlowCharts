@@ -93,6 +93,7 @@ namespace Jira.Querying
             var fake = (FakeJiraIssue)issue;
             CachedIssue cachedIssue = new CachedIssue()
             {
+                Project = fake.Project,
                 Key = fake.Key,
                 Created = fake.Created,
                 Updated = fake.Updated,

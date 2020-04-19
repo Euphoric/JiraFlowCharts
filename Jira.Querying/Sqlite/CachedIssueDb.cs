@@ -1,5 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
@@ -7,8 +6,10 @@ namespace Jira.Querying.Sqlite
 {
     public class CachedIssueDb
     {
-        [Key]
+        [Key, Required]
         public string Key { get; set; }
+        [Required(AllowEmptyStrings = false)]
+        public string Project { get; set; }
         public string Title { get; set; }
         public string Type { get; set; }
         public string Resolution { get; set; }
