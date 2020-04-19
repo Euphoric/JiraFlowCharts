@@ -58,34 +58,46 @@ namespace Jira.FlowCharts.StoryFiltering
             NotifyOfPropertyChange(nameof(ResetStates));
         }
 
-        private async Task MoveStateToFilteredInner()
+        private Task MoveStateToFilteredInner()
         {
             _stateFiltering.AddFilteredState(SelectedAvailableState);
+
+            return Task.CompletedTask;
         }
 
-        private async Task MoveStateFromFilteredInner()
+        private Task MoveStateFromFilteredInner()
         {
             _stateFiltering.RemoveFilteredState(SelectedFilteredState);
+
+            return Task.CompletedTask;
         }
 
-        private async Task MoveStateToResetInner()
+        private Task MoveStateToResetInner()
         {
             _stateFiltering.AddResetState(SelectedAvailableState);
+
+            return Task.CompletedTask;
         }
 
-        private async Task MoveStateFromResetInner()
+        private Task MoveStateFromResetInner()
         {
             _stateFiltering.RemoveResetState(SelectedResetState);
+
+            return Task.CompletedTask;
         }
 
-        private async Task MoveFilteredStateLowerInner()
+        private Task MoveFilteredStateLowerInner()
         {
             _stateFiltering.MoveFilteredStateLower(SelectedFilteredState);
+
+            return Task.CompletedTask;
         }
 
-        private async Task MoveFilteredStateHigherInner()
+        private Task MoveFilteredStateHigherInner()
         {
             _stateFiltering.MoveFilteredStateHigher(SelectedFilteredState);
+
+            return Task.CompletedTask;
         }
     }
 }
