@@ -300,6 +300,10 @@
     <Compile Include="StateFiltering.cs" />
     <Compile Include="StateFilteringParameter.cs" />
     <Compile Include="StateFilteringProvider.cs" />
+    <Compile Include="ProjectSelector\ProjectSelectorView.xaml.cs">
+      <DependentUpon>ProjectSelectorView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ProjectSelector\ProjectSelectorViewModel.cs" />
     <Compile Include="StoryFiltering\StoryFilteringView.xaml.cs">
       <DependentUpon>StoryFilteringView.xaml</DependentUpon>
     </Compile>
@@ -354,6 +358,10 @@
       <SubType>Code</SubType>
     </Compile>
     <Page Include="Simulation\SimulationView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ProjectSelector\ProjectSelectorView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

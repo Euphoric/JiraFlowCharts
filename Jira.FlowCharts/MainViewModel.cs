@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Caliburn.Micro;
 using Jira.FlowCharts.IssuesGrid;
 using Jira.FlowCharts.JiraUpdate;
+using Jira.FlowCharts.ProjectSelector;
 using Jira.FlowCharts.StoryFiltering;
 
 namespace Jira.FlowCharts
@@ -12,6 +13,8 @@ namespace Jira.FlowCharts
     public class MainViewModel : Conductor<IScreen>.Collection.OneActive
     {
         private readonly StateFiltering _stateFiltering;
+
+        public ProjectSelectorViewModel ProjectSelector { get; }
 
         public MainViewModel()
         {
@@ -32,6 +35,8 @@ namespace Jira.FlowCharts
             var issuesFrom = DateTime.Now.AddYears(-1);
 
             var stateFilteringProvider = new StateFilteringProvider(_stateFiltering);
+            
+            ProjectSelector = new ProjectSelectorViewModel(tasksSource);
 
             Items.Add(new JiraUpdateViewModel(tasksSource, new CurrentTime()));
             Items.Add(new StoryFilteringViewModel(_stateFiltering));
@@ -59,6 +64,20 @@ namespace Jira.FlowCharts
         protected override async Task OnInitializeAsync(CancellationToken cancellationToken)
         {
             await _stateFiltering.ReloadStates();
+        }
+
+        protected override async Task OnActivateAsync(CancellationToken cancellationToken)
+        {
+            await base.OnActivateAsync(cancellationToken);
+
+            await ProjectSelector.ActivateAsync();
+        }
+
+        protected override async Task OnDeactivateAsync(bool close, CancellationToken cancellationToken)
+        {
+            await ProjectSelector.DeactivateAsync(close);
+
+            await base.OnDeactivateAsync(close, cancellationToken);
         }
     }
 }

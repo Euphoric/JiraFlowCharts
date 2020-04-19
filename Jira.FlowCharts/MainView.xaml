@@ -10,6 +10,11 @@
         MinHeight="450" MinWidth="800"
     >
     <Grid>
-        <TabControl x:Name="Items" />
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" MinHeight="10"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <ContentControl x:Name="ProjectSelector" />
+        <TabControl x:Name="Items" Grid.Row="1" />
     </Grid>
 </UserControl>
