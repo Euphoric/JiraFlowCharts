@@ -48,8 +48,13 @@ namespace Jira.Querying.Sqlite
 
         public async Task<ProjectStatistic[]> GetProjects()
         {
-            var issues = await GetIssues();
-            return issues.Select(x => x.Key.Split('-')[0]).Distinct().Select(key=>new ProjectStatistic(key)).ToArray();
+            var projectStatistics = 
+                await _dbContext.Issues
+                    .GroupBy(x=>x.Project)
+                    .Select(grp=>new ProjectStatistic(grp.Key))
+                    .ToArrayAsync();
+
+            return projectStatistics;
         }
 
         public async Task AddOrReplaceCachedIssue(CachedIssue issue)
