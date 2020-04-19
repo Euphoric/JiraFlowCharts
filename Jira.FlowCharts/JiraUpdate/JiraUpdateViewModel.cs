@@ -27,6 +27,8 @@ namespace Jira.FlowCharts.JiraUpdate
             UpdateCommand = ReactiveCommand.CreateFromTask(UpdateJira);
             UpdateProgress = -1;
 
+            StartFromDate = currentTime.UtcNow.AddYears(-1).AddMonths(-3);
+
             _projects = new ObservableCollection<JiraProjectViewModel>();
         }
 
@@ -35,6 +37,8 @@ namespace Jira.FlowCharts.JiraUpdate
         public string JiraUsername { get; set; }
 
         public string ProjectKey { get; set; }
+
+        public DateTime StartFromDate { get; set; }
 
         public ReactiveCommand<Unit, Unit> UpdateCommand { get; }
 
@@ -94,7 +98,7 @@ namespace Jira.FlowCharts.JiraUpdate
 
                 var jiraLoginParameters = new JiraLoginParameters(JiraUrl, JiraUsername, view.GetLoginPassword());
 
-                await _tasksSource.UpdateIssues(jiraLoginParameters, ProjectKey, this);
+                await _tasksSource.UpdateIssues(jiraLoginParameters, ProjectKey, StartFromDate, this);
 
                 await UpdateDisplay();
 

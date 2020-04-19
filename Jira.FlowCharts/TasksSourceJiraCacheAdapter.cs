@@ -10,7 +10,7 @@ namespace Jira.FlowCharts
     public interface ITasksSourceJiraCacheAdapter
     {
         Task<List<CachedIssue>> GetIssues();
-        Task UpdateIssues(JiraLoginParameters jiraLoginParameters, string projectKey, ICacheUpdateProgress cacheUpdateProgress);
+        Task UpdateIssues(JiraLoginParameters jiraLoginParameters, string projectKey, ICacheUpdateProgress cacheUpdateProgress, DateTime startUpdateDate);
         Task<string[]> GetAllStates();
     }
 
@@ -38,7 +38,7 @@ namespace Jira.FlowCharts
             }
         }
 
-        public async Task UpdateIssues(JiraLoginParameters jiraLoginParameters, string projectKey, ICacheUpdateProgress cacheUpdateProgress)
+        public async Task UpdateIssues(JiraLoginParameters jiraLoginParameters, string projectKey, ICacheUpdateProgress cacheUpdateProgress, DateTime startUpdateDate)
         {
             using (var cache = new JiraLocalCache(CreateRepository()))
             {
@@ -46,7 +46,7 @@ namespace Jira.FlowCharts
 
                 var client = new JiraClient(jiraLoginParameters);
 
-                await cache.Update(client, DateTime.MinValue, projectKey, cacheUpdateProgress);
+                await cache.Update(client, startUpdateDate, projectKey, cacheUpdateProgress);
             }
         }
 

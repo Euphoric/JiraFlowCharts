@@ -38,6 +38,7 @@
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
                 <RowDefinition/>
             </Grid.RowDefinitions>
             <TextBlock Margin="2" Grid.Row="0" Grid.Column="0">Jira URL:</TextBlock>
@@ -50,12 +51,15 @@
             <TextBlock Margin="2" Grid.Row="3" Grid.Column="0">Project key:</TextBlock>
             <TextBox Grid.Row="3" Grid.Column="1" MinWidth="500" Text="{Binding ProjectKey}" />
 
-            <Button Margin="2" Grid.Row="4" Grid.Column="1" Command="{Binding UpdateCommand}">Update</Button>
-            <Grid Grid.Row="5" Grid.Column="1">
+            <TextBlock Margin="2" Grid.Row="4" Grid.Column="0">Start from date:</TextBlock>
+            <DatePicker Grid.Row="4" Grid.Column="1" MinWidth="500" SelectedDate="{Binding StartFromDate}" />
+
+            <Button Margin="2" Grid.Row="5" Grid.Column="1" Command="{Binding UpdateCommand}">Update</Button>
+            <Grid Grid.Row="6" Grid.Column="1">
                 <ProgressBar Margin="2" Height="15" Minimum="0" Maximum="100" Value="{Binding UpdateProgress, Mode=OneWay}" />
                 <TextBlock HorizontalAlignment="Center" Text="{Binding LastUpdatedKey, Mode=OneWay}" />
             </Grid>
-            <TextBlock Grid.Row="6" Grid.Column="1" Text="{Binding UpdateError}" Foreground="Red" />
+            <TextBlock Grid.Row="7" Grid.Column="1" Text="{Binding UpdateError}" Foreground="Red" />
         </Grid>
     </Grid>
 </UserControl>

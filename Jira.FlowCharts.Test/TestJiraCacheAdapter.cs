@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Jira.Querying;
 using Xunit;
@@ -20,7 +21,7 @@ namespace Jira.FlowCharts
 
         public string ExpectedProjectKey { get; internal set; }
 
-        public Task UpdateIssues(JiraLoginParameters jiraLoginParameters, string projectKey, ICacheUpdateProgress cacheUpdateProgress)
+        public Task UpdateIssues(JiraLoginParameters jiraLoginParameters, string projectKey, ICacheUpdateProgress cacheUpdateProgress, DateTime startUpdateDate)
         {
             if (ExpectedLoginParameters != null)
             {

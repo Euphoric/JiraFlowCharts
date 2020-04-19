@@ -25,9 +25,10 @@ namespace Jira.FlowCharts
             _mapper = config.CreateMapper();
         }
 
-        public async Task UpdateIssues(JiraLoginParameters jiraLoginParameters, string projectName, ICacheUpdateProgress cacheUpdateProgress)
+        public async Task UpdateIssues(JiraLoginParameters jiraLoginParameters, string projectName,
+            DateTime startUpdateDate, ICacheUpdateProgress cacheUpdateProgress)
         {
-            await _jiraCache.UpdateIssues(jiraLoginParameters, projectName, cacheUpdateProgress);
+            await _jiraCache.UpdateIssues(jiraLoginParameters, projectName, cacheUpdateProgress, startUpdateDate);
         }
 
         public async Task<IEnumerable<AnalyzedIssue>> GetAllIssues(StateFilteringParameter stateFiltering)

@@ -39,7 +39,10 @@ namespace Jira.FlowCharts
             _jiraCacheAdapter = new TestJiraCacheAdapter();
 
             var tasksSource = new TasksSource(_jiraCacheAdapter);
-            _currentTime = new TestCurrentTime();
+            _currentTime = new TestCurrentTime()
+            {
+                UtcNow = new DateTime(2019, 1, 1)
+            };
             _vm = new JiraUpdateViewModel(tasksSource, _currentTime);
 
             _view = new TestView();
