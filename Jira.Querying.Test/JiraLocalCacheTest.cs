@@ -405,7 +405,7 @@ namespace Jira.Querying
         {
             await Cache.Initialize();
 
-            string[] projects = (await Cache.GetProjects()).ToArray();
+            var projects = await Cache.GetProjects();
 
             Assert.Empty(projects);
         }
@@ -421,9 +421,9 @@ namespace Jira.Querying
 
             await CacheUpdate(projectKey: project);
 
-            string[] projects = (await Cache.GetProjects()).ToArray();
+            var projects = await Cache.GetProjects();
 
-            Assert.Equal(new [] { project }, projects);
+            Assert.Equal(new [] { project }, projects.Select(x=>x.Key));
         }
 
         [Fact]

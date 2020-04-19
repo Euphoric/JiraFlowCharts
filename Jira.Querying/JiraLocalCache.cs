@@ -118,10 +118,10 @@ namespace Jira.Querying
             _isInitialized = true;
         }
 
-        public async Task<IEnumerable<string>> GetProjects()
+        public async Task<ProjectStatistic[]> GetProjects()
         {
-            var issues = await GetIssues();
-            return issues.Select(x => x.Key.Split('-')[0]).Distinct();
+            var issues = await _repository.GetIssues();
+            return issues.Select(x => x.Key.Split('-')[0]).Distinct().Select(key=>new ProjectStatistic(key)).ToArray();
         }
 
         public async Task Update(IJiraClient client, DateTime startUpdateDate, string projectKey, ICacheUpdateProgress progress = null)
