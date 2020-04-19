@@ -1,13 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.Dynamic;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper;
-using AutoMapper.Mappers;
 using Caliburn.Micro;
 using DynamicData;
 using TimeSpan = System.TimeSpan;
@@ -18,11 +14,13 @@ namespace Jira.FlowCharts.IssuesGrid
     {
         private readonly TasksSource _tasksSource;
         private readonly IStateFilteringProvider _stateFilteringProvider;
+        private readonly ICurrentProject _currentProject;
 
-        public IssuesGridViewModel(TasksSource tasksSource, IStateFilteringProvider stateFilteringProvider)
+        public IssuesGridViewModel(TasksSource tasksSource, IStateFilteringProvider stateFilteringProvider, ICurrentProject currentProject)
         {
             _tasksSource = tasksSource;
             _stateFilteringProvider = stateFilteringProvider;
+            _currentProject = currentProject;
             DisplayName = "Issues grid";
 
             Issues = new ObservableCollection<dynamic>();
@@ -35,7 +33,7 @@ namespace Jira.FlowCharts.IssuesGrid
             Issues.Clear();
 
             var stateFilteringParameter = await _stateFilteringProvider.GetStateFilteringParameter();
-            var allIssues = await _tasksSource.GetAllIssues(stateFilteringParameter);
+            var allIssues = await _tasksSource.GetAllIssues(_currentProject.ProjectKey,stateFilteringParameter);
 
             var mapper = new Mapper(new MapperConfiguration(cfg => { }));
             Issues.AddRange(allIssues.Select(issue => ToDynamicRow(issue, mapper)));

@@ -6,7 +6,7 @@ using DynamicData;
 
 namespace Jira.FlowCharts.ProjectSelector
 {
-    public class ProjectSelectorViewModel : ReactiveScreen
+    public class ProjectSelectorViewModel : ReactiveScreen, ICurrentProject
     {
         private readonly TasksSource _tasksSource;
         private string _selectedProjectKey;
@@ -39,5 +39,7 @@ namespace Jira.FlowCharts.ProjectSelector
             get => _selectedProjectKey;
             set => Set(ref _selectedProjectKey, value);
         }
+
+        string ICurrentProject.ProjectKey => SelectedProjectKey;
     }
 }

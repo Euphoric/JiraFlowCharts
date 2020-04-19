@@ -31,12 +31,6 @@ namespace Jira.FlowCharts
             await _jiraCache.UpdateIssues(jiraLoginParameters, projectName, cacheUpdateProgress, startUpdateDate);
         }
 
-        [Obsolete("Use overload with project key.")]
-        public Task<IEnumerable<AnalyzedIssue>> GetAllIssues(StateFilteringParameter stateFiltering)
-        {
-            return GetAllIssues(null, stateFiltering);
-        }
-
         public async Task<IEnumerable<AnalyzedIssue>> GetAllIssues(string projectKey, StateFilteringParameter stateFiltering)
         {
             List<CachedIssue> issues = await _jiraCache.GetIssues(projectKey);
