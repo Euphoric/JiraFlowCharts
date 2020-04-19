@@ -41,7 +41,8 @@ namespace Jira.FlowCharts
 
         protected override async Task OnActivateAsync(CancellationToken cancellationToken)
         {
-            var latestFinishedStories = (await _tasksSource.GetFinishedStories(_stateFilteringProvider.GetStateFilteringParameter()));
+            var stateFilteringParameter = await _stateFilteringProvider.GetStateFilteringParameter();
+            var latestFinishedStories = await _tasksSource.GetFinishedStories(stateFilteringParameter);
 
             var orderedStories = latestFinishedStories.OrderBy(x => x.Ended).ToArray();
 

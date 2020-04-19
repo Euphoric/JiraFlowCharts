@@ -1,8 +1,10 @@
-﻿namespace Jira.FlowCharts
+﻿using System.Threading.Tasks;
+
+namespace Jira.FlowCharts
 {
     public interface IStateFilteringProvider
     {
         StateFiltering GetStateFiltering();
-        StateFilteringParameter GetStateFilteringParameter();
+        Task<StateFilteringParameter> GetStateFilteringParameter();
     }
 }

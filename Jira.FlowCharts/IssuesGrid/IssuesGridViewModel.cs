@@ -34,7 +34,8 @@ namespace Jira.FlowCharts.IssuesGrid
         {
             Issues.Clear();
 
-            var allIssues = await _tasksSource.GetAllIssues(_stateFilteringProvider.GetStateFilteringParameter());
+            var stateFilteringParameter = await _stateFilteringProvider.GetStateFilteringParameter();
+            var allIssues = await _tasksSource.GetAllIssues(stateFilteringParameter);
 
             var mapper = new Mapper(new MapperConfiguration(cfg => { }));
             Issues.AddRange(allIssues.Select(issue => ToDynamicRow(issue, mapper)));

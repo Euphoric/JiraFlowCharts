@@ -45,6 +45,11 @@ namespace Jira.FlowCharts.StoryFiltering
 
         public ReactiveCommand<Unit, Unit> MoveFilteredStateHigher { get; }
 
+        protected override async Task OnInitializeAsync(CancellationToken cancellationToken)
+        {
+            await base.OnInitializeAsync(cancellationToken);
+        }
+
         protected override async Task OnActivateAsync(CancellationToken cancellationToken)
         {
             await _stateFiltering.ReloadStates();

@@ -62,7 +62,8 @@ namespace Jira.FlowCharts
 
         private async Task<Simulation.FlowSimulationStatisticOutput> RunSimulationInner()
         {
-            var finishedStories = await _taskSource.GetLatestFinishedStories(new IssuesFromParameters(_issuesFrom), _stateFilteringProvider.GetStateFilteringParameter());
+            var stateFilteringParameter = await _stateFilteringProvider.GetStateFilteringParameter();
+            var finishedStories = await _taskSource.GetLatestFinishedStories(new IssuesFromParameters(_issuesFrom), stateFilteringParameter);
 
             var from = finishedStories.Min(x => x.Ended);
             var to = finishedStories.Max(x => x.Ended);

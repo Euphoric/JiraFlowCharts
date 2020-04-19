@@ -1,4 +1,6 @@
-﻿namespace Jira.FlowCharts
+﻿using System.Threading.Tasks;
+
+namespace Jira.FlowCharts
 {
     public class StateFilteringProvider : IStateFilteringProvider
     {
@@ -14,9 +16,10 @@
             return _stateFiltering;
         }
 
-        public StateFilteringParameter GetStateFilteringParameter()
+        public Task<StateFilteringParameter> GetStateFilteringParameter()
         {
-            return StateFilteringParameter.GetParameters(_stateFiltering);
+            var result = StateFilteringParameter.GetParameters(_stateFiltering);
+            return Task.FromResult(result);
         }
     }
 }
