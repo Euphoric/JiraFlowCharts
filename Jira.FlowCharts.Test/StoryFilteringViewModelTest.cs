@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Linq;
 using System.Reactive.Threading.Tasks;
 using System.Text;
 using System.Threading.Tasks;
 using Caliburn.Micro;
+using DynamicData.Binding;
 using Jira.FlowCharts.StoryFiltering;
 using Xunit;
 
@@ -26,34 +28,72 @@ namespace Jira.FlowCharts
             _stateFilteringProvider = new StateFilteringProvider(_jiraCacheAdapter, _statesRepository);
             _vm = new StoryFilteringViewModel(_stateFilteringProvider);
 
-            // emulates WPF's behavior of changing selected item when it is removed from bound collection
-            _vm.AvailableStates.CollectionChanged += (s, e) =>
+            EmulateCollectionSelectedItemChanging();
+        }
+
+        /// <summary>
+        /// Emulates WPF's behavior of changing selected item when it is removed from bound collection
+        /// </summary>
+        private void EmulateCollectionSelectedItemChanging()
+        {
+            void OnAvailableStatesOnCollectionChanged(object s, NotifyCollectionChangedEventArgs e)
             {
-                if (
-                e.Action == NotifyCollectionChangedAction.Remove && 
-                e.OldItems.OfType<string>().SingleOrDefault() == _vm.SelectedAvailableState)
+                if (e.Action == NotifyCollectionChangedAction.Remove && e.OldItems.OfType<string>().SingleOrDefault() == _vm.SelectedAvailableState)
                 {
                     _vm.SelectedAvailableState = null;
                 }
-            };
+            }
 
-            _vm.FilteredStates.CollectionChanged += (s, e) =>
+            void OnFilteredStatesOnCollectionChanged(object s, NotifyCollectionChangedEventArgs e)
             {
-                if (
-                e.Action == NotifyCollectionChangedAction.Remove &&
-                e.OldItems.OfType<string>().SingleOrDefault() == _vm.SelectedFilteredState)
+                if (e.Action == NotifyCollectionChangedAction.Remove && e.OldItems.OfType<string>().SingleOrDefault() == _vm.SelectedFilteredState)
                 {
                     _vm.SelectedFilteredState = null;
                 }
-            };
+            }
 
-            _vm.ResetStates.CollectionChanged += (s, e) =>
+            void OnResetStatesOnCollectionChanged(object s, NotifyCollectionChangedEventArgs e)
             {
-                if (
-                e.Action == NotifyCollectionChangedAction.Remove &&
-                e.OldItems.OfType<string>().SingleOrDefault() == _vm.SelectedResetState)
+                if (e.Action == NotifyCollectionChangedAction.Remove && e.OldItems.OfType<string>().SingleOrDefault() == _vm.SelectedResetState)
                 {
                     _vm.SelectedResetState = null;
+                }
+            }
+
+            ObservableCollection<string> prevAvailableStates = null;
+            ObservableCollection<string> prevFilteredStates = null;
+            ObservableCollection<string> prevResetStates = null;
+
+            _vm.PropertyChanged += (sender, args) =>
+            {
+                switch (args.PropertyName)
+                {
+                    case nameof(_vm.AvailableStates):
+                        if (prevAvailableStates != null)
+                        {
+                            prevAvailableStates.CollectionChanged -= OnAvailableStatesOnCollectionChanged;
+                        }
+                        _vm.AvailableStates.CollectionChanged += OnAvailableStatesOnCollectionChanged;
+                        prevAvailableStates = _vm.AvailableStates;
+                        break;
+
+                    case nameof(_vm.FilteredStates):
+                        if (prevFilteredStates != null)
+                        {
+                            prevFilteredStates.CollectionChanged -= OnFilteredStatesOnCollectionChanged;
+                        }
+                        _vm.FilteredStates.CollectionChanged += OnFilteredStatesOnCollectionChanged;
+                        prevFilteredStates = _vm.FilteredStates;
+                        break;
+
+                    case nameof(_vm.ResetStates):
+                        if (prevResetStates != null)
+                        {
+                            prevResetStates.CollectionChanged -= OnResetStatesOnCollectionChanged;
+                        }
+                        _vm.ResetStates.CollectionChanged += OnResetStatesOnCollectionChanged;
+                        prevResetStates = _vm.ResetStates;
+                        break;
                 }
             };
         }
@@ -80,6 +120,19 @@ namespace Jira.FlowCharts
             Assert.Empty(_vm.AvailableStates);
             Assert.Empty(_vm.FilteredStates);
             Assert.Empty(_vm.ResetStates);
+        }
+
+        [Fact]
+        public async Task Notifies_collection_change_when_activating()
+        {
+            HashSet<string> notifiedProperties = new HashSet<string>();
+            _vm.PropertyChanged += (sender, args) => notifiedProperties.Add(args.PropertyName);
+
+            await Reactivate();
+
+            Assert.Contains(nameof(_vm.AvailableStates), notifiedProperties);
+            Assert.Contains(nameof(_vm.FilteredStates), notifiedProperties);
+            Assert.Contains(nameof(_vm.ResetStates), notifiedProperties);
         }
 
         [Fact]

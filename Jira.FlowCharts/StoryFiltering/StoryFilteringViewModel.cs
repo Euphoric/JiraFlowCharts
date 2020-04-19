@@ -8,11 +8,13 @@ namespace Jira.FlowCharts.StoryFiltering
 {
     public class StoryFilteringViewModel : ReactiveScreen
     {
-        private readonly StateFiltering _stateFiltering;
+        private readonly IStateFilteringProvider _stateFilteringProvider;
 
-        public StoryFilteringViewModel(IStateFilteringProvider stateFiltering)
+        private StateFiltering _stateFiltering;
+
+        public StoryFilteringViewModel(IStateFilteringProvider stateFilteringProvider)
         {
-            _stateFiltering = stateFiltering.GetStateFiltering();
+            _stateFilteringProvider = stateFilteringProvider;
 
             DisplayName = "Story and state filtering";
 
@@ -45,16 +47,15 @@ namespace Jira.FlowCharts.StoryFiltering
 
         public ReactiveCommand<Unit, Unit> MoveFilteredStateHigher { get; }
 
-        protected override async Task OnInitializeAsync(CancellationToken cancellationToken)
-        {
-            await base.OnInitializeAsync(cancellationToken);
-        }
-
         protected override async Task OnActivateAsync(CancellationToken cancellationToken)
         {
-            await _stateFiltering.ReloadStates();
-
             await base.OnActivateAsync(cancellationToken);
+
+            _stateFiltering = _stateFilteringProvider.GetStateFiltering();
+            await _stateFiltering.ReloadStates();
+            NotifyOfPropertyChange(nameof(AvailableStates));
+            NotifyOfPropertyChange(nameof(FilteredStates));
+            NotifyOfPropertyChange(nameof(ResetStates));
         }
 
         private async Task MoveStateToFilteredInner()
