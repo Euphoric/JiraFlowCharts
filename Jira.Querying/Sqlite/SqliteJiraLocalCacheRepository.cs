@@ -39,6 +39,12 @@ namespace Jira.Querying.Sqlite
             await _dbContext.Database.MigrateAsync();
         }
 
+        public async Task<ProjectStatistic[]> GetProjects()
+        {
+            var issues = await GetIssues();
+            return issues.Select(x => x.Key.Split('-')[0]).Distinct().Select(key=>new ProjectStatistic(key)).ToArray();
+        }
+
         public async Task AddOrReplaceCachedIssue(CachedIssue issue)
         {
             var existingIssue = await _dbContext.Issues.FirstOrDefaultAsync(x => x.Key == issue.Key);

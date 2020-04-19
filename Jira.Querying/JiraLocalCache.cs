@@ -32,6 +32,8 @@ namespace Jira.Querying
 
             Task<DateTime?> LastUpdatedIssueTime(string projectKey);
 
+            Task<ProjectStatistic[]> GetProjects();
+
             bool IsDisposed { get; }
         }
 
@@ -44,6 +46,12 @@ namespace Jira.Querying
             public Task Initialize()
             {
                 return Task.CompletedTask;
+            }
+
+            public async Task<ProjectStatistic[]> GetProjects()
+            {
+                var issues = await GetIssues();
+                return issues.Select(x => x.Key.Split('-')[0]).Distinct().Select(key=>new ProjectStatistic(key)).ToArray();
             }
 
             public Task<IEnumerable<CachedIssue>> GetIssues(string projectKey = null)
@@ -118,10 +126,9 @@ namespace Jira.Querying
             _isInitialized = true;
         }
 
-        public async Task<ProjectStatistic[]> GetProjects()
+        public Task<ProjectStatistic[]> GetProjects()
         {
-            var issues = await _repository.GetIssues();
-            return issues.Select(x => x.Key.Split('-')[0]).Distinct().Select(key=>new ProjectStatistic(key)).ToArray();
+            return _repository.GetProjects();
         }
 
         public async Task Update(IJiraClient client, DateTime startUpdateDate, string projectKey, ICacheUpdateProgress progress = null)
