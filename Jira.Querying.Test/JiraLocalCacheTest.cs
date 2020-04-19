@@ -423,7 +423,33 @@ namespace Jira.Querying
 
             var projects = await Cache.GetProjects();
 
-            Assert.Equal(new [] { project }, projects.Select(x=>x.Key));
+            Assert.Equal(new[] { project }, projects.Select(x => x.Key));
+        }
+
+        [Theory]
+        [InlineData(1)]
+        [InlineData(5)]
+        [InlineData(11)]
+        public async Task Returns_project_statistics(int issueCount)
+        {
+            await Cache.Initialize();
+
+            string projectKey = "KEY";
+
+            for (int i = 1; i <= issueCount; i++)
+            {
+                _client.UpdateIssue(projectKey + "-" + i);
+            }
+
+            await CacheUpdate(projectKey: projectKey);
+
+            var projects = await Cache.GetProjects();
+
+            var project = Assert.Single(projects);
+            Assert.NotNull(project);
+
+            Assert.Equal(issueCount, project.IssueCount);
+            Assert.Equal(new DateTime(2019, 1, 1).AddDays(issueCount - 1), project.LastUpdatedDate);
         }
 
         [Fact]
@@ -435,12 +461,12 @@ namespace Jira.Querying
             _client.UpdateIssue("B-1");
             _client.UpdateIssue("C-1");
 
-            await CacheUpdate(projectKey:"A");
+            await CacheUpdate(projectKey: "A");
 
             var retrievedIssues = await Cache.GetIssues();
 
             var issueKeys = retrievedIssues.Select(x => x.Key).ToArray();
-            Assert.Equal(new[] {"A-1"}, issueKeys);
+            Assert.Equal(new[] { "A-1" }, issueKeys);
         }
 
         [Fact]
@@ -452,14 +478,14 @@ namespace Jira.Querying
             _client.UpdateIssue("B-1");
             _client.UpdateIssue("C-1");
 
-            await CacheUpdate(projectKey:"A");
-            await CacheUpdate(projectKey:"B");
-            await CacheUpdate(projectKey:"C");
+            await CacheUpdate(projectKey: "A");
+            await CacheUpdate(projectKey: "B");
+            await CacheUpdate(projectKey: "C");
 
             var retrievedIssues = await Cache.GetIssues();
 
             var issueKeys = retrievedIssues.Select(x => x.Key).ToArray();
-            Assert.Equal(new[] {"A-1", "B-1", "C-1"}, issueKeys.OrderBy(x=>x));
+            Assert.Equal(new[] { "A-1", "B-1", "C-1" }, issueKeys.OrderBy(x => x));
         }
 
         [Fact]
@@ -470,13 +496,13 @@ namespace Jira.Querying
             _client.UpdateIssue("A-1");
             _client.UpdateIssue("B-1");
 
-            await CacheUpdate(projectKey:"B");
-            await CacheUpdate(projectKey:"A");
+            await CacheUpdate(projectKey: "B");
+            await CacheUpdate(projectKey: "A");
 
             var retrievedIssues = await Cache.GetIssues();
 
             var issueKeys = retrievedIssues.Select(x => x.Key).ToArray();
-            Assert.Equal(new[] {"A-1", "B-1"}, issueKeys.OrderBy(x=>x));
+            Assert.Equal(new[] { "A-1", "B-1" }, issueKeys.OrderBy(x => x));
         }
 
         [Fact]
@@ -494,10 +520,10 @@ namespace Jira.Querying
             await Cache.Initialize();
 
             _client.UpdateIssue("A-1");
-            await CacheUpdate(projectKey:"A");
+            await CacheUpdate(projectKey: "A");
 
             var issueKeys = (await Cache.GetIssues("A")).Select(x => x.Key).ToArray();
-            Assert.Equal(new[] {"A-1"}, issueKeys);
+            Assert.Equal(new[] { "A-1" }, issueKeys);
         }
 
         [Fact]
@@ -508,10 +534,10 @@ namespace Jira.Querying
             _client.UpdateIssue("A-1");
             _client.UpdateIssue("B-1");
 
-            await CacheUpdate(projectKey:"A");
+            await CacheUpdate(projectKey: "A");
 
             var issueAKeys = (await Cache.GetIssues("A")).Select(x => x.Key).ToArray();
-            Assert.Equal(new[] {"A-1"}, issueAKeys);
+            Assert.Equal(new[] { "A-1" }, issueAKeys);
 
             var issueBKeys = (await Cache.GetIssues("B")).Select(x => x.Key).ToArray();
             Assert.Empty(issueBKeys);

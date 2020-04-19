@@ -51,7 +51,7 @@ namespace Jira.Querying.Sqlite
             var projectStatistics = 
                 await _dbContext.Issues
                     .GroupBy(x=>x.Project)
-                    .Select(grp=>new ProjectStatistic(grp.Key))
+                    .Select(grp=>new ProjectStatistic(grp.Key, grp.Count(), grp.Max(x=>x.Updated)))
                     .ToArrayAsync();
 
             return projectStatistics;

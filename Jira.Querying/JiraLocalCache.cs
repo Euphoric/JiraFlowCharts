@@ -53,7 +53,8 @@ namespace Jira.Querying
                 var projectStatistics = 
                     _issues
                         .GroupBy(x=>x.Project)
-                        .Select(grp=>new ProjectStatistic(grp.Key)).ToArray();
+                        .Select(grp=>new ProjectStatistic(grp.Key, grp.Count(), grp.Max(x=>x.Updated)))
+                        .ToArray();
 
                 return Task.FromResult(projectStatistics);
             }
