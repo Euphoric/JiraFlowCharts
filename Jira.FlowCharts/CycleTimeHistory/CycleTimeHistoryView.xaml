@@ -17,8 +17,8 @@
             <lvc:Axis Labels="{Binding Labels}"/>
         </lvc:CartesianChart.AxisX>
         <lvc:CartesianChart.AxisY>
-            <lvc:Axis Foreground="DodgerBlue" Title="Days"/>
-            <lvc:Axis Foreground="IndianRed" Title="Count" Position="RightTop">
+            <lvc:Axis Foreground="DodgerBlue" Title="Days" MinValue="0" />
+            <lvc:Axis Foreground="IndianRed" Title="Count" Position="RightTop" MinValue="0">
                 <lvc:Axis.Separator>
                     <lvc:Separator Style="{StaticResource CleanSeparator}"></lvc:Separator>
                 </lvc:Axis.Separator>
