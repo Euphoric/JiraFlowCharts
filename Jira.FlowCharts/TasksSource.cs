@@ -31,9 +31,15 @@ namespace Jira.FlowCharts
             await _jiraCache.UpdateIssues(jiraLoginParameters, projectName, cacheUpdateProgress, startUpdateDate);
         }
 
-        public async Task<IEnumerable<AnalyzedIssue>> GetAllIssues(StateFilteringParameter stateFiltering)
+        [Obsolete("Use overload with project key.")]
+        public Task<IEnumerable<AnalyzedIssue>> GetAllIssues(StateFilteringParameter stateFiltering)
         {
-            List<CachedIssue> issues = await _jiraCache.GetIssues();
+            return GetAllIssues(null, stateFiltering);
+        }
+
+        public async Task<IEnumerable<AnalyzedIssue>> GetAllIssues(string projectKey, StateFilteringParameter stateFiltering)
+        {
+            List<CachedIssue> issues = await _jiraCache.GetIssues(projectKey);
 
             List<AnalyzedIssue> analyzedIssues = _mapper.Map<List<AnalyzedIssue>>(issues);
 
@@ -70,9 +76,15 @@ namespace Jira.FlowCharts
                 (issue.Status != "Withdrawn" && issue.Status != "On Hold");
         }
 
-        public async Task<IEnumerable<AnalyzedIssue>> GetStories(StateFilteringParameter stateFiltering)
+        [Obsolete("Use overload with project key.")]
+        public Task<IEnumerable<AnalyzedIssue>> GetStories(StateFilteringParameter stateFiltering)
         {
-            var issues = await GetAllIssues(stateFiltering);
+            return GetStories(null, stateFiltering);
+        }
+
+        public async Task<IEnumerable<AnalyzedIssue>> GetStories(string projectKey, StateFilteringParameter stateFiltering)
+        {
+            var issues = await GetAllIssues(projectKey, stateFiltering);
 
             IEnumerable<AnalyzedIssue> stories = issues
                 .Where(IsValidIssue);
@@ -80,9 +92,9 @@ namespace Jira.FlowCharts
             return stories;
         }
 
-        private async Task<IEnumerable<AnalyzedIssue>> GetLatestStories(IssuesFromParameters parameters, StateFilteringParameter stateFiltering)
+        private async Task<IEnumerable<AnalyzedIssue>> GetLatestStories(string projectKey, IssuesFromParameters parameters, StateFilteringParameter stateFiltering)
         {
-            IEnumerable<AnalyzedIssue> stories = (await GetStories(stateFiltering)).ToArray();
+            IEnumerable<AnalyzedIssue> stories = (await GetStories(projectKey, stateFiltering)).ToArray();
 
             var latestStories = stories
                     .Where(x => parameters.IssuesFrom == null || x.Ended >= parameters.IssuesFrom)
@@ -91,16 +103,28 @@ namespace Jira.FlowCharts
             return latestStories;
         }
 
-        public async Task<IEnumerable<FinishedIssue>> GetLatestFinishedStories(IssuesFromParameters parameters, StateFilteringParameter stateFiltering)
+        [Obsolete("Use overload with project key.")]
+        public Task<IEnumerable<FinishedIssue>> GetLatestFinishedStories(IssuesFromParameters parameters, StateFilteringParameter stateFiltering)
         {
-            var latestStories = await GetLatestStories(parameters, stateFiltering);
+            return GetLatestFinishedStories(null, parameters, stateFiltering);
+        }
+
+        public async Task<IEnumerable<FinishedIssue>> GetLatestFinishedStories(string projectKey, IssuesFromParameters parameters, StateFilteringParameter stateFiltering)
+        {
+            var latestStories = await GetLatestStories(projectKey, parameters, stateFiltering);
 
             return OfFinishedStories(latestStories);
         }
 
-        public async Task<IEnumerable<FinishedIssue>> GetFinishedStories(StateFilteringParameter stateFiltering)
+        [Obsolete("Use overload with project key.")]
+        public Task<IEnumerable<FinishedIssue>> GetFinishedStories(StateFilteringParameter stateFiltering)
         {
-            var stories = await GetStories(stateFiltering);
+            return GetFinishedStories(null, stateFiltering);
+        }
+
+        public async Task<IEnumerable<FinishedIssue>> GetFinishedStories(string projectKey, StateFilteringParameter stateFiltering)
+        {
+            var stories = await GetStories(projectKey, stateFiltering);
 
             return OfFinishedStories(stories);
         }
