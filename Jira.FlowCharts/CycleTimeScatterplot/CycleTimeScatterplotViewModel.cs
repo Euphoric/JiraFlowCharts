@@ -49,6 +49,7 @@ namespace Jira.FlowCharts
         private double _days7;
         private DateTime _issuesFrom;
         private readonly IStateFilteringProvider _stateFilteringProvider;
+        private readonly ICurrentProject _currentProject;
 
         public ChartValues<IssuePoint> Stories
         {
@@ -110,11 +111,12 @@ namespace Jira.FlowCharts
             private set => Set(ref _days14, value);
         }
 
-        public CycleTimeScatterplotViewModel(TasksSource taskSource, DateTime issuesFrom, IStateFilteringProvider stateFilteringProvider)
+        public CycleTimeScatterplotViewModel(TasksSource taskSource, DateTime issuesFrom, IStateFilteringProvider stateFilteringProvider, ICurrentProject currentProject)
         {
             _taskSource = taskSource;
             _issuesFrom = issuesFrom;
             _stateFilteringProvider = stateFilteringProvider;
+            _currentProject = currentProject;
 
             DisplayName = "Cycle time scatterplot";
         }
@@ -125,7 +127,7 @@ namespace Jira.FlowCharts
             Bugs = new ChartValues<IssuePoint>();
 
             var stateFilteringParameter = await _stateFilteringProvider.GetStateFilteringParameter();
-            var finishedTasks = await _taskSource.GetLatestFinishedStories(new IssuesFromParameters(_issuesFrom), stateFilteringParameter);
+            var finishedTasks = await _taskSource.GetLatestFinishedStories(_currentProject.ProjectKey, new IssuesFromParameters(_issuesFrom), stateFilteringParameter);
             foreach (var issue in finishedTasks)
             {
                 var sinceStart = issue.Ended - _baseDate;

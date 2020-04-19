@@ -70,12 +70,6 @@ namespace Jira.FlowCharts
                 (issue.Status != "Withdrawn" && issue.Status != "On Hold");
         }
 
-        [Obsolete("Use overload with project key.")]
-        public Task<IEnumerable<AnalyzedIssue>> GetStories(StateFilteringParameter stateFiltering)
-        {
-            return GetStories(null, stateFiltering);
-        }
-
         public async Task<IEnumerable<AnalyzedIssue>> GetStories(string projectKey, StateFilteringParameter stateFiltering)
         {
             var issues = await GetAllIssues(projectKey, stateFiltering);
@@ -97,23 +91,11 @@ namespace Jira.FlowCharts
             return latestStories;
         }
 
-        [Obsolete("Use overload with project key.")]
-        public Task<IEnumerable<FinishedIssue>> GetLatestFinishedStories(IssuesFromParameters parameters, StateFilteringParameter stateFiltering)
-        {
-            return GetLatestFinishedStories(null, parameters, stateFiltering);
-        }
-
         public async Task<IEnumerable<FinishedIssue>> GetLatestFinishedStories(string projectKey, IssuesFromParameters parameters, StateFilteringParameter stateFiltering)
         {
             var latestStories = await GetLatestStories(projectKey, parameters, stateFiltering);
 
             return OfFinishedStories(latestStories);
-        }
-
-        [Obsolete("Use overload with project key.")]
-        public Task<IEnumerable<FinishedIssue>> GetFinishedStories(StateFilteringParameter stateFiltering)
-        {
-            return GetFinishedStories(null, stateFiltering);
         }
 
         public async Task<IEnumerable<FinishedIssue>> GetFinishedStories(string projectKey, StateFilteringParameter stateFiltering)

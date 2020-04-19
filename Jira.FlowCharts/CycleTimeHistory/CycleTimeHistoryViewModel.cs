@@ -17,6 +17,7 @@ namespace Jira.FlowCharts
     {
         private readonly TasksSource _tasksSource;
         private readonly IStateFilteringProvider _stateFilteringProvider;
+        private readonly ICurrentProject _currentProject;
         private string[] _labels;
         private SeriesCollection _seriesCollection;
 
@@ -32,17 +33,18 @@ namespace Jira.FlowCharts
             set => Set(ref _labels, value);
         }
 
-        public CycleTimeHistoryViewModel(TasksSource tasksSource, IStateFilteringProvider stateFilteringProvider)
+        public CycleTimeHistoryViewModel(TasksSource tasksSource, IStateFilteringProvider stateFilteringProvider, ICurrentProject currentProject)
         {
             _tasksSource = tasksSource;
             _stateFilteringProvider = stateFilteringProvider;
+            _currentProject = currentProject;
             DisplayName = "Cycle time and throughput history";
         }
 
         protected override async Task OnActivateAsync(CancellationToken cancellationToken)
         {
             var stateFilteringParameter = await _stateFilteringProvider.GetStateFilteringParameter();
-            var latestFinishedStories = await _tasksSource.GetFinishedStories(stateFilteringParameter);
+            var latestFinishedStories = await _tasksSource.GetFinishedStories(_currentProject.ProjectKey, stateFilteringParameter);
 
             var orderedStories = latestFinishedStories.OrderBy(x => x.Ended).ToArray();
 

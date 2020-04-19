@@ -18,6 +18,7 @@ namespace Jira.FlowCharts
         private Func<double, string> _formatter;
         private readonly DateTime _issuesFrom;
         private readonly IStateFilteringProvider _stateFilteringProvider;
+        private readonly ICurrentProject _currentProject;
 
         public SeriesCollection SeriesCollection
         {
@@ -37,18 +38,19 @@ namespace Jira.FlowCharts
             private set => Set(ref _formatter, value);
         }
 
-        public CycleTimeHistogramViewModel(TasksSource taskSource, DateTime issuesFrom, IStateFilteringProvider stateFilteringProvider)
+        public CycleTimeHistogramViewModel(TasksSource taskSource, DateTime issuesFrom, IStateFilteringProvider stateFilteringProvider, ICurrentProject currentProject)
         {
             _taskSource = taskSource;
             _issuesFrom = issuesFrom;
             _stateFilteringProvider = stateFilteringProvider;
+            _currentProject = currentProject;
             DisplayName = "Cycle time histogram";
         }
 
         protected override async Task OnActivateAsync(CancellationToken cancellationToken)
         {
             var stateFilteringParameter = await _stateFilteringProvider.GetStateFilteringParameter();
-            var finishedStories = await _taskSource.GetLatestFinishedStories(new IssuesFromParameters(_issuesFrom), stateFilteringParameter);
+            var finishedStories = await _taskSource.GetLatestFinishedStories(_currentProject.ProjectKey, new IssuesFromParameters(_issuesFrom), stateFilteringParameter);
 
             var durations = finishedStories.Select(x => x.DurationDays).OrderBy(x=>x).ToArray();
 

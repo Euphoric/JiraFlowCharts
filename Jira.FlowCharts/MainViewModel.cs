@@ -37,14 +37,13 @@ namespace Jira.FlowCharts
             Items.Add(new JiraUpdateViewModel(tasksSource, new CurrentTime()));
             Items.Add(new StoryFilteringViewModel(stateFilteringProvider));
             Items.Add(new IssuesGridViewModel(tasksSource, stateFilteringProvider, ProjectSelector));
-            Items.Add(new CumulativeFlowViewModel(tasksSource, stateFilteringProvider));
-            Items.Add(new CycleTimeScatterplotViewModel(tasksSource, issuesFrom, stateFilteringProvider));
-            Items.Add(new CycleTimeHistogramViewModel(tasksSource, issuesFrom, stateFilteringProvider));
-            Items.Add(new CycleTimeHistoryViewModel(tasksSource, stateFilteringProvider));
-            // not shown now
-            //Items.Add(new CycleTimeHistogramSmoothViewModel(tasksSource, issuesFrom, stateFilteringProvider));
-            Items.Add(new StoryPointCycleTimeViewModel(tasksSource, issuesFrom, stateFilteringProvider));
-            Items.Add(new SimulationViewModel(tasksSource, issuesFrom, stateFilteringProvider));
+            Items.Add(new CumulativeFlowViewModel(tasksSource, stateFilteringProvider, ProjectSelector));
+            Items.Add(new CycleTimeScatterplotViewModel(tasksSource, issuesFrom, stateFilteringProvider, ProjectSelector));
+            Items.Add(new CycleTimeHistogramViewModel(tasksSource, issuesFrom, stateFilteringProvider, ProjectSelector));
+            Items.Add(new CycleTimeHistogramSmoothViewModel(tasksSource, issuesFrom, stateFilteringProvider, ProjectSelector));
+            Items.Add(new CycleTimeHistoryViewModel(tasksSource, stateFilteringProvider, ProjectSelector));
+            Items.Add(new StoryPointCycleTimeViewModel(tasksSource, issuesFrom, stateFilteringProvider, ProjectSelector));
+            Items.Add(new SimulationViewModel(tasksSource, issuesFrom, stateFilteringProvider, ProjectSelector));
         }
 
         private static string GetPathToData()

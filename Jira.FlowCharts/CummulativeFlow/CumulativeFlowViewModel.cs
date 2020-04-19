@@ -14,11 +14,13 @@ namespace Jira.FlowCharts
     {
         private readonly TasksSource _source;
         private readonly IStateFilteringProvider _stateFilteringProvider;
+        private readonly ICurrentProject _currentProject;
 
-        public CumulativeFlowViewModel(TasksSource source, IStateFilteringProvider stateFilteringProvider)
+        public CumulativeFlowViewModel(TasksSource source, IStateFilteringProvider stateFilteringProvider, ICurrentProject currentProject)
         {
             _source = source;
             _stateFilteringProvider = stateFilteringProvider;
+            _currentProject = currentProject;
             DisplayName = "Cumulative flow";
 
             SeriesCollection = new SeriesCollection();
@@ -31,7 +33,7 @@ namespace Jira.FlowCharts
         protected override async Task OnActivateAsync(CancellationToken token)
         {
             var stateFiltering = await _stateFilteringProvider.GetStateFilteringParameter();
-            var stories = (await _source.GetStories(stateFiltering)).ToArray();
+            var stories = (await _source.GetStories(_currentProject.ProjectKey, stateFiltering)).ToArray();
             var fromDate = stories.Where(x=>x.Ended.HasValue).Max(x=>x.Ended.Value).AddMonths(-3);
             var cfa = new CumulativeFlowAnalysis(stories, stateFiltering.FilteredStates, fromDate);
 
