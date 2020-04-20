@@ -542,5 +542,119 @@ namespace Jira.Querying
             var issueBKeys = (await Cache.GetIssues("B")).Select(x => x.Key).ToArray();
             Assert.Empty(issueBKeys);
         }
+
+        [Fact]
+        public async Task No_status_when_no_issues()
+        {
+            await Cache.Initialize();
+
+            string[] statuses = await Cache.GetStatuses();
+
+            Assert.Empty(statuses);
+        }
+
+        [Fact]
+        public async Task Returns_status_of_issue()
+        {
+            await Cache.Initialize();
+
+            _client.UpdateIssue("A-1", status:"In Progress");
+
+            await CacheUpdate(projectKey: "A");
+
+            string[] statuses = await Cache.GetStatuses();
+
+            Assert.Equal(new[] {"In Progress"}, statuses);
+        }
+
+        [Fact]
+        public async Task Returns_multiple_statuses_of_issues()
+        {
+            await Cache.Initialize();
+
+            _client.UpdateIssue("A-1", status:"In Progress");
+            _client.UpdateIssue("A-2", status:"In Development");
+            _client.UpdateIssue("A-3", status:"Done");
+
+            await CacheUpdate(projectKey: "A");
+
+            string[] statuses = await Cache.GetStatuses();
+
+            Assert.Equal(new[] {"Done", "In Development", "In Progress"}, statuses.OrderBy(x=>x));
+        }
+
+        [Fact]
+        public async Task Statuses_are_distinct()
+        {
+            await Cache.Initialize();
+
+            _client.UpdateIssue("A-1", status:"In Progress");
+            _client.UpdateIssue("A-2", status:"In Progress");
+            _client.UpdateIssue("A-3", status:"Done");
+            _client.UpdateIssue("A-4", status:"Done");
+
+            await CacheUpdate(projectKey: "A");
+
+            string[] statuses = await Cache.GetStatuses();
+
+            Assert.Equal(new[] {"Done",  "In Progress"}, statuses.OrderBy(x=>x));
+        }
+
+        [Fact]
+        public async Task Returns_statuses_from_status_changes()
+        {
+            await Cache.Initialize();
+
+            _client.UpdateIssue("A-1", status:"In Progress");
+            _client.UpdateIssue("A-1", status:"Done");
+
+            await CacheUpdate(projectKey: "A");
+
+            string[] statuses = await Cache.GetStatuses();
+
+            Assert.Equal(new[] {"Done",  "In Progress"}, statuses.OrderBy(x=>x));
+        }
+
+        [Fact]
+        public async Task Returns_multiple_statuses_from_multiple_issues_and_multiple_changes()
+        {
+            await Cache.Initialize();
+
+            _client.UpdateIssue("A-1", status: "In Progress");
+            _client.UpdateIssue("A-1", status: "Done");
+
+            _client.UpdateIssue("A-2", status:"In Dev");
+            _client.UpdateIssue("A-2", status:"In QA");
+            _client.UpdateIssue("A-2", status:"Ready for Done");
+
+            await CacheUpdate(projectKey: "A");
+
+            string[] statuses = await Cache.GetStatuses();
+
+            Assert.Equal(new[] {"Done", "In Dev", "In Progress", "In QA", "Ready for Done"}, statuses.OrderBy(x=>x));
+        }
+
+        [Fact]
+        public async Task Statuses_are_distinct_across_multiple_issues_and_status_changes()
+        {
+            await Cache.Initialize();
+
+            _client.UpdateIssue("A-1", status: "In Progress");
+            _client.UpdateIssue("A-2", status:"In QA");
+            _client.UpdateIssue("A-1", status: "Done");
+
+            _client.UpdateIssue("A-2", status: "In Progress");
+            _client.UpdateIssue("A-2", status:"In Dev");
+            _client.UpdateIssue("A-2", status:"In QA");
+            _client.UpdateIssue("A-2", status:"In Dev");
+            _client.UpdateIssue("A-2", status:"In QA");
+            _client.UpdateIssue("A-2", status:"Ready for Done");
+
+            await CacheUpdate(projectKey: "A");
+
+            string[] statuses = await Cache.GetStatuses();
+
+            Assert.Equal(new[] {"Done", "In Dev", "In Progress", "In QA", "Ready for Done"}, statuses.OrderBy(x=>x));
+        }
     }
 }

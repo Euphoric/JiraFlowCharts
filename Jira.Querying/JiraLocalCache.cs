@@ -202,5 +202,13 @@ namespace Jira.Querying
         {
             _repository.Dispose();
         }
+
+        public async Task<string[]> GetStatuses()
+        {
+            var issues = await _repository.GetIssues();
+            var issueStatuses = issues.Select(x => x.Status);
+            var issueChangeStatuses = issues.SelectMany(x => x.StatusChanges).Select(x => x.State);
+            return issueStatuses.Union(issueChangeStatuses).ToArray();
+        }
     }
 }

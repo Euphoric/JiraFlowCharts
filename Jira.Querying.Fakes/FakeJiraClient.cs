@@ -13,12 +13,15 @@ namespace Jira.Querying
             public FakeJiraIssue(string key)
             {
                 Key = key;
+                StatusChanges = new List<string>();
             }
 
             public string Project => Key.Split('-')[0];
             public string Key { get; private set; }
             public DateTime? Created { get; set; }
             public DateTime? Updated { get; set; }
+            public string Status { get; set; }
+            public List<string> StatusChanges { get; }
         }
 
         readonly List<FakeJiraIssue> _issues = new List<FakeJiraIssue>();
@@ -91,28 +94,34 @@ namespace Jira.Querying
         public Task<CachedIssue> RetrieveDetails(IJiraIssue issue)
         {
             var fake = (FakeJiraIssue)issue;
+            var changes = fake.StatusChanges.Select(x=>new CachedIssueStatusChange(new DateTime(), x)).ToArray();
             CachedIssue cachedIssue = new CachedIssue()
             {
                 Project = fake.Project,
                 Key = fake.Key,
                 Created = fake.Created,
                 Updated = fake.Updated,
-                StatusChanges = new Collection<CachedIssueStatusChange>()
+                Status = fake.Status,
+                StatusChanges = new Collection<CachedIssueStatusChange>(changes)
             };
 
             return Task.FromResult(cachedIssue);
         }
 
-        public void UpdateIssue(string key, TimeSpan? step = null)
+        public void UpdateIssue(string key, TimeSpan? step = null, string status = null)
         {
             var existingIssue = _issues.FirstOrDefault(x => x.Key == key);
             if (existingIssue == null)
             {
-                _issues.Add(new FakeJiraIssue(key) { Created = _currentDateTime, Updated = _currentDateTime });
+                var fakeJiraIssue = new FakeJiraIssue(key) { Created = _currentDateTime, Updated = _currentDateTime, Status = status };
+                fakeJiraIssue.StatusChanges.Add(status);
+                _issues.Add(fakeJiraIssue);
             }
             else
             {
                 existingIssue.Updated = _currentDateTime;
+                existingIssue.StatusChanges.Add(status);
+                existingIssue.Status = status;
             }
             _currentDateTime = _currentDateTime.Add(step ?? TimeSpan.FromDays(1));
         }
