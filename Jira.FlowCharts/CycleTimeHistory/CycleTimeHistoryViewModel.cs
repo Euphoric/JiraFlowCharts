@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -44,8 +45,8 @@ namespace Jira.FlowCharts
         protected override async Task OnActivateAsync(CancellationToken cancellationToken)
         {
             var stateFilteringParameter = await _stateFilteringProvider.GetStateFilteringParameter();
-            var latestFinishedStories = await _tasksSource.GetFinishedStories(_currentProject.ProjectKey, stateFilteringParameter);
 
+            var latestFinishedStories = await _tasksSource.GetFinishedStories(_currentProject.ProjectKey, stateFilteringParameter);
             var orderedStories = latestFinishedStories.OrderBy(x => x.Ended).ToArray();
 
             TimeSpan historyWindow = TimeSpan.FromDays(-3*30);
@@ -82,7 +83,6 @@ namespace Jira.FlowCharts
                 percentiles85.Add(dp.DurationAtPercentile(0.85));
                 percentiles95.Add(dp.DurationAtPercentile(0.95));
             }
-
 
             SeriesCollection = new SeriesCollection
             {

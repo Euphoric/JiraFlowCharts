@@ -85,13 +85,6 @@ namespace Jira.Querying
         }
 
         [Fact]
-        public async Task Update_without_initializing_is_error()
-        {
-            var ex = await Assert.ThrowsAsync<InvalidOperationException>(() => CacheUpdate());
-            Assert.Equal("Must call Initialize before updating.", ex.Message);
-        }
-
-        [Fact]
         public void Repository_is_disposed_after_cache_is_disposed_when_not_initialized()
         {
             Assert.False(Repository.IsDisposed);
@@ -102,8 +95,6 @@ namespace Jira.Querying
         [Fact]
         public async Task Repository_is_disposed_after_cache_is_disposed_when_initialized()
         {
-            await Cache.Initialize();
-
             Assert.False(Repository.IsDisposed);
             Cache.Dispose();
             Assert.True(Repository.IsDisposed);
@@ -112,21 +103,18 @@ namespace Jira.Querying
         [Fact]
         public async Task Update_parameter_check()
         {
-            await Cache.Initialize();
             await Assert.ThrowsAsync<ArgumentNullException>(() => Cache.Update(null, new DateTime(2018, 1, 1), "AB"));
         }
 
         [Fact]
         public async Task Project_key_cannot_be_empty()
         {
-            await Cache.Initialize();
             await Assert.ThrowsAsync<ArgumentNullException>(() => Cache.Update(_client, new DateTime(2018, 1, 1), ""));
         }
 
         [Fact]
         public async Task Updates_no_issues()
         {
-            await Cache.Initialize();
             await CacheUpdate();
 
             Assert.Empty(await Cache.GetIssues());
@@ -135,8 +123,6 @@ namespace Jira.Querying
         [Fact]
         public async Task Update_passes_right_project_key()
         {
-            await Cache.Initialize();
-
             _client.ExpectedProjectKey = "EFG";
 
             await CacheUpdate(projectKey: "EFG");
@@ -149,7 +135,6 @@ namespace Jira.Querying
         {
             _client.UpdateIssue("KEY-1");
 
-            await Cache.Initialize();
             await CacheUpdate();
 
             var cachedKeys = (await Cache.GetIssues()).Select(x => x.Key).ToArray();
@@ -164,7 +149,6 @@ namespace Jira.Querying
             _client.UpdateIssue("KEY-2");
             _client.UpdateIssue("KEY-3");
 
-            await Cache.Initialize();
             await CacheUpdate();
 
             var cachedKeys = (await Cache.GetIssues()).Select(x => x.Key).ToArray();
@@ -179,7 +163,6 @@ namespace Jira.Querying
             _client.UpdateIssue("KEY-2");
             _client.UpdateIssue("KEY-3");
 
-            await Cache.Initialize();
             await CacheUpdate();
 
             var cachedKeys = (await Cache.GetIssues()).Select(x => x.Key).ToArray();
@@ -196,7 +179,6 @@ namespace Jira.Querying
         {
             _client.UpdateIssue("KEY-1");
 
-            await Cache.Initialize();
             await CacheUpdate(new DateTime(2019, 1, 2));
 
             var cachedKeys = (await Cache.GetIssues()).Select(x => x.Key).ToArray();
@@ -215,7 +197,6 @@ namespace Jira.Querying
                 _client.UpdateIssue("KEY-" + i);
             }
 
-            await Cache.Initialize();
             await CacheUpdate();
 
             var cachedKeys = (await Cache.GetIssues()).Select(x => x.Key).ToArray();
@@ -234,7 +215,6 @@ namespace Jira.Querying
                 _client.UpdateIssue("KEY-" + i, TimeSpan.FromSeconds(5));
             }
 
-            await Cache.Initialize();
             await CacheUpdate();
 
             var cachedKeys = (await Cache.GetIssues()).Select(x => x.Key).ToArray();
@@ -255,7 +235,6 @@ namespace Jira.Querying
                 _client.UpdateIssue("KEY-" + i, TimeSpan.FromSeconds(0.5));
             }
 
-            await Cache.Initialize();
             await CacheUpdate();
 
             var cachedKeys = (await Cache.GetIssues()).Select(x => x.Key).ToArray();
@@ -266,8 +245,6 @@ namespace Jira.Querying
         [Fact]
         public async Task Updates_issue_in_cache_when_it_was_updated_in_client1()
         {
-            await Cache.Initialize();
-
             _client.UpdateIssue("KEY-1");
 
             await CacheUpdate();
@@ -286,8 +263,6 @@ namespace Jira.Querying
         [Fact]
         public async Task When_updating_doesnt_retrive_items_not_updated_since_last_update()
         {
-            await Cache.Initialize();
-
             _client.UpdateIssue("KEY-1");
             _client.UpdateIssue("KEY-2");
 
@@ -303,8 +278,6 @@ namespace Jira.Querying
         [Fact]
         public async Task When_updating_doesnt_retrive_items_not_updated_since_last_update2()
         {
-            await Cache.Initialize();
-
             _client.UpdateIssue("KEY-1");
             _client.UpdateIssue("KEY-2");
 
@@ -372,8 +345,6 @@ namespace Jira.Querying
         [Fact]
         public async Task Issues_reported_when_updated()
         {
-            await Cache.Initialize();
-
             _client.UpdateIssue("KEY-1");
             _client.UpdateIssue("KEY-2");
             await CacheUpdate();
@@ -403,8 +374,6 @@ namespace Jira.Querying
         [Fact]
         public async Task No_projects_when_empty()
         {
-            await Cache.Initialize();
-
             var projects = await Cache.GetProjects();
 
             Assert.Empty(projects);
@@ -415,8 +384,6 @@ namespace Jira.Querying
         [InlineData("PROJ")]
         public async Task Returns_project_after_update(string project)
         {
-            await Cache.Initialize();
-
             _client.UpdateIssue(project + "-1");
 
             await CacheUpdate(projectKey: project);
@@ -432,8 +399,6 @@ namespace Jira.Querying
         [InlineData(11)]
         public async Task Returns_project_statistics(int issueCount)
         {
-            await Cache.Initialize();
-
             string projectKey = "KEY";
 
             for (int i = 1; i <= issueCount; i++)
@@ -455,8 +420,6 @@ namespace Jira.Querying
         [Fact]
         public async Task Updates_only_specific_project()
         {
-            await Cache.Initialize();
-
             _client.UpdateIssue("A-1");
             _client.UpdateIssue("B-1");
             _client.UpdateIssue("C-1");
@@ -472,8 +435,6 @@ namespace Jira.Querying
         [Fact]
         public async Task Returns_all_updated_projects()
         {
-            await Cache.Initialize();
-
             _client.UpdateIssue("A-1");
             _client.UpdateIssue("B-1");
             _client.UpdateIssue("C-1");
@@ -491,8 +452,6 @@ namespace Jira.Querying
         [Fact]
         public async Task Last_update_times_are_independent_per_project()
         {
-            await Cache.Initialize();
-
             _client.UpdateIssue("A-1");
             _client.UpdateIssue("B-1");
 
@@ -508,8 +467,6 @@ namespace Jira.Querying
         [Fact]
         public async Task Issues_are_empty_for_nonexisting_project()
         {
-            await Cache.Initialize();
-
             var issueKeys = (await Cache.GetIssues("A")).Select(x => x.Key).ToArray();
             Assert.Empty(issueKeys);
         }
@@ -517,8 +474,6 @@ namespace Jira.Querying
         [Fact]
         public async Task Issues_are_returned_for_project()
         {
-            await Cache.Initialize();
-
             _client.UpdateIssue("A-1");
             await CacheUpdate(projectKey: "A");
 
@@ -529,8 +484,6 @@ namespace Jira.Querying
         [Fact]
         public async Task Issues_are_returned_only_for_specified_project()
         {
-            await Cache.Initialize();
-
             _client.UpdateIssue("A-1");
             _client.UpdateIssue("B-1");
 
@@ -546,8 +499,6 @@ namespace Jira.Querying
         [Fact]
         public async Task No_status_when_no_issues()
         {
-            await Cache.Initialize();
-
             string[] statuses = await Cache.GetStatuses();
 
             Assert.Empty(statuses);
@@ -556,105 +507,93 @@ namespace Jira.Querying
         [Fact]
         public async Task Returns_status_of_issue()
         {
-            await Cache.Initialize();
-
-            _client.UpdateIssue("A-1", status:"In Progress");
+            _client.UpdateIssue("A-1", status: "In Progress");
 
             await CacheUpdate(projectKey: "A");
 
             string[] statuses = await Cache.GetStatuses();
 
-            Assert.Equal(new[] {"In Progress"}, statuses);
+            Assert.Equal(new[] { "In Progress" }, statuses);
         }
 
         [Fact]
         public async Task Returns_multiple_statuses_of_issues()
         {
-            await Cache.Initialize();
-
-            _client.UpdateIssue("A-1", status:"In Progress");
-            _client.UpdateIssue("A-2", status:"In Development");
-            _client.UpdateIssue("A-3", status:"Done");
+            _client.UpdateIssue("A-1", status: "In Progress");
+            _client.UpdateIssue("A-2", status: "In Development");
+            _client.UpdateIssue("A-3", status: "Done");
 
             await CacheUpdate(projectKey: "A");
 
             string[] statuses = await Cache.GetStatuses();
 
-            Assert.Equal(new[] {"Done", "In Development", "In Progress"}, statuses.OrderBy(x=>x));
+            Assert.Equal(new[] { "Done", "In Development", "In Progress" }, statuses.OrderBy(x => x));
         }
 
         [Fact]
         public async Task Statuses_are_distinct()
         {
-            await Cache.Initialize();
-
-            _client.UpdateIssue("A-1", status:"In Progress");
-            _client.UpdateIssue("A-2", status:"In Progress");
-            _client.UpdateIssue("A-3", status:"Done");
-            _client.UpdateIssue("A-4", status:"Done");
+            _client.UpdateIssue("A-1", status: "In Progress");
+            _client.UpdateIssue("A-2", status: "In Progress");
+            _client.UpdateIssue("A-3", status: "Done");
+            _client.UpdateIssue("A-4", status: "Done");
 
             await CacheUpdate(projectKey: "A");
 
             string[] statuses = await Cache.GetStatuses();
 
-            Assert.Equal(new[] {"Done",  "In Progress"}, statuses.OrderBy(x=>x));
+            Assert.Equal(new[] { "Done", "In Progress" }, statuses.OrderBy(x => x));
         }
 
         [Fact]
         public async Task Returns_statuses_from_status_changes()
         {
-            await Cache.Initialize();
-
-            _client.UpdateIssue("A-1", status:"In Progress");
-            _client.UpdateIssue("A-1", status:"Done");
+            _client.UpdateIssue("A-1", status: "In Progress");
+            _client.UpdateIssue("A-1", status: "Done");
 
             await CacheUpdate(projectKey: "A");
 
             string[] statuses = await Cache.GetStatuses();
 
-            Assert.Equal(new[] {"Done",  "In Progress"}, statuses.OrderBy(x=>x));
+            Assert.Equal(new[] { "Done", "In Progress" }, statuses.OrderBy(x => x));
         }
 
         [Fact]
         public async Task Returns_multiple_statuses_from_multiple_issues_and_multiple_changes()
         {
-            await Cache.Initialize();
-
             _client.UpdateIssue("A-1", status: "In Progress");
             _client.UpdateIssue("A-1", status: "Done");
 
-            _client.UpdateIssue("A-2", status:"In Dev");
-            _client.UpdateIssue("A-2", status:"In QA");
-            _client.UpdateIssue("A-2", status:"Ready for Done");
+            _client.UpdateIssue("A-2", status: "In Dev");
+            _client.UpdateIssue("A-2", status: "In QA");
+            _client.UpdateIssue("A-2", status: "Ready for Done");
 
             await CacheUpdate(projectKey: "A");
 
             string[] statuses = await Cache.GetStatuses();
 
-            Assert.Equal(new[] {"Done", "In Dev", "In Progress", "In QA", "Ready for Done"}, statuses.OrderBy(x=>x));
+            Assert.Equal(new[] { "Done", "In Dev", "In Progress", "In QA", "Ready for Done" }, statuses.OrderBy(x => x));
         }
 
         [Fact]
         public async Task Statuses_are_distinct_across_multiple_issues_and_status_changes()
         {
-            await Cache.Initialize();
-
             _client.UpdateIssue("A-1", status: "In Progress");
-            _client.UpdateIssue("A-2", status:"In QA");
+            _client.UpdateIssue("A-2", status: "In QA");
             _client.UpdateIssue("A-1", status: "Done");
 
             _client.UpdateIssue("A-2", status: "In Progress");
-            _client.UpdateIssue("A-2", status:"In Dev");
-            _client.UpdateIssue("A-2", status:"In QA");
-            _client.UpdateIssue("A-2", status:"In Dev");
-            _client.UpdateIssue("A-2", status:"In QA");
-            _client.UpdateIssue("A-2", status:"Ready for Done");
+            _client.UpdateIssue("A-2", status: "In Dev");
+            _client.UpdateIssue("A-2", status: "In QA");
+            _client.UpdateIssue("A-2", status: "In Dev");
+            _client.UpdateIssue("A-2", status: "In QA");
+            _client.UpdateIssue("A-2", status: "Ready for Done");
 
             await CacheUpdate(projectKey: "A");
 
             string[] statuses = await Cache.GetStatuses();
 
-            Assert.Equal(new[] {"Done", "In Dev", "In Progress", "In QA", "Ready for Done"}, statuses.OrderBy(x=>x));
+            Assert.Equal(new[] { "Done", "In Dev", "In Progress", "In QA", "Ready for Done" }, statuses.OrderBy(x => x));
         }
     }
 }

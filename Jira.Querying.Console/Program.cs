@@ -37,8 +37,6 @@ namespace JiraParse
 
             using (JiraLocalCache jiraLocalCache = new JiraLocalCache(new SqliteJiraLocalCacheRepository(@"../../../../Data/issuesCache.db")))
             {
-                await jiraLocalCache.Initialize();
-
                 await jiraLocalCache.Update(client, lastUpdate, "AC");
             }
 

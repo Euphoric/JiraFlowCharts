@@ -131,23 +131,32 @@ namespace Jira.Querying
 
         public async Task<IEnumerable<CachedIssue>> GetIssues(string projectKey)
         {
+            await EnsureInitialized();
+
             return await _repository.GetIssues(projectKey);
         }
 
-        public async Task Initialize()
+        private async Task EnsureInitialized()
         {
+            if (_isInitialized)
+                return;
+
             await _repository.Initialize();
 
             _isInitialized = true;
         }
 
-        public Task<ProjectStatistic[]> GetProjects()
+        public async Task<ProjectStatistic[]> GetProjects()
         {
-            return _repository.GetProjects();
+            await EnsureInitialized();
+
+            return await _repository.GetProjects();
         }
 
         public async Task Update(IJiraClient client, DateTime startUpdateDate, string projectKey, ICacheUpdateProgress progress = null)
         {
+            await EnsureInitialized();
+
             progress = progress ?? new NullCacheUpdateProgres();
 
             if (client == null)
@@ -158,11 +167,6 @@ namespace Jira.Querying
             if (string.IsNullOrWhiteSpace(projectKey))
             {
                 throw new ArgumentNullException(nameof(projectKey));
-            }
-
-            if (!_isInitialized)
-            {
-                throw new InvalidOperationException($"Must call {nameof(Initialize)} before updating.");
             }
 
             DateTime lastUpdateDate = await GetLastUpdateDateTime(projectKey, startUpdateDate);
@@ -215,6 +219,8 @@ namespace Jira.Querying
 
         public async Task<string[]> GetStatuses()
         {
+            await EnsureInitialized();
+
             return await _repository.GetStatuses();
         }
     }

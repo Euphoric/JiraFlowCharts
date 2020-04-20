@@ -33,8 +33,6 @@ namespace Jira.FlowCharts
         {
             using (var cache = new JiraLocalCache(CreateRepository()))
             {
-                await cache.Initialize();
-
                 return (await cache.GetIssues(projectKey)).ToList();
             }
         }
@@ -43,8 +41,6 @@ namespace Jira.FlowCharts
         {
             using (var cache = new JiraLocalCache(CreateRepository()))
             {
-                await cache.Initialize();
-
                 var client = new JiraClient(jiraLoginParameters);
 
                 await cache.Update(client, startUpdateDate, projectKey, cacheUpdateProgress);
@@ -55,8 +51,6 @@ namespace Jira.FlowCharts
         {
             using (var cache = new JiraLocalCache(CreateRepository()))
             {
-                await cache.Initialize();
-
                 return await cache.GetStatuses();
             }
         }
@@ -65,8 +59,6 @@ namespace Jira.FlowCharts
         {
             using (var cache = new JiraLocalCache(CreateRepository()))
             {
-                await cache.Initialize();
-
                 return await cache.GetProjects();
             }
         }
