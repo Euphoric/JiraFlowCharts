@@ -90,6 +90,15 @@ namespace Jira.Querying.Sqlite
             return await _dbContext.Issues.Where(x=>x.Key.StartsWith(projectKey)).Select(x => x.Updated).MaxAsync();
         }
 
+        public async Task<string[]> GetStatuses()
+        {
+            var issueStatuses = _dbContext.Issues.Select(x => x.Status);
+            var issueChangeStatuses = _dbContext.Issues.SelectMany(x => x.StatusChanges).Select(x => x.State);
+            var statuses = await issueStatuses.Union(issueChangeStatuses).ToArrayAsync();
+
+            return statuses;
+        }
+
         public void Dispose()
         {
             _dbContext.Dispose(); // WARN: Not unit tested. 

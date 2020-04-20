@@ -35,6 +35,7 @@ namespace Jira.Querying
             Task<ProjectStatistic[]> GetProjects();
 
             bool IsDisposed { get; }
+            Task<string[]> GetStatuses();
         }
 
         private class InMemoryRepository : IRepository
@@ -91,6 +92,15 @@ namespace Jira.Querying
                         .Max();
 
                 return Task.FromResult(lastUpdatedTime);
+            }
+
+            public Task<string[]> GetStatuses()
+            {
+                var issueStatuses = _issues.Select(x => x.Status);
+                var issueChangeStatuses = _issues.SelectMany(x => x.StatusChanges).Select(x => x.State);
+                var statuses = issueStatuses.Union(issueChangeStatuses).ToArray();
+
+                return Task.FromResult(statuses);
             }
 
             public void Dispose()
@@ -205,10 +215,7 @@ namespace Jira.Querying
 
         public async Task<string[]> GetStatuses()
         {
-            var issues = await _repository.GetIssues();
-            var issueStatuses = issues.Select(x => x.Status);
-            var issueChangeStatuses = issues.SelectMany(x => x.StatusChanges).Select(x => x.State);
-            return issueStatuses.Union(issueChangeStatuses).ToArray();
+            return await _repository.GetStatuses();
         }
     }
 }
