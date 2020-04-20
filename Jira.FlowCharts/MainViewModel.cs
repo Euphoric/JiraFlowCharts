@@ -7,11 +7,13 @@ using Jira.FlowCharts.IssuesGrid;
 using Jira.FlowCharts.JiraUpdate;
 using Jira.FlowCharts.ProjectSelector;
 using Jira.FlowCharts.StoryFiltering;
+using Jira.Querying.Sqlite;
 
 namespace Jira.FlowCharts
 {
     public class MainViewModel : Conductor<IScreen>.Collection.OneActive
     {
+        private readonly SqliteJiraLocalCacheRepository _cacheRepository;
         public ProjectSelectorViewModel ProjectSelector { get; }
 
         public MainViewModel()
@@ -25,7 +27,9 @@ namespace Jira.FlowCharts
                 Directory.CreateDirectory(dataPath);
             }
 
-            TasksSourceJiraCacheAdapter jiraCacheAdapter = new TasksSourceJiraCacheAdapter(Path.Combine(dataPath, @"issuesCache.db"));
+            string databaseFile = Path.Combine(dataPath, @"issuesCache.db");
+            _cacheRepository = new SqliteJiraLocalCacheRepository(databaseFile);
+            TasksSourceJiraCacheAdapter jiraCacheAdapter = new TasksSourceJiraCacheAdapter(_cacheRepository);
             JsonStatesRepository statesRepository = new JsonStatesRepository(Path.Combine(dataPath, @"analysisSettings.json"));
             var stateFilteringProvider = new StateFilteringProvider(jiraCacheAdapter, statesRepository);
             var tasksSource = new TasksSource(jiraCacheAdapter);
@@ -66,6 +70,11 @@ namespace Jira.FlowCharts
         protected override async Task OnDeactivateAsync(bool close, CancellationToken cancellationToken)
         {
             await ProjectSelector.DeactivateAsync(close);
+
+            if (close)
+            {
+                _cacheRepository.Dispose();
+            }
 
             await base.OnDeactivateAsync(close, cancellationToken);
         }

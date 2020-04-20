@@ -44,9 +44,16 @@ namespace Jira.FlowCharts
 
         protected override async Task OnActivateAsync(CancellationToken cancellationToken)
         {
+            Stopwatch watch = Stopwatch.StartNew();
+
             var stateFilteringParameter = await _stateFilteringProvider.GetStateFilteringParameter();
 
+            var a = watch.Elapsed;
+
             var latestFinishedStories = await _tasksSource.GetFinishedStories(_currentProject.ProjectKey, stateFilteringParameter);
+
+            var b = watch.Elapsed;
+
             var orderedStories = latestFinishedStories.OrderBy(x => x.Ended).ToArray();
 
             TimeSpan historyWindow = TimeSpan.FromDays(-3*30);

@@ -15,52 +15,40 @@ namespace Jira.FlowCharts
         Task<ProjectStatistic[]> GetProjects();
     }
 
-    public class TasksSourceJiraCacheAdapter : ITasksSourceJiraCacheAdapter
+    public class TasksSourceJiraCacheAdapter : ITasksSourceJiraCacheAdapter, IDisposable
     {
-        private readonly string _databaseFile;
+        private readonly JiraLocalCache _cache;
 
-        public TasksSourceJiraCacheAdapter(string databaseFile)
+        public TasksSourceJiraCacheAdapter(SqliteJiraLocalCacheRepository sqliteJiraLocalCacheRepository)
         {
-            _databaseFile = databaseFile;
-        }
-
-        private JiraLocalCache.IRepository CreateRepository()
-        {
-            return new SqliteJiraLocalCacheRepository(_databaseFile);
+            _cache = new JiraLocalCache(sqliteJiraLocalCacheRepository);
         }
 
         public async Task<List<CachedIssue>> GetIssues(string projectKey)
         {
-            using (var cache = new JiraLocalCache(CreateRepository()))
-            {
-                return (await cache.GetIssues(projectKey)).ToList();
-            }
+            return (await _cache.GetIssues(projectKey)).ToList();
         }
 
         public async Task UpdateIssues(JiraLoginParameters jiraLoginParameters, string projectKey, ICacheUpdateProgress cacheUpdateProgress, DateTime startUpdateDate)
         {
-            using (var cache = new JiraLocalCache(CreateRepository()))
-            {
-                var client = new JiraClient(jiraLoginParameters);
+            var client = new JiraClient(jiraLoginParameters);
 
-                await cache.Update(client, startUpdateDate, projectKey, cacheUpdateProgress);
-            }
+            await _cache.Update(client, startUpdateDate, projectKey, cacheUpdateProgress);
         }
 
         public async Task<string[]> GetAllStates()
         {
-            using (var cache = new JiraLocalCache(CreateRepository()))
-            {
-                return await cache.GetStatuses();
-            }
+            return await _cache.GetStatuses();
         }
 
         public async Task<ProjectStatistic[]> GetProjects()
         {
-            using (var cache = new JiraLocalCache(CreateRepository()))
-            {
-                return await cache.GetProjects();
-            }
+            return await _cache.GetProjects();
+        }
+
+        public void Dispose()
+        {
+            _cache.Dispose();
         }
     }
 }
