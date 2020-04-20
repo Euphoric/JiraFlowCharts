@@ -26,7 +26,7 @@ namespace Jira.FlowCharts
 
         public async Task<List<CachedIssue>> GetIssues(string projectKey)
         {
-            return (await _cache.GetIssues(projectKey)).ToList();
+            return await _cache.GetIssues(projectKey);
         }
 
         public async Task UpdateIssues(JiraLoginParameters jiraLoginParameters, string projectKey, ICacheUpdateProgress cacheUpdateProgress, DateTime startUpdateDate)

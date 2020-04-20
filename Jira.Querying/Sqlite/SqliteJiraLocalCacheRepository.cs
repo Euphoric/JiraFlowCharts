@@ -73,16 +73,16 @@ namespace Jira.Querying.Sqlite
             await _dbContext.SaveChangesAsync();
         }
 
-        public async Task<IEnumerable<CachedIssue>> GetIssues(string projectKey = null)
+        public async Task<List<CachedIssue>> GetIssues(string projectKey = null)
         {
             IQueryable<CachedIssueDb> issues = _dbContext.Issues;
             if (projectKey != null)
             {
                 issues = issues.Where(x => x.Key.StartsWith(projectKey));
             }
-            var dbIssues = await issues.ToArrayAsync();
+            var dbIssues = await issues.ToListAsync();
 
-            return _mapper.Map<IEnumerable<CachedIssue>>(dbIssues);
+            return _mapper.Map<List<CachedIssue>>(dbIssues);
         }
 
         public async Task<DateTime?> LastUpdatedIssueTime(string projectKey)
