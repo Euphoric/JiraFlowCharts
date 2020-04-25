@@ -25,6 +25,12 @@ namespace Jira.FlowCharts
 
             SeriesCollection = new SeriesCollection();
             XFormatter = val => new DateTime((long)val).ToShortDateString();
+
+            _currentProject.ProjectKeyChanged += async (sender, args) =>
+            {
+                if (IsActive)
+                    await Update();
+            };
         }
 
         public SeriesCollection SeriesCollection { get; private set; }
@@ -32,9 +38,14 @@ namespace Jira.FlowCharts
 
         protected override async Task OnActivateAsync(CancellationToken token)
         {
+            await Update();
+        }
+
+        private async Task Update()
+        {
             var stateFiltering = await _stateFilteringProvider.GetStateFilteringParameter();
             var stories = (await _source.GetStories(_currentProject.ProjectKey, stateFiltering)).ToArray();
-            var fromDate = stories.Where(x=>x.Ended.HasValue).Max(x=>x.Ended.Value).AddMonths(-3);
+            var fromDate = stories.Where(x => x.Ended.HasValue).Max(x => x.Ended.Value).AddMonths(-3);
             var cfa = new CumulativeFlowAnalysis(stories, stateFiltering.FilteredStates, fromDate);
 
             SeriesCollection.Clear();

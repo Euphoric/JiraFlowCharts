@@ -24,16 +24,27 @@ namespace Jira.FlowCharts.IssuesGrid
             DisplayName = "Issues grid";
 
             Issues = new ObservableCollection<dynamic>();
+
+            _currentProject.ProjectKeyChanged += async (sender, args) =>
+            {
+                if (IsActive)
+                    await Update();
+            };
         }
 
         public ObservableCollection<dynamic> Issues { get; }
 
         protected override async Task OnActivateAsync(CancellationToken cancellationToken)
         {
+            await Update();
+        }
+
+        private async Task Update()
+        {
             Issues.Clear();
 
             var stateFilteringParameter = await _stateFilteringProvider.GetStateFilteringParameter();
-            var allIssues = await _tasksSource.GetAllIssues(_currentProject.ProjectKey,stateFilteringParameter);
+            var allIssues = await _tasksSource.GetAllIssues(_currentProject.ProjectKey, stateFilteringParameter);
 
             var mapper = new Mapper(new MapperConfiguration(cfg => { }));
             Issues.AddRange(allIssues.Select(issue => ToDynamicRow(issue, mapper)));

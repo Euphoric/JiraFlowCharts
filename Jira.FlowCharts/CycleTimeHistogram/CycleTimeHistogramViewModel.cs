@@ -45,16 +45,28 @@ namespace Jira.FlowCharts
             _stateFilteringProvider = stateFilteringProvider;
             _currentProject = currentProject;
             DisplayName = "Cycle time histogram";
+
+            _currentProject.ProjectKeyChanged += async (sender, args) =>
+            {
+                if (IsActive)
+                    await Update();
+            };
         }
 
         protected override async Task OnActivateAsync(CancellationToken cancellationToken)
         {
+            await Update();
+        }
+
+        private async Task Update()
+        {
             var stateFilteringParameter = await _stateFilteringProvider.GetStateFilteringParameter();
-            var finishedStories = await _taskSource.GetLatestFinishedStories(_currentProject.ProjectKey, new IssuesFromParameters(_issuesFrom), stateFilteringParameter);
+            var finishedStories = await _taskSource.GetLatestFinishedStories(_currentProject.ProjectKey,
+                new IssuesFromParameters(_issuesFrom), stateFilteringParameter);
 
-            var durations = finishedStories.Select(x => x.DurationDays).OrderBy(x=>x).ToArray();
+            var durations = finishedStories.Select(x => x.DurationDays).OrderBy(x => x).ToArray();
 
-            int max = (int)Math.Ceiling(durations[durations.Length * 99 / 100]);
+            int max = (int) Math.Ceiling(durations[durations.Length * 99 / 100]);
 
             Histogram hist = new Histogram(durations, max, 0, max);
 

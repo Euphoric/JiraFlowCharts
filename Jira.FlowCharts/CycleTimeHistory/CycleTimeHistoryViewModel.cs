@@ -40,23 +40,29 @@ namespace Jira.FlowCharts
             _stateFilteringProvider = stateFilteringProvider;
             _currentProject = currentProject;
             DisplayName = "Cycle time and throughput history";
+
+            _currentProject.ProjectKeyChanged += async (sender, args) =>
+            {
+                if (IsActive)
+                    await Update();
+            };
         }
 
         protected override async Task OnActivateAsync(CancellationToken cancellationToken)
         {
-            Stopwatch watch = Stopwatch.StartNew();
+            await Update();
+        }
 
+        private async Task Update()
+        {
             var stateFilteringParameter = await _stateFilteringProvider.GetStateFilteringParameter();
 
-            var a = watch.Elapsed;
-
-            var latestFinishedStories = await _tasksSource.GetFinishedStories(_currentProject.ProjectKey, stateFilteringParameter);
-
-            var b = watch.Elapsed;
+            var latestFinishedStories =
+                await _tasksSource.GetFinishedStories(_currentProject.ProjectKey, stateFilteringParameter);
 
             var orderedStories = latestFinishedStories.OrderBy(x => x.Ended).ToArray();
 
-            TimeSpan historyWindow = TimeSpan.FromDays(-3*30);
+            TimeSpan historyWindow = TimeSpan.FromDays(-3 * 30);
 
             var endDate = orderedStories.Last().Ended.Date;
             var startDate = endDate.AddYears(-1);
@@ -74,7 +80,7 @@ namespace Jira.FlowCharts
                 var durationsInWindow =
                     orderedStories
                         .Where(x => x.Ended > fromDate && x.Ended <= currentDate)
-                        .Select(x=>x.DurationDays)
+                        .Select(x => x.DurationDays)
                         .ToArray();
 
                 if (durationsInWindow.Length == 0)
@@ -125,7 +131,7 @@ namespace Jira.FlowCharts
                 {
                     Values = new ChartValues<double>(issuesCounts),
                     Fill = Brushes.Transparent,
-                    StrokeDashArray = new DoubleCollection(new double[]{ 4, 2 }),
+                    StrokeDashArray = new DoubleCollection(new double[] {4, 2}),
                     PointGeometry = null,
                     Title = "Issues count",
                     ScalesYAt = 1

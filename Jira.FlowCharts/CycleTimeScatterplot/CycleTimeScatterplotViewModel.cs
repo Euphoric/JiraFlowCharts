@@ -119,15 +119,27 @@ namespace Jira.FlowCharts
             _currentProject = currentProject;
 
             DisplayName = "Cycle time scatterplot";
+
+            _currentProject.ProjectKeyChanged += async (sender, args) =>
+            {
+                if (IsActive)
+                    await Update();
+            };
         }
 
         protected override async Task OnActivateAsync(CancellationToken cancellationToken)
+        {
+            await Update();
+        }
+
+        private async Task Update()
         {
             Stories = new ChartValues<IssuePoint>();
             Bugs = new ChartValues<IssuePoint>();
 
             var stateFilteringParameter = await _stateFilteringProvider.GetStateFilteringParameter();
-            var finishedTasks = await _taskSource.GetLatestFinishedStories(_currentProject.ProjectKey, new IssuesFromParameters(_issuesFrom), stateFilteringParameter);
+            var finishedTasks = await _taskSource.GetLatestFinishedStories(_currentProject.ProjectKey,
+                new IssuesFromParameters(_issuesFrom), stateFilteringParameter);
             foreach (var issue in finishedTasks)
             {
                 var sinceStart = issue.Ended - _baseDate;
@@ -158,7 +170,7 @@ namespace Jira.FlowCharts
             Days7 = dp.PercentileAtDuration(7) * 100;
             Days14 = dp.PercentileAtDuration(14) * 100;
 
-            LabelPoint = x => IssuePointLabel((IssuePoint)x.Instance);
+            LabelPoint = x => IssuePointLabel((IssuePoint) x.Instance);
             Formatter = x => (_baseDate + TimeSpan.FromDays(x)).ToString("d/M/yy", CultureInfo.InvariantCulture);
         }
 

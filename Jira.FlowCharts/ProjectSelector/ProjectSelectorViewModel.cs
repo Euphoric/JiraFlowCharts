@@ -1,4 +1,5 @@
-﻿using System.Collections.ObjectModel;
+﻿using System;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -37,9 +38,18 @@ namespace Jira.FlowCharts.ProjectSelector
         public string SelectedProjectKey
         {
             get => _selectedProjectKey;
-            set => Set(ref _selectedProjectKey, value);
+            set
+            {
+                var changed = Set(ref _selectedProjectKey, value);
+                if (changed)
+                {
+                    ProjectKeyChanged?.Invoke(this, EventArgs.Empty);
+                }
+            }
         }
 
         string ICurrentProject.ProjectKey => SelectedProjectKey;
+
+        public event EventHandler<EventArgs> ProjectKeyChanged;
     }
 }

@@ -18,7 +18,7 @@ namespace Jira.FlowCharts
         private readonly TasksSource _tasksSource;
         private string[] _labels;
         private SeriesCollection _seriesCollection;
-        private DateTime _issuesFrom;
+        private readonly DateTime _issuesFrom;
         private readonly IStateFilteringProvider _stateFilteringProvider;
         private readonly ICurrentProject _currentProject;
 
@@ -41,12 +41,24 @@ namespace Jira.FlowCharts
             _stateFilteringProvider = stateFilteringProvider;
             _currentProject = currentProject;
             DisplayName = "Story point vs. cycle time";
+
+            _currentProject.ProjectKeyChanged += async (sender, args) =>
+            {
+                if (IsActive)
+                    await Update();
+            };
         }
 
         protected override async Task OnActivateAsync(CancellationToken cancellationToken)
         {
+            await Update();
+        }
+
+        private async Task Update()
+        {
             var stateFilteringParameter = await _stateFilteringProvider.GetStateFilteringParameter();
-            var storyPointGrouped = (await _tasksSource.GetLatestFinishedStories(_currentProject.ProjectKey, new IssuesFromParameters(_issuesFrom), stateFilteringParameter))
+            var storyPointGrouped = (await _tasksSource.GetLatestFinishedStories(_currentProject.ProjectKey,
+                    new IssuesFromParameters(_issuesFrom), stateFilteringParameter))
                 .Where(x => x.StoryPoints.HasValue)
                 .Where(x => x.StoryPoints.Value > 0)
                 .GroupBy(x => x.StoryPoints.Value)
@@ -80,14 +92,13 @@ namespace Jira.FlowCharts
                 },
                 new LineSeries
                 {
-                    Values = new ChartValues<double>(storyPointGrouped.Select(x=>(double)x.Average)),
+                    Values = new ChartValues<double>(storyPointGrouped.Select(x => (double) x.Average)),
                     Fill = Brushes.Transparent,
                     Title = "Average cycle time"
-                }
-                ,
+                },
                 new LineSeries
                 {
-                    Values = new ChartValues<double>(storyPointGrouped.Select(x=>(double)x.Count)),
+                    Values = new ChartValues<double>(storyPointGrouped.Select(x => (double) x.Count)),
                     Fill = Brushes.Transparent,
                     Title = "Issue count"
                 }
