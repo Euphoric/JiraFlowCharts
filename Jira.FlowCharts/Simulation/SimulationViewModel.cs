@@ -14,7 +14,8 @@ namespace Jira.FlowCharts
     {
         private readonly TasksSource _taskSource;
         private double _storyCreationRate;
-        private int _simulatedStoriesCount;
+        private int _simulatedStoriesCountMin;
+        private int _simulatedStoriesCountMax;
 
         public double StoryCreationRate { get => _storyCreationRate; private set => this.RaiseAndSetIfChanged(ref _storyCreationRate, value); }
 
@@ -33,10 +34,16 @@ namespace Jira.FlowCharts
 
         public ReactiveCommand<Unit, Simulation.FlowSimulationStatisticOutput> RunSimulation { get; }
 
-        public int SimulatedStoriesCount
+        public int SimulatedStoriesCountMin
         {
-            get => _simulatedStoriesCount;
-            set => this.RaiseAndSetIfChanged(ref _simulatedStoriesCount, value);
+            get => _simulatedStoriesCountMax;
+            set => this.RaiseAndSetIfChanged(ref _simulatedStoriesCountMax, value);
+        }
+
+        public int SimulatedStoriesCountMax
+        {
+            get => _simulatedStoriesCountMin;
+            set => this.RaiseAndSetIfChanged(ref _simulatedStoriesCountMin, value);
         }
 
         public SimulationViewModel(TasksSource taskSource, DateTime issuesFrom, IStateFilteringProvider stateFilteringProvider, ICurrentProject currentProject)
@@ -47,7 +54,8 @@ namespace Jira.FlowCharts
             _currentProject = currentProject;
             DisplayName = "Simulation";
 
-            SimulatedStoriesCount = 10;
+            SimulatedStoriesCountMin = 10;
+            SimulatedStoriesCountMax = 15;
 
             RunSimulation = ReactiveCommand.CreateFromTask(RunSimulationInner);
             RunSimulation.ToProperty(this, nameof(SimulationOutput), out _simulationOutput);
@@ -73,7 +81,7 @@ namespace Jira.FlowCharts
             StoryCreationRate = finishedStories.Count() / (to - from).TotalDays;
             var cycleTimes = finishedStories.Select(x => x.DurationDays).ToArray();
 
-            Simulation.FlowSimulationStatisticOutput simStats = await Task.Run(() => Simulation.FlowSimulationStatistics.RunSimulationStatistic(StoryCreationRate, cycleTimes, 20000, SimulatedStoriesCount));
+            Simulation.FlowSimulationStatisticOutput simStats = await Task.Run(() => Simulation.FlowSimulationStatistics.RunSimulationStatistic(StoryCreationRate, cycleTimes, 20000, SimulatedStoriesCountMin, SimulatedStoriesCountMax));
             return simStats;
         }
 

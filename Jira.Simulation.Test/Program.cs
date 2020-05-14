@@ -21,7 +21,7 @@ namespace Jira.Simulation.Test
                 if (i%1000 == 0)
                     Console.WriteLine(i);
 
-                FlowSimulationStatisticOutput stats = FlowSimulationStatistics.RunSimulationStatistic(1, new double[] { 1, 2, 2, 3 }, 1000, 10);
+                FlowSimulationStatisticOutput stats = FlowSimulationStatistics.RunSimulationStatistic(1, new double[] { 1, 2, 2, 3 }, 1000, 8, 12);
                 runsStats.Add(stats);
             }
 
@@ -49,7 +49,7 @@ namespace Jira.Simulation.Test
 
             File.WriteAllLines("out.csv", distances.Select(x=>x.ToString(CultureInfo.InvariantCulture)));
 
-            FlowSimulationStatisticOutput statsTest = FlowSimulationStatistics.RunSimulationStatistic(1, new double[] { 1, 2, 2, 3 }, 10000, 10);
+            FlowSimulationStatisticOutput statsTest = FlowSimulationStatistics.RunSimulationStatistic(1, new double[] { 1, 2, 2, 3 }, 10000, 8, 12);
 
             var testDistance = HistogramDistance(totalHistogram, statsTest.NormalizedHistogram());
 

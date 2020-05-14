@@ -19,7 +19,9 @@
             </TextBlock>
             <StackPanel Orientation="Horizontal" Margin="4">
                 <Label Margin="0" Padding="0">Stories to simulate:</Label>
-                <TextBox Text="{Binding SimulatedStoriesCount}" />
+                <TextBox Text="{Binding SimulatedStoriesCountMin}" />
+                <Label Margin="0" Padding="0">-</Label>
+                <TextBox Text="{Binding SimulatedStoriesCountMax}" />
             </StackPanel>
             <Button Command="{Binding RunSimulation}" Margin="4">Run</Button>
         </StackPanel>

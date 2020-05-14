@@ -1,19 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using MathNet.Numerics.Distributions;
 using MathNet.Numerics.Statistics;
 
 namespace Jira.FlowCharts.Simulation
 {
     public static class FlowSimulationStatistics
     {
-        public static FlowSimulationStatisticOutput RunSimulationStatistic(double newStoryRate, double[] storyCycleTimes, int simulationRuns, int expectedCompletedStories)
+        public static FlowSimulationStatisticOutput RunSimulationStatistic(double newStoryRate, double[] storyCycleTimes, int simulationRuns, int expectedCompletedStoriesMin, int expectedCompletedStoriesMax)
         {
             List<double> simulationTimes = new List<double>();
             List<double> avgWorkInProgress = new List<double>();
+            DiscreteUniform completedStoriesDistribution = new DiscreteUniform(expectedCompletedStoriesMin, expectedCompletedStoriesMax);
+
             for (int i = 0; i < simulationRuns; i++)
             {
-                var simulation = new FlowSimulation(newStoryRate, storyCycleTimes, expectedCompletedStories);
+                var simulation = new FlowSimulation(newStoryRate, storyCycleTimes, completedStoriesDistribution.Sample());
                 simulation.Run();
 
                 simulationTimes.Add(simulation.SimulationTime);
